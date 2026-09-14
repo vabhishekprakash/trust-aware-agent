@@ -24,7 +24,6 @@ reports; bucket and grade appear there only, never on the live path.
 
 A common misconception: the page's number is the number the report
 measured. It is the shipped artifact's, refit on all of dev and capped;
-the report's metrics are out of fold, and the page says so.
-
-Summary: one page, three endpoints, the measured system at its real cost,
-and the report's caveats printed where the number is.
+the report's metrics are out of fold; the page says so.
+Summary: one page, three endpoints, the measured system at its real
+cost, the report's caveats printed where the number is.
