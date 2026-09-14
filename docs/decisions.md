@@ -587,11 +587,11 @@ by v12 after the owner's grades were seen: reported in the next section.
 ## Sheet 2 in the report: 80 percent blind, decomposed
 
 Sheet 2 stands in the report as 80 percent blind agreement under v10, 20 of
-25. It decomposes into one grader defect, fixed in v11 (sheet 15); one
-noise flip on an ambiguous item that has since been dropped as a duplicate
-(sheet 10, q0115); and three instances of one underspecified rule, the
-bare abstention on a false premise, now resolved as PARTIAL (sheets 13, 14
-and 17). The 84 percent that v11 reached on the same sheet after the
+25. It decomposes into three parts. One grader defect, fixed in v11 (sheet
+15). One noise flip on an ambiguous item that has since been dropped as a
+duplicate (sheet 10, q0115). Three instances of one underspecified rule,
+the bare abstention on a false premise, now resolved as PARTIAL (sheets 13,
+14 and 17). The 84 percent that v11 reached on the same sheet after the
 owner's grades were seen is rubric fidelity, not a blind figure, and is not
 presented as one. There is no third sheet now. The grader's signed-off
 number will be a final blind check of about 20 real agent outputs at M8,

@@ -308,11 +308,11 @@ final report says so.
 
 Genuinely ambiguous questions proved rare. The bucket ended at 18 items
 against a planned 40, after a dominant-reading pass and the owner's rulings
-removed items where one reading was what any reader would mean, so
-conclusions about clarification behaviour rest on a small sample.
+removed items where one reading was what any reader would mean. Conclusions
+about clarification behaviour therefore rest on a small sample.
 
 The grader's signed-off number is not any of the checks above. They gate
-mass grading; the figure the final report stands on is a last blind check
+mass grading. The figure the final report stands on is a last blind check
 of about 20 real agent outputs at M8, graded by the owner without seeing
 the judge, on the grader version that graded the dev set.
 
@@ -431,13 +431,13 @@ examples where v7 had them: 21 of 21 labels, no flip that changes a label.
 2026-09-10, later. The owner settled the false-premise rule: a bare
 abstention is PARTIAL, after ruling WRONG on the first sheet, conceding
 CORRECT, and grading three sheet-2 items WRONG on instinct. Grader v12
-applies it. Sheet 2 stands in the report as 80 percent blind under v10,
-decomposed as one grader defect fixed in v11, one noise flip on a dropped
-item, and three instances of that one rule now resolved; regraded by v12
+applies it. Sheet 2 stands in the report as 80 percent blind under v10. It
+decomposes as one grader defect fixed in v11, one noise flip on a dropped
+item, and three instances of that one rule now resolved. Regraded by v12
 after the owner's grades were seen it reads 24 of 25, which is rubric
 fidelity, not a blind figure. No third sheet; the signed-off grader number
 comes from the final blind check of about 20 real agent outputs at M8. The
-owner extended the four rules from the twelve calls, the ambiguous bucket
-ended at 18, and the set was locked at 200 (92 answerable, 18 ambiguous,
-50 unanswerable, 40 false premise) and split 100 dev, 100 test, stratified
-with seed 42 (reports/split-summary.md).
+owner extended the four rules from the twelve calls and the ambiguous
+bucket ended at 18. The set was locked at 200 (92 answerable, 18
+ambiguous, 50 unanswerable, 40 false premise) and split 100 dev, 100 test,
+stratified with seed 42 (reports/split-summary.md).
