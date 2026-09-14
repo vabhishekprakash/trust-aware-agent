@@ -30,6 +30,10 @@ demo = ["playwright>=1.45"]
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# requirements.txt is generated from this file; the exact command is recorded
+# in its header. It pins torch from the PyTorch CPU index because the default
+# PyPI wheel on Linux is the CUDA build, several gigabytes the project does not use.
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

@@ -22,11 +22,16 @@ local model.
     python -m venv .venv
     .venv\Scripts\activate          # Windows
     source .venv/bin/activate       # macOS or Linux
-    pip install -e ".[dev]"
+    pip install -r requirements.txt
+    pip install -e . --no-deps
     sh scripts/hooks/install-hooks.sh
     ollama pull qwen2.5:3b-instruct
     python scripts/check_logprobs.py
     pytest
+
+Install from requirements.txt rather than from the package alone. It pins the
+CPU build of PyTorch. On Linux the default wheel is the CUDA build, several
+gigabytes this project never uses.
 
 The hook install step matters. It copies the commit-msg and pre-push hooks into
 .git/hooks, which git does not track. The commit-msg hook strips co-author
