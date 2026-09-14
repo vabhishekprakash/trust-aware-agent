@@ -19,19 +19,27 @@ import sys
 import time
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIDENT = "What is AS9100 and which industry was it created for?"
 ESCALATED = "Which NASA requirements document must software development follow when the technical team makes or codes a product?"
 
 
+def caption_font(size: int = 16) -> ImageFont.FreeTypeFont:
+    """A real TrueType face. Pillow's built-in bitmap font drops space advances at small sizes, which ran words together."""
+    import matplotlib
+
+    return ImageFont.truetype(str(Path(matplotlib.get_data_path()) / "fonts" / "ttf" / "DejaVuSans.ttf"), size)
+
+
 def caption(png: bytes, text: str) -> Image.Image:
     img = Image.open(io.BytesIO(png)).convert("RGB")
     draw = ImageDraw.Draw(img)
     w, h = img.size
-    draw.rectangle([0, h - 34, w, h], fill=(28, 28, 28))
-    draw.text((12, h - 26), text, fill=(255, 255, 255))
+    font = caption_font()
+    draw.rectangle([0, h - 40, w, h], fill=(28, 28, 28))
+    draw.text((12, h - 30), text, fill=(255, 255, 255), font=font)
     return img
 
 

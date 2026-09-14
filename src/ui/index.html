@@ -110,7 +110,9 @@ function render(r) {
   $("response").textContent = r.response;
   $("conf").textContent = pct(r.confidence);
   $("confbar").style.width = pct(r.confidence);
-  $("cap-mark").style.left = pct(r.display_cap);
+  const capMark = $("cap-mark");
+  capMark.style.left = pct(r.display_cap);
+  capMark.style.display = r.confidence < r.display_cap ? "block" : "none";  // the tick only when it adds information
   $("note").textContent = r.note;
   $("capline").textContent = "Shown value capped at " + pct(r.display_cap) + " (uncapped " + pct(r.confidence_uncapped) + "). The shipped calibrator is refit on all 134 dev items; the report's metrics are out of fold, and the two differ by 0.09 on average. The cap is a presentation guard, not a fix." + (r.gated ? "" : " The policy did not gate this output: the agent's own action stands.");
   $("families").innerHTML = r.families.filter(f => Math.abs(f.log_odds) >= 0.05).map(f => `<span>${f.family}</span><b>${f.log_odds > 0 ? "+" : ""}${f.log_odds.toFixed(2)}</b>`).join("");
