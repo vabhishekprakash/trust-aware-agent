@@ -311,7 +311,7 @@ it could not point at identical words. v5 put a copying hint on every
 question and marked the candidate with delimiters. The judge stayed literal,
 and a loose matching rule let a copy of the question text pass as a copy of
 the draft. v6 separated the two jobs. The yes-or-no call is the v3 prompt
-again, and each YES then goes back to the judge as a small copying task,
+again. Each YES then goes back to the judge as a small copying task,
 "copy the exact words in this text that ...", checked by code. Recall came
 back and no flip changed a label. v7 lets code settle a YES itself when the
 draft contains the claimed answer, an alias, or its acronym. The copying
@@ -340,46 +340,48 @@ the owner was stricter than the judge in six cases and more lenient in one.
 Read one by one, the seven disagreements split into one judge error and six
 rubric gaps. The judge error: an abstention on an unanswerable item ("the
 passage does not provide information about the dollar cost cap...") went to
-the judge because a capitalised name followed the refusal, and the judge
+the judge because a capitalised name followed the refusal. The judge then
 answered that the draft offers an answer. The rubric gaps, which the guide
-does not settle and the owner's grades do: three abstentions phrased as
-"the passage does not provide" rather than the handbook, one of them adding
-a wrong expansion of PDR and one adding a false claim about what the
-handbook mentions, which the owner graded PARTIAL and the grader CORRECT;
-one bare abstention on a false-premise item, CORRECT by the guide's table
-and WRONG to the owner; one right answer padded with claims from outside
-the handbook (the Aerospace Industries Association, defence), CORRECT to
-the grader and PARTIAL to the owner; and one ambiguous item whose one-sided
-answer the owner graded CORRECT, reading the item as having a natural
-answer. Those six are decisions for the owner before the grader changes.
+did not settle and the owner's grades did, were four kinds. Three
+abstentions were phrased as "the passage does not provide" rather than the
+handbook; one of them added a wrong expansion of PDR and one added a false
+claim about what the handbook mentions. The owner graded those PARTIAL and
+the grader CORRECT. One bare abstention on a false-premise item was CORRECT
+by the guide's table and WRONG to the owner. One right answer was padded
+with claims from outside the handbook (the Aerospace Industries Association,
+defence), CORRECT to the grader and PARTIAL to the owner. One ambiguous item
+drew a one-sided answer that the owner graded CORRECT, reading the item as
+having a natural answer. Those six were decisions for the owner before the
+grader changed; the rulings follow below.
 
 Item check. The owner labelled 40 held-back items from the handbook alone.
-Bucket agreement 37 of 40, 92 percent: answerable 14 of 14, and the owner's
-answer contained the gold answer or an alias every time; unanswerable 10 of
-10; false premise 8 of 8, corrections matching the drafted fix; ambiguous 5
-of 8. The three misses were drafted as ambiguous and read as answerable:
-the second reading rested on a distinction the handbook draws (Concept of
-Operations against Operations Concept, MOEs against MOPs, requirements
-validation against product validation) that a user asking the question
-would not have in mind. In two of the three the owner noted the near-call.
-That is the failure the guide names, "if one reading is clearly what any
-reader would mean, the item is not ambiguous", and it is the bucket to
-re-read across all candidates during the review. Unanswerable, which the
-owner expected to be the shakiest bucket, matched on every item.
+Bucket agreement was 37 of 40, 92 percent. Answerable 14 of 14, and the
+owner's answer contained the gold answer or an alias every time.
+Unanswerable 10 of 10. False premise 8 of 8, with corrections matching the
+drafted fix. Ambiguous 5 of 8. The three misses were drafted as ambiguous
+and read as answerable. The second reading rested on a distinction the
+handbook draws that a user asking the question would not have in mind:
+Concept of Operations against Operations Concept, MOEs against MOPs,
+requirements validation against product validation. In two of the three the
+owner noted the near-call. That is the failure the guide names: "if one
+reading is clearly what any reader would mean, the item is not ambiguous".
+It is the bucket to re-read across all candidates during the review.
+Unanswerable, which the owner expected to be the shakiest bucket, matched on
+every item.
 
 Both figures are measured limitations and go into the final report as they
 stand.
 
 ## Owner's rulings on the seven disagreements, 2026-09-09
 
-Sheet 18 was a judge defect and is fixed: the specifics trigger after a
+Sheet 18 was a judge defect and is fixed. The specifics trigger after a
 refusal now fires only on names and figures the question itself did not
 mention, because a capitalised phrase echoed from the question is not an
 invented answer.
 
-Sheets 3 and 5 stay PARTIAL, as the owner graded, under a new rule: an
-abstention scoped to "the passage" stays CORRECT, and an abstention carrying
-a positive assertion that is false, including an invented expansion of an
+Sheets 3 and 5 stay PARTIAL, as the owner graded, under a new rule. An
+abstention scoped to "the passage" stays CORRECT. An abstention carrying a
+positive assertion that is false, including an invented expansion of an
 acronym, is PARTIAL.
 
 Sheet 34 the owner withdrew: same scoped wording as sheet 18, so CORRECT.
@@ -393,8 +395,8 @@ not support, and a correct answer padded with outside claims is PARTIAL.
 Sheet 16 the owner withdrew: a bare abstention on a false premise fails safe
 and stays CORRECT, as the guide's table said. The owner's stricter reading,
 that a refusal which neither rejects the premise nor answers should be
-WRONG, is recorded here as the alternative, and the final report will show
-the sensitivity of the results to it.
+WRONG, is recorded here as the alternative. The final report will show the
+sensitivity of the results to it.
 
 Sheet 19: the guide's rule stands, one reading without the other is
 PARTIAL. The disagreement is an item problem and is handled in the
@@ -402,7 +404,7 @@ ambiguous pass below.
 
 The fixed grader is v8. Rerun on the same 40 drafts, and scored against the
 owner's grades with the two withdrawals applied, it gives a rubric-fidelity
-figure, not a blind one: it measures how faithfully the fixed grader follows
+figure, not a blind one. It measures how faithfully the fixed grader follows
 the rubric the owner settled, on the drafts the fix was designed against.
 The 82 percent first-pass figure stands as the blind number. A second sheet
 of 25 fresh drafts, drawn the same way, gives the honest post-fix agreement
@@ -412,16 +414,16 @@ once the owner has graded it blind.
 
 The blind item check put the item problem in the ambiguous bucket, so every
 ambiguous candidate was tested against one question: would a person asking
-this question have both readings in mind? Of 39 items, 20 hold up, 4 move
-to answerable (the owner's three blind labels and q0124, where the owner's
-grade on the grader check took the Flight Readiness Review as the natural
-answer), 3 are duplicates the code check missed and are dropped, and 12 are
-close calls left to the owner in reports/ambiguous-calls.md, since language
-model verifiers produced the problem and the author of the pass is one too.
-The bucket will end between 20 and 32 items depending on those calls, so
-the 40-item target for ambiguous is out of reach without more drafting; the
-200-item plan (70/40/50/40) may need to accept fewer ambiguous items or a
-second drafting round for that bucket only.
+this question have both readings in mind? Of 39 items, 20 hold up. Four
+move to answerable: the owner's three blind labels, and q0124, where the
+owner's grade on the grader check took the Flight Readiness Review as the
+natural answer. Three are duplicates the code check missed and are dropped.
+Twelve are close calls left to the owner in reports/ambiguous-calls.md,
+since language model verifiers produced the problem and the author of the
+pass is one too. The bucket will end between 20 and 32 items depending on
+those calls, so the 40-item target for ambiguous is out of reach without
+more drafting. The 200-item plan (70/40/50/40) needs either fewer ambiguous
+items or a second drafting round for that bucket only.
 
 ## M2 must implement CLARIFY and ABSTAIN as real actions
 

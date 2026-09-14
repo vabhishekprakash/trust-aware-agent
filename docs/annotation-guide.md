@@ -109,18 +109,18 @@ the answer, and a CLARIFY again if the whole draft is one short question.
 Anything else is an ANSWER. The patterns handle the clear cases; the judge in
 stage 4 reads the unclear ones. On the unanswerable and false-premise buckets
 the rules accept an ABSTAIN only when nothing specific follows the refusal
-phrase that the question itself did not mention. If the words after it
-contain a digit, a number word such as "million", a month, or a capitalised
-name mid-sentence that is new relative to the question, the draft may be a
-refusal carrying an invented answer. It goes to the judge instead. A name or
-figure echoed from the question is not an invented answer. A refusal that
-goes on to offer a figure is PARTIAL, which the strict rule turns into label
-0. A user would act on that figure, and it is the failure this project
-exists to catch. A refusal scoped to "the passage" the agent was given,
-with nothing added, is CORRECT. A refusal that carries a positive assertion
-that is false or unsupported, such as an invented expansion of an acronym or
-a claim about what the handbook does or does not cover, is PARTIAL. These
-are the owner's rulings of 2026-09-09.
+phrase that the question itself did not mention. The trigger is a digit, a
+number word such as "million", a month, or a capitalised name mid-sentence,
+and only when the question did not already mention it. Such a draft may be
+a refusal carrying an invented answer, so it goes to the judge instead. A
+name or figure echoed from the question is not an invented answer. A
+refusal that goes on to offer a figure is PARTIAL, which the strict rule
+turns into label 0. A user would act on that figure, and it is the failure
+this project exists to catch. A refusal scoped to "the passage" the agent
+was given, with nothing added, is CORRECT. A refusal that carries a positive
+assertion that is false or unsupported is PARTIAL. An invented expansion of
+an acronym, or a claim about what the handbook does or does not cover,
+counts. These are the owner's rulings of 2026-09-09.
 
 Stage 3, exact check. For an ANSWER draft with a gold answer, if the
 normalised draft equals the gold answer or an alias, the grade is CORRECT and
@@ -293,14 +293,13 @@ final report says so.
 
 A second limitation is a confounder, not a footnote. In the grader check the
 model under test was right on every answerable item when its own evidence
-passage was in front of it (6 of 6) and on almost none without it (1 of 8).
+passage was in front of it, 6 of 6. Without it, it was right on 1 of 8.
 Whether the agent answers correctly is therefore decided mostly by whether
-retrieval found the right passage, so much of the variance the calibrator
-sees, and much of what the confidence signals will pick up, is retrieval
-quality rather than the model's judgement about its own answer. The final
-report must separate the two where it can, for example by reporting
-calibration with retrieval quality held fixed, and must say so where it
-cannot.
+retrieval found the right passage. Much of the variance the calibrator sees,
+and much of what the confidence signals pick up, is retrieval quality rather
+than the model's judgement of its own answer. The final report must separate
+the two where it can, for example by reporting calibration with retrieval
+quality held fixed, and must say so where it cannot.
 
 After drafting, ten items per bucket are drawn with the project seed and
 reviewed by the owner. Each is marked keep, fix, or drop. Fixes are applied
@@ -339,7 +338,7 @@ flips among the drafts the judge saw.
 
 Sign-off on the examples is not the last word. Mass grading is gated on the
 blind grader check in reports/grader-check-sheet.md reaching about 90
-percent agreement with the owner on the binary label; below that the grader
+percent agreement with the owner on the binary label. Below that the grader
 is fixed first, whatever the table says. Nothing in data/eval is locked and
 no split is made until the owner has returned both blind sheets and the
 review sample.
@@ -349,14 +348,16 @@ model drafts and agreed with the judge on the binary label on 32 of 39, 82
 percent (reports/grader-check-result.md). That is below the bar, so grader
 v7 is not signed off in practice and mass grading waits. One of the seven
 disagreements is a judge error (an abstention on an unanswerable item
-graded as an answer). The other six are rubric questions the owner's grades
-raise and this guide does not yet settle: an abstention that refers to "the
-passage" rather than the handbook, or adds an invented detail; a bare
-abstention on a false-premise question; a right answer padded with claims
-from outside the handbook; and one ambiguous item the owner read as having
-one natural answer. Item check: the owner's bucket matched the drafted
-bucket on 37 of 40 items, 92 percent (reports/item-check-result.md);
-answerable 14 of 14 with the owner's answer matching the gold or an alias
-every time, unanswerable 10 of 10, false premise 8 of 8, ambiguous 5 of 8.
-The three misses were drafted as ambiguous and read as answerable by the
-owner. Both figures go into the final report as measured limitations.
+graded as an answer). The other six were rubric questions the owner's
+grades raised and this guide did not then settle. They were: an abstention
+that refers to "the passage" rather than the handbook, or adds an invented
+detail; a bare abstention on a false-premise question; a right answer padded
+with claims from outside the handbook; and one ambiguous item the owner read
+as having one natural answer. The rulings that settled them are in stage 2
+and stage 4 above and in docs/decisions.md. Item check: the owner's bucket
+matched the drafted bucket on 37 of 40 items, 92 percent
+(reports/item-check-result.md). Answerable 14 of 14, with the owner's answer
+matching the gold or an alias every time; unanswerable 10 of 10; false
+premise 8 of 8; ambiguous 5 of 8. The three misses were drafted as ambiguous
+and read as answerable by the owner. Both figures go into the final report
+as measured limitations.
