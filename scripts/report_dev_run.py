@@ -48,6 +48,7 @@ def main() -> int:
     parser.add_argument("--rows", default=str(ROOT / "reports" / "dev-run-v1.jsonl"))
     parser.add_argument("--out", default=str(ROOT / "reports" / "dev-run-v1.md"))
     parser.add_argument("--grading-note", default="", help="one sentence about how the grading pass went, appended to the wall clock section")
+    parser.add_argument("--previous", default="", help="rows from an earlier grader on the same traces; adds a before-and-after section per bucket")
     args = parser.parse_args()
     rows = [json.loads(l) for l in Path(args.rows).read_text(encoding="utf-8").splitlines() if l.strip()]
     manifest = json.loads(Path(args.rows).with_name(Path(args.rows).stem + "-manifest.json").read_text(encoding="utf-8"))
@@ -60,7 +61,7 @@ def main() -> int:
     lines = [
         "# Dev run v1, untuned",
         "",
-        f"Agent: {run['model']}, k={run['k']}, abstain threshold {run['abstain_threshold']} (unset, so the ABSTAIN rule never fired), "
+        f"Agent: {run['model']}, k={run['k']}, no retrieval-score abstain rule (unset in this run and dropped after it), "
         f"trace {run['trace_version']}. Graded by {manifest['grader_version']} with judge {manifest['judge']}. "
         f"{n_all} dev items; the test split was not read. The ambiguous bucket has {len(by_bucket['ambiguous'])} dev items, "
         "so its numbers are indicative only.",
@@ -107,7 +108,8 @@ def main() -> int:
         lines.append(f"- What the draft behind those CLARIFYs would have scored: " + ", ".join(f"{g} {dg[g]}" for g in GRADES) + ".")
         artefact = [r for r in clar if any(p["answer"].strip().upper().startswith("ONE READING") for p in r["readings"]["parsed"])]
         lines.append(f"- Items where a listed 'answer' was the words ONE READING, a format slip the parser took as a reading: {len(artefact)}"
-                     + (f" ({', '.join(r['item_id'] for r in artefact)}). Without them the rate is {pct(len(clar) - len(artefact), len(ans))}." if artefact else "."))
+                     + (f" ({', '.join(r['item_id'] for r in artefact)}). Without them the rate is {pct(len(clar) - len(artefact), len(ans))}. "
+                        "The parser was fixed after this run and the run was not repeated, so the measured rate is the higher one and the real rate is nearer the lower." if artefact else "."))
         lines.append("- The readings the model listed on those items:")
         for r in clar:
             lines.append(f"  - {r['item_id']}: {r['question']}")
@@ -187,6 +189,28 @@ def main() -> int:
         lines.append("- The guide grades a CLARIFY that names the two readings CORRECT. The judge did not read the composed question as "
                      "asking which reading is meant. A code rule for that case is a grader change and needs the 21 examples and both "
                      "rubric-fidelity sheets rerun before it is used; these grades stand as v12 gave them.")
+
+    # before and after a grader change, on the same traces
+    if args.previous:
+        prev_rows = {json.loads(l)["item_id"]: json.loads(l) for l in Path(args.previous).read_text(encoding="utf-8").splitlines() if l.strip()}
+        prev_manifest = json.loads(Path(args.previous).with_name(Path(args.previous).stem + "-manifest.json").read_text(encoding="utf-8"))
+        old_v, new_v = prev_manifest["grader_version"], manifest["grader_version"]
+        lines += ["", f"## Regrade: {old_v} against {new_v} on the same traces", "",
+                  f"Same drafts, same actions; only the grader changed. {old_v} numbers are kept here, labelled, next to {new_v}.", "",
+                  f"| bucket | n | {old_v} CORRECT / PARTIAL / WRONG | {new_v} CORRECT / PARTIAL / WRONG | items changed |", "|---|---|---|---|---|"]
+        changed_all = []
+        for b in BUCKETS:
+            rs = by_bucket[b]
+            oc = Counter(prev_rows[r["item_id"]]["grade"]["grade"] for r in rs)
+            nc = Counter(r["grade"]["grade"] for r in rs)
+            changed = [(r["item_id"], prev_rows[r["item_id"]]["grade"]["grade"], r["grade"]["grade"]) for r in rs if prev_rows[r["item_id"]]["grade"]["grade"] != r["grade"]["grade"]]
+            changed_all += changed
+            lines.append(f"| {b} | {len(rs)} | {oc['CORRECT']} / {oc['PARTIAL']} / {oc['WRONG']} | {nc['CORRECT']} / {nc['PARTIAL']} / {nc['WRONG']} | {len(changed)} |")
+        flips = [c for c in changed_all if (c[1] == "CORRECT") != (c[2] == "CORRECT")]
+        lines += ["", f"Items whose grade changed: {len(changed_all)}; binary label flips: {len(flips)}."]
+        for item_id, o, n in changed_all:
+            row = next(r for r in rows if r["item_id"] == item_id)
+            lines.append(f"- {item_id} ({row['bucket']}, {row['action']}): {o} -> {n}, decided by {prev_rows[item_id]['grade']['decided_by']} then {row['grade']['decided_by']}. Response: {row['response']}")
 
     # best score distribution for the threshold discussion
     lines += ["", "## Best retrieval score, for choosing the abstain threshold", "", "Nothing was tuned in this run. Per bucket, then by grade label among items where the agent answered.", ""]

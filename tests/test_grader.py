@@ -275,8 +275,8 @@ def test_abstains_and_flags_are_grounded_by_the_code_patterns():
     assert r["judge_ungrounded"] == [["answers"], ["answers"]]
     assert r["grade"] == "CORRECT"
     judge = both(True, False, False, extract=no_extraction)
-    r = grade(AMBIGUOUS, "Do you mean the review before Phase B or before Phase C?", judge=judge)
-    assert r["grade"] == "CORRECT"
+    r = grade(AMBIGUOUS, "Do you mean the review before Phase B or some other review?", judge=judge)
+    assert r["decided_by"] == "judge" and r["grade"] == "CORRECT"
     assert r["judge_quotes"][0]["flags"].lower() == "do you mean"
 
 
@@ -683,9 +683,13 @@ def test_false_premise_reject_correct_and_build_wrong():
 
 
 def test_ambiguous_clarify_that_names_both_readings_is_correct():
+    # v13: decided in code, the judge is not called
+    r = grade(AMBIGUOUS, "Do you mean the review before Phase B or before Phase C?", judge=never_called)
+    assert (r["decided_by"], r["grade"]) == ("rules", "CORRECT")
+    # naming one reading still goes to the judge, whose questions carry both readings
     judge = both(True, False, False)
-    r = grade(AMBIGUOUS, "Do you mean the review before Phase B or before Phase C?", judge=judge)
-    assert r["grade"] == "CORRECT"
+    r = grade(AMBIGUOUS, "Do you mean the review before Phase B or some other review?", judge=judge)
+    assert (r["decided_by"], r["grade"]) == ("judge", "CORRECT")
     prompt = judge.question_calls()[0][-1]["content"]
     assert "before Phase C" in prompt and "before Phase B" in prompt
 
@@ -768,3 +772,43 @@ def test_record_carries_identity_version_form_and_reason():
     assert r["grader_version"] == GRADER_VERSION
     assert r["reason"]
     assert set(r) >= {"judge_grades", "judge_answers", "judge_quotes", "judge_ungrounded", "judge_outputs", "flag", "judge_model", "decided_by", "label"}
+
+
+READINGS_ITEM = {
+    "id": "amb1",
+    "bucket": "ambiguous",
+    "question": "Who is the customer whose expectations a systems engineer has to capture at the start of the design processes?",
+    "readings": [
+        {"reading": "a systems engineer working at the top level of the Product Breakdown Structure", "answer": "the person or organization purchasing the product", "page": "46"},
+        {"reading": "a systems engineer working several levels down in the Product Breakdown Structure", "answer": "the leader of the team that takes the element and integrates it into a larger assembly", "page": "46"},
+    ],
+    "evidence": [],
+}
+
+
+def test_clarify_alternatives_splits_a_composed_question():
+    from calibration.grader import clarify_alternatives
+
+    assert clarify_alternatives("Do you mean the project SEMP, or the program SEMP?") == ["the project SEMP", "the program SEMP"]
+    assert clarify_alternatives("Both are held in Phase A. Do you mean the requirements review or the architecture review that follows it?") == [
+        "the requirements review", "the architecture review that follows it"]
+    assert clarify_alternatives("The Program Manager approves it.") == []
+
+
+def test_a_clarify_that_names_both_readings_is_correct_by_rule():
+    draft = "Do you mean Systems engineer at topmost level of project, or Systems engineer working three or four levels down in PBS?"
+    r = grade(READINGS_ITEM, draft, judge=never_called)
+    assert (r["decided_by"], r["grade"], r["label"]) == ("rules", "CORRECT", 1)
+
+
+def test_a_clarify_that_names_one_reading_goes_to_the_judge():
+    from calibration.grader import names_readings
+
+    assert not names_readings("Do you mean the purchasing organization, or something else?", READINGS_ITEM["readings"])
+    assert not names_readings("Do you mean the customer, or the customer's expectations?", READINGS_ITEM["readings"])
+    assert not names_readings("Which customer do you mean?", READINGS_ITEM["readings"])
+
+
+def test_a_clarify_on_an_answerable_item_is_still_wrong():
+    r = grade(ANSWERABLE, "Do you mean the project manager, or the program manager?", judge=never_called)
+    assert (r["decided_by"], r["grade"]) == ("rules", "WRONG")

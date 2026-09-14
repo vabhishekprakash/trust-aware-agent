@@ -42,7 +42,6 @@ def main() -> int:
     parser.add_argument("--show", default="", help="print this item's trace in full")
     parser.add_argument("--model", default="qwen2.5:3b-instruct")
     parser.add_argument("--k", type=int, default=8)
-    parser.add_argument("--abstain-threshold", type=float, default=None)
     parser.add_argument("--out", default=str(TRACES))
     args = parser.parse_args()
     if "test" in Path(args.split).name:
@@ -68,7 +67,7 @@ def main() -> int:
         print("no index for the current chunks; run scripts/build_index.py first")
         return 1
     provider = OllamaProvider(model=args.model, cache_dir=ROOT / "data" / "cache", num_ctx=4096)
-    agent = Agent(provider, index, k=args.k, abstain_threshold=args.abstain_threshold)
+    agent = Agent(provider, index, k=args.k)
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     by_id = {c["id"]: c for c in chunks}
@@ -103,7 +102,6 @@ def main() -> int:
         "split": str(Path(args.split).relative_to(ROOT)) if Path(args.split).is_relative_to(ROOT) else args.split,
         "model": args.model,
         "k": args.k,
-        "abstain_threshold": args.abstain_threshold,
         "items": len(items),
         "ids": [i["id"] for i in items],
         "started_at": started_at,

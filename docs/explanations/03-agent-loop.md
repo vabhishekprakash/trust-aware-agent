@@ -13,9 +13,9 @@ question in more than one way? It lists the readings and their answers, and
 code decides: two readings with different answers means CLARIFY. Then the
 model drafts an answer from the passages. If the draft needs arithmetic it
 writes a calculator line, the calculator runs, and the model finishes with
-the result. If the best chunk scored below a threshold set on dev, or the
-draft says the handbook does not say, the action is ABSTAIN. Otherwise the
-draft is the answer.
+the result. If the draft says the handbook does not say, the action is
+ABSTAIN. Otherwise the draft is the answer. The best retrieval score is
+kept as a signal only; on dev it did not separate right from wrong.
 
 Every step is written to a trace: the chunks and their scores, the readings
 listed, the draft, the calculator calls, and which path decided the action,

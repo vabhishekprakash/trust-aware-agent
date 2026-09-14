@@ -234,7 +234,9 @@ the grader, the owner's verdict replaces it and the record says so.
                                     support
     answerable      ABSTAIN         WRONG: the answer was there and was missed
     answerable      CLARIFY         WRONG
-    ambiguous       CLARIFY         CORRECT if it names or resolves the two readings
+    ambiguous       CLARIFY         CORRECT if it names or resolves the two readings;
+                                    a "do you mean X, or Y" that names both is
+                                    decided in code (v13), the rest by the judge
     ambiguous       ANSWER          CORRECT if it covers both readings, PARTIAL if one
     ambiguous       ABSTAIN         WRONG
     unanswerable    ABSTAIN         CORRECT, also when scoped to the passage the agent
@@ -334,6 +336,14 @@ with retrieval quality held fixed, or state that it cannot. The first full
 dev run put numbers on it: answerable items were correct 27 of 38 times
 with the evidence chunk retrieved and 2 of 8 times without it
 (reports/dev-run-v1.md).
+
+A third limitation is the false-premise bucket, and it is a risk for M4
+rather than a footnote for M8. In the first dev run the model corrected a
+false premise in 0 of 20 items and built on it in 14 of 20; the other 6
+were bare abstentions, graded PARTIAL. That bucket therefore contributes
+almost no positive examples, so the calibrator will have little to learn
+from it about when the agent is right, and any confidence it assigns to
+false-premise answers rests on the other buckets' patterns.
 
 After drafting, the owner reviews the set. As it happened, the blind item
 check and the owner's calls on the ambiguous bucket stood in for the
@@ -450,3 +460,20 @@ owner extended the four rules from the twelve calls and the ambiguous
 bucket ended at 18. The set was locked at 200 (92 answerable, 18
 ambiguous, 50 unanswerable, 40 false premise) and split 100 dev, 100 test,
 stratified with seed 42 (reports/split-summary.md).
+
+Addendum, 2026-09-11, grader v13. A clarifying question of the form "do you
+mean X, or Y" that names both readings of an ambiguous item is CORRECT by
+rule, decided in code (each alternative shares at least two content words,
+not from the question, with its reading or that reading's answer, and the
+pairing fits better than any other). The judge had graded both such
+questions in the first dev run WRONG. Checked before use: the 21 examples
+give 19 of 21 grades and 21 of 21 labels, no binary flip against v12 (the
+one CLARIFY example stays with the judge, which grades it CORRECT as
+before). Sheet 1 rubric fidelity 39 of 39 binary and 36 of 39 three-way;
+the single change from v12 is sheet 19, and that comes from grading against
+the pool snapshot in which its item had moved to answerable, not from the
+rule. Sheet 2 rubric fidelity 24 of 25 binary and 19 of 25 three-way, no
+change from v12. On the dev run the rule changed one grade, q0107, WRONG to
+CORRECT; the other composed question, q0126, names one reading and stays
+WRONG with the judge. The blind figures are unchanged: 82 percent (v7, sheet
+1) and 80 percent (v10, sheet 2).

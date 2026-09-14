@@ -746,3 +746,37 @@ draft; retrieval is negligible. Grading was interrupted once by a session
 end and once by a dropped connection; the final pass took 710 s with 53
 items replayed from the cache, so no clean grading wall clock exists for
 this run.
+
+## The retrieval score is a signal, not an abstain trigger, 2026-09-11
+
+The owner dropped the score threshold as an ABSTAIN rule after the first
+dev run, on these numbers from reports/dev-run-v1.md: the median best
+score was 0.755 for answered items graded CORRECT and 0.752 for answered
+items graded otherwise; 0.748 when the evidence chunk was retrieved and
+0.727 when it was not; and the unanswerable bucket's median of 0.711 sits
+inside the answerable range (0.647 to 0.863). A cut anywhere would abstain
+almost at random. ABSTAIN is now the prompt's alone. The score stays in
+every trace and goes to M3 as a retrieval-support signal, where a
+calibrator can weigh it against the others rather than act on it alone.
+Anyone proposing a threshold later starts from those medians.
+
+## Grader v13: a clarifying question that names both readings, 2026-09-11
+
+The judge answered NO to "asks which reading is meant" on both
+rule-composed questions of the form "do you mean X, or Y" in the dev run,
+against the guide's rule that a CLARIFY naming both readings is CORRECT.
+v13 decides that case in code. The draft must contain a "do you mean"
+question offering one alternative per reading; each alternative must share
+at least two content words with its reading or that reading's answer, and
+that pairing must fit better than any other, so two alternatives that only
+echo the question do not pass. A question that names one reading, or none,
+still goes to the judge. Checked before use: examples 19 of 21 grades, 21 of
+21 labels, no binary flip against v12; sheet 1 rubric fidelity 39 of 39
+binary (the one change from v12, sheet 19, is the pool snapshot's bucket
+for that item, not the rule); sheet 2 rubric fidelity 24 of 25 binary,
+unchanged. On the dev run one grade changed, q0107, WRONG to CORRECT. The
+composed question on q0126 names one reading (both alternatives describe
+the Flight Readiness Review) and stays with the judge, WRONG. Both regrades
+of the sheets use scripts/regrade_key.py against the pool snapshot the
+sheets were built from (git 7a2a82d), so the drafts are exactly the ones
+the owner graded.

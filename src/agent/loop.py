@@ -4,8 +4,10 @@ The agent's own actions are ANSWER, CLARIFY and ABSTAIN. CLARIFY and ABSTAIN
 each have two paths, a prompt instruction the model may follow on its own
 and a rule that code applies, and the trace records which path fired. The
 readings step is the CLARIFY rule: the model lists the readings the passages
-answer differently and code decides. The ABSTAIN rule is a threshold on the
-best retrieval score, set on dev. See docs/explanations/03-agent-loop.md.
+answer differently and code decides. ABSTAIN comes from the prompt alone: a
+threshold on the best retrieval score was dropped after the first dev run,
+where the score did not separate right answers from wrong ones (decisions.md).
+The score stays in the trace as a signal. See docs/explanations/03-agent-loop.md.
 """
 
 from __future__ import annotations
@@ -91,12 +93,10 @@ def clarify_question(readings: list[dict]) -> str:
 
 
 class Agent:
-    def __init__(self, provider: Provider, index: Index, k: int = DEFAULT_K, abstain_threshold: Optional[float] = None,
-                 seed: int = 42, max_tokens: int = 160):
+    def __init__(self, provider: Provider, index: Index, k: int = DEFAULT_K, seed: int = 42, max_tokens: int = 160):
         self.provider = provider
         self.index = index
         self.k = k
-        self.abstain_threshold = abstain_threshold
         self.seed = seed
         self.max_tokens = max_tokens
 
@@ -116,7 +116,6 @@ class Agent:
             "model": self.provider.model,
             "seed": self.seed,
             "k": self.k,
-            "abstain_threshold": self.abstain_threshold,
             "calls": calls,
         }
 
@@ -157,7 +156,7 @@ class Agent:
         # 4. decide
         form = classify_form(final_draft)
         abstain_prompt = form == "ABSTAIN"
-        abstain_rule = self.abstain_threshold is not None and best < self.abstain_threshold
+        abstain_rule = False  # the score threshold was dropped; see the module docstring
         clarify_prompt = form == "CLARIFY"
         clarify_rule = readings_fired
         action, response = "ANSWER", final_draft

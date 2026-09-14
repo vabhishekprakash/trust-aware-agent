@@ -2,7 +2,7 @@
 
 import pytest
 
-from agent.loop import ABSTAIN_TEXT, TRACE_VERSION, Agent, clarify_question, distinct_answers, parse_readings
+from agent.loop import TRACE_VERSION, Agent, clarify_question, distinct_answers, parse_readings
 from agent.retriever import Hit
 
 
@@ -39,8 +39,8 @@ CHUNKS = [
 HITS = [Hit(CHUNKS[0], 0.81), Hit(CHUNKS[1], 0.64)]
 
 
-def make_agent(replies, threshold=None, hits=HITS):
-    return Agent(ScriptedProvider(replies), FakeIndex(hits), k=2, abstain_threshold=threshold)
+def make_agent(replies, hits=HITS):
+    return Agent(ScriptedProvider(replies), FakeIndex(hits), k=2)
 
 
 def test_parse_readings_and_distinct_answers():
@@ -136,23 +136,19 @@ def test_both_clarify_paths_are_recorded_and_the_models_question_is_kept():
     assert (trace["action"], trace["clarify_by"], trace["response"]) == ("CLARIFY", "both", "Do you mean a or b?")
 
 
-def test_abstain_by_prompt_and_by_rule():
+def test_abstain_comes_from_the_prompt_and_a_low_score_alone_does_not_abstain():
     trace = make_agent(["ONE READING", "The handbook does not say."]).run("How much does a CDR cost?")
     assert (trace["action"], trace["abstain_by"], trace["response"]) == ("ABSTAIN", "prompt", "The handbook does not say.")
-    trace = make_agent(["ONE READING", "About two million dollars."], threshold=0.9).run("How much does a CDR cost?")
-    assert (trace["action"], trace["abstain_by"], trace["response"]) == ("ABSTAIN", "rule", ABSTAIN_TEXT)
-    assert trace["draft"]["final"] == "About two million dollars."
-    trace = make_agent(["ONE READING", "The handbook does not say."], threshold=0.9).run("How much does a CDR cost?")
-    assert trace["abstain_by"] == "both"
-    trace = make_agent(["ONE READING", "The Program Manager."], threshold=0.5).run("Who approves the SEMP?")
-    assert trace["action"] == "ANSWER" and trace["abstain_by"] is None
+    low = [Hit(CHUNKS[0], 0.31), Hit(CHUNKS[1], 0.30)]
+    trace = make_agent(["ONE READING", "About two million dollars."], hits=low).run("How much does a CDR cost?")
+    assert (trace["action"], trace["abstain_by"], trace["best_score"]) == ("ANSWER", None, 0.31)
 
 
 def test_clarify_wins_over_abstain_when_both_apply():
     replies = ["READING: a | ANSWER: x\nREADING: b | ANSWER: y", "The handbook does not say."]
-    trace = make_agent(replies, threshold=0.9).run("q")
+    trace = make_agent(replies).run("q")
     assert trace["action"] == "CLARIFY"
-    assert trace["abstain_by"] == "both"
+    assert trace["abstain_by"] == "prompt"
 
 
 def test_calculator_round_trip_is_traced():

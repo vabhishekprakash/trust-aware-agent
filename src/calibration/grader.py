@@ -55,6 +55,7 @@ flipped a correct clarifying question from CORRECT to PARTIAL in both orders.
 from __future__ import annotations
 
 import copy
+import itertools
 import json
 import re
 from pathlib import Path
@@ -67,7 +68,7 @@ PAGES_PATH = ROOT / "data" / "corpus" / "pages.jsonl"
 ACRONYMS: Optional[dict] = None
 CORPUS: Optional[str] = None
 
-GRADER_VERSION = "grader-v12"
+GRADER_VERSION = "grader-v13"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
@@ -352,6 +353,70 @@ def grade_from_answers(bucket: str, answers: dict, form: Optional[str] = None) -
 
 def _tokens(text: str) -> set:
     return set(normalise(text).split()) - _STOPWORDS
+
+
+_MEAN = re.compile(r"\b(?:do|did)\s+you\s+mean\s+(.+)$", re.IGNORECASE | re.DOTALL)
+_OR_AFTER_COMMA = re.compile(r",\s*or\s+", re.IGNORECASE)
+_OR = re.compile(r"\s+or\s+", re.IGNORECASE)
+_SUFFIXES = ("ing", "ed", "es", "s")
+
+
+def _stem(token: str) -> str:
+    for suffix in _SUFFIXES:
+        if len(token) > len(suffix) + 3 and token.endswith(suffix):
+            return token[: -len(suffix)]
+    return token
+
+
+def _content(text: str) -> set:
+    return {_stem(t) for t in _tokens(text)}
+
+
+def clarify_alternatives(draft: str) -> list[str]:
+    """The alternatives a 'do you mean X, or Y' question offers; empty when the draft is not one."""
+    match = _MEAN.search(draft.translate(_QUOTES).strip())
+    if not match:
+        return []
+    body = match.group(1).strip().rstrip("?.! ")
+    parts = _OR_AFTER_COMMA.split(body) if _OR_AFTER_COMMA.search(body) else _OR.split(body)
+    return [p.strip(" ,;.?") for p in parts if p.strip(" ,;.?")]
+
+
+def _same_word(a: str, b: str) -> bool:
+    """Equal after stemming, or one is the other's start (top and topmost, level and levels)."""
+    if a == b:
+        return True
+    short, long_ = sorted((a, b), key=len)
+    return len(short) >= 3 and len(long_) - len(short) <= 4 and long_.startswith(short)
+
+
+def names_readings(draft: str, readings: list[dict], question: str = "") -> bool:
+    """True when a clarifying question offers one alternative per reading.
+
+    Each reading's alternative must share at least two content words, not
+    taken from the question, with the reading or its answer, and that pairing
+    must fit better than any other, so two alternatives that both echo the
+    question do not pass. Short readings that differ by one word stay with
+    the judge.
+    """
+    alternatives = clarify_alternatives(draft)
+    if len(readings) < 2 or len(alternatives) < len(readings):
+        return False
+    asked = _content(question)
+    alt_tokens = [_content(a) - asked for a in alternatives]
+    reading_tokens = [_content(r.get("reading", "")) | _content(r.get("answer", "")) for r in readings]
+
+    def overlap(a: int, i: int) -> int:
+        return sum(1 for t in alt_tokens[a] if any(_same_word(t, r) for r in reading_tokens[i]))
+
+    def overlaps(pairing) -> list[int]:
+        return [overlap(a, i) for i, a in enumerate(pairing)]
+
+    pairings = list(itertools.permutations(range(len(alternatives)), len(readings)))
+    best = max(pairings, key=lambda p: sum(overlaps(p)))
+    if min(overlaps(best)) < 2:
+        return False
+    return all(sum(overlaps(p)) < sum(overlaps(best)) for p in pairings if p != best)
 
 
 def _reference_text(item: dict) -> str:
@@ -783,6 +848,11 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
     if bucket == "ambiguous":
         if form == "ABSTAIN":
             return _decide(record, "rules", "WRONG", "the handbook answers both readings; abstaining is a miss")
+        # A clarifying question that names both readings is CORRECT by the guide's
+        # rule, decided here because the judge did not read composed questions of
+        # the form "do you mean X, or Y" as asking which reading is meant (v13).
+        if form == "CLARIFY" and names_readings(draft, item.get("readings") or [], item.get("question", "")):
+            return _decide(record, "rules", "CORRECT", "asks which reading is meant and names both readings")
         return _run_judge(record, item, draft, judge)
 
     # For the last two buckets the rules accept an abstention only when nothing
