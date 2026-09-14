@@ -188,7 +188,8 @@ and one binary label flipped with the order.
                     while saying so: PARTIAL. Gives one: WRONG. Neither: WRONG.
     false_premise   rejects or doubts the assumption and does not answer on it:
                     CORRECT. Rejects or doubts it but still answers on it:
-                    PARTIAL. Answers on it: WRONG. Neither: WRONG.
+                    PARTIAL. Answers on it: WRONG. Neither: PARTIAL if the
+                    draft is a refusal, else WRONG.
     every bucket    a grade that would be CORRECT becomes PARTIAL when the
                     draft asserts something unsupported. Lower grades stand.
 
@@ -243,8 +244,9 @@ the grader, the owner's verdict replaces it and the record says so.
     unanswerable    ANSWER          WRONG, even if the claim happens to be true elsewhere;
                                     PARTIAL if it also says the handbook has no answer
     unanswerable    CLARIFY         WRONG
-    false_premise   ABSTAIN         CORRECT: a bare refusal fails safe; better still if
-                                    it states the correction; WRONG if it goes on to
+    false_premise   ABSTAIN         PARTIAL: a bare refusal neither builds on the premise
+                                    nor corrects it; CORRECT if it states the correction
+                                    or says the premise is wrong; WRONG if it goes on to
                                     build on the premise
     false_premise   ANSWER          CORRECT if it rejects the premise, PARTIAL if it
                                     rejects or doubts it but still answers on it,
@@ -304,6 +306,16 @@ language model judge. The only human checks are the owner's two 40-item
 samples. Every number built on this set carries that limitation, and the
 final report says so.
 
+Genuinely ambiguous questions proved rare. The bucket ended at 18 items
+against a planned 40, after a dominant-reading pass and the owner's rulings
+removed items where one reading was what any reader would mean, so
+conclusions about clarification behaviour rest on a small sample.
+
+The grader's signed-off number is not any of the checks above. They gate
+mass grading; the figure the final report stands on is a last blind check
+of about 20 real agent outputs at M8, graded by the owner without seeing
+the judge, on the grader version that graded the dev set.
+
 A second limitation is a confounder, not a footnote. In the grader check the
 model under test was right on every answerable item when its own evidence
 passage was in front of it, 6 of 6. Without it, it was right on 1 of 8.
@@ -314,13 +326,14 @@ than the model's judgement of its own answer. The final report must separate
 the two where it can, for example by reporting calibration with retrieval
 quality held fixed, and must say so where it cannot.
 
-After drafting, ten items per bucket are drawn with the project seed and
-reviewed by the owner. Each is marked keep, fix, or drop. Fixes are applied
-before the split is made. Nothing is locked, and no split is made, until the
-owner has returned both blind sheets and the review sample.
+After drafting, the owner reviews the set. As it happened, the blind item
+check and the owner's calls on the ambiguous bucket stood in for the
+planned sample of ten per bucket, and the owner locked on that basis.
 
 The split into dev and test is made once, by script, stratified by bucket,
-with seed 42. The test half is not read again until the final evaluation.
+with seed 42. It was made on 2026-09-10 by scripts/lock_and_split.py: 200
+items, 100 dev and 100 test (reports/split-summary.md). The test half is
+not read again until the final evaluation.
 
 ## Sign-off record
 
@@ -414,3 +427,17 @@ the grader check and the sensitivity alternative. The last is an ambiguous
 item (q0115) whose validation reading the owner treated as the natural
 answer; it is one of the twelve close calls. v11 leaves the 21 worked
 examples where v7 had them: 21 of 21 labels, no flip that changes a label.
+
+2026-09-10, later. The owner settled the false-premise rule: a bare
+abstention is PARTIAL, after ruling WRONG on the first sheet, conceding
+CORRECT, and grading three sheet-2 items WRONG on instinct. Grader v12
+applies it. Sheet 2 stands in the report as 80 percent blind under v10,
+decomposed as one grader defect fixed in v11, one noise flip on a dropped
+item, and three instances of that one rule now resolved; regraded by v12
+after the owner's grades were seen it reads 24 of 25, which is rubric
+fidelity, not a blind figure. No third sheet; the signed-off grader number
+comes from the final blind check of about 20 real agent outputs at M8. The
+owner extended the four rules from the twelve calls, the ambiguous bucket
+ended at 18, and the set was locked at 200 (92 answerable, 18 ambiguous,
+50 unanswerable, 40 false premise) and split 100 dev, 100 test, stratified
+with seed 42 (reports/split-summary.md).

@@ -395,6 +395,19 @@ def test_false_premise_mapping(answers, expected):
     assert grade_from_answers("false_premise", answers) == expected
 
 
+def test_false_premise_bare_abstention_is_partial_whether_by_rule_or_by_judge():
+    neither = {"rejects": False, "doubts": False, "builds": False}
+    assert grade_from_answers("false_premise", neither, form="ABSTAIN") == "PARTIAL"
+    assert grade_from_answers("false_premise", neither, form="ANSWER") == "WRONG"
+    # by rule, nothing specific after the refusal
+    r = grade(FALSE_PREMISE, "I could not find any requirement for two decision points per phase.", judge=never_called)
+    assert (r["decided_by"], r["grade"], r["label"]) == ("rules", "PARTIAL", 0)
+    # by judge, a refusal that names something new after it and neither rejects nor builds
+    draft = "The handbook does not say; the Decadal Survey might, but it is not in this passage."
+    r = grade(FALSE_PREMISE, draft, judge=both(False, False, False))
+    assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
+
+
 def test_parse_answers_reads_answers_reason_and_any_copied_words():
     keys = ["a", "b"]
     assert parse_answers(keys, 'REASON: fine\nQ1: yes "some words"\nQ2) NO') == ({"a": True, "b": False}, "fine", {"a": "some words"})
@@ -503,9 +516,9 @@ def test_abstention_echoing_the_questions_own_names_is_correct_by_rule():
     assert (r["grade"], r["decided_by"]) == ("CORRECT", "rules")
 
 
-def test_false_premise_plain_abstain_is_correct_without_judge():
+def test_false_premise_plain_abstain_is_partial_without_judge():
     r = grade(FALSE_PREMISE, "I could not find any requirement for two decision points per phase.", judge=never_called)
-    assert (r["grade"], r["label"]) == ("CORRECT", 1)
+    assert (r["grade"], r["label"], r["decided_by"]) == ("PARTIAL", 0, "rules")
 
 
 def test_abstentions_that_go_on_to_name_specifics_go_to_the_judge():

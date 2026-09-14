@@ -562,6 +562,83 @@ only. The first round kept 24 of 48 drafted after the dominant-reading
 pass, so reaching 40 would mean drafting about 35 more and running the
 pass again. The proposal awaits the owner's approval; nothing is locked.
 
+## A bare abstention on a false premise is PARTIAL, 2026-09-10
+
+The trail is worth keeping. On the first blind sheet the owner graded a
+bare abstention on a false-premise item WRONG (sheet 16). Shown the
+disagreement, the owner withdrew it: a bare abstention fails safe and stays
+CORRECT, as the guide's table said. On the second blind sheet the owner
+then graded three more bare abstentions on false premises WRONG (sheets 13,
+14 and 17) on instinct, against that ruling. Asked to settle the rule one
+way, the owner settled on PARTIAL: a bare abstention neither acts on the
+false premise nor corrects it. Grader v12 applies that by rule when nothing
+specific follows the refusal, and through the judge otherwise (a refusal
+that neither rejects nor builds is PARTIAL; anything else that neither
+rejects nor builds is WRONG). The revisions file keeps only sheet 34, since
+the owner's original WRONG grades on sheets 9, 16 and 33 now match PARTIAL
+on the binary label.
+
+Effect. The 21 worked examples are unchanged: 19 of 21 grades, 21 of 21
+labels, one grade-only flip. The first 40 drafts: binary agreement stays at
+38 of 39; three-way agreement falls from 38 to 35 of 39, because the three
+bare abstentions the owner graded WRONG are now PARTIAL. Sheet 2 regraded
+by v12 after the owner's grades were seen: reported in the next section.
+
+## Sheet 2 in the report: 80 percent blind, decomposed
+
+Sheet 2 stands in the report as 80 percent blind agreement under v10, 20 of
+25. It decomposes into one grader defect, fixed in v11 (sheet 15); one
+noise flip on an ambiguous item that has since been dropped as a duplicate
+(sheet 10, q0115); and three instances of one underspecified rule, the
+bare abstention on a false premise, now resolved as PARTIAL (sheets 13, 14
+and 17). The 84 percent that v11 reached on the same sheet after the
+owner's grades were seen is rubric fidelity, not a blind figure, and is not
+presented as one. There is no third sheet now. The grader's signed-off
+number will be a final blind check of about 20 real agent outputs at M8,
+graded by the owner without seeing the judge on the grader version that
+graded the dev set.
+
+## The four generalisations, extended, 2026-09-10
+
+The owner extended all four rules from the twelve calls to the items they
+fit. q0096 moved to answerable under the q0095 rule, gold "two: Formulation
+and Implementation" with a scoped seven accepted. The owner's blind label
+had read q0096 as ambiguous; the owner's later rule disagreed with the
+owner's earlier label on that item, and the rule won. q0106, q0118 and
+q0122 moved under the q0111 rule with compound golds drawn from both
+passages; for q0106 that is the rewrite the owner asked for, done as a
+compound gold rather than a new question. q0101 was dropped under the q0104
+rule. q0131 moved under the q0132 rule, gold "a relevant environment" with
+the TRL 7 space environment accepted when scoped. q0125 was listed under the
+q0104 rule and re-read: its two approvals are two versions of the plans,
+build-to at CDR and as-built at SIR, like q0102's two plans, not a
+disagreement, so it stays ambiguous. The ambiguous bucket ends at 18 items.
+The pool is 235: answerable 109, ambiguous 18, unanswerable 59, false
+premise 49.
+
+## Target approved: 200, ambiguous as it survives, 2026-09-10
+
+The owner approved 200 items with the ambiguous bucket at whatever
+survived and the shortfall going to answerable, and no second drafting
+round. That is 92 answerable, 18 ambiguous, 50 unanswerable, 40 false
+premise. The limitation goes into the report in these words: genuinely
+ambiguous questions proved rare, the bucket ended at 18 against a planned
+40, so conclusions about clarification behaviour rest on a small sample.
+
+## Locked and split, 2026-09-10
+
+scripts/lock_and_split.py drew the set from the 235 candidates with seed
+42, stratified by bucket: 92 answerable, 18 ambiguous, 50 unanswerable, 40
+false premise, 200 in all, then split each bucket in half with the same
+seed. dev.jsonl and test.jsonl hold 100 items each: 46 and 46 answerable, 9
+and 9 ambiguous, 25 and 25 unanswerable, 20 and 20 false premise. Ten of
+the 200 need the calculator. Thirty-five candidates stay in
+items_reserve.jsonl for fixes. The 10-per-bucket review sample drawn before
+the dominant-reading pass was never used and is retired; the owner's blind
+item check and ambiguous calls stood in for it, and the owner locked on
+that basis. The test half is now read by exactly one script, once, at the
+end of M8, and nothing is tuned on it.
+
 ## M2 must implement CLARIFY and ABSTAIN as real actions
 
 On the grader check the model under test scored 0 of 4 on ambiguous items

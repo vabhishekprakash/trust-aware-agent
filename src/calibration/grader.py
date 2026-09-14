@@ -67,7 +67,7 @@ PAGES_PATH = ROOT / "data" / "corpus" / "pages.jsonl"
 ACRONYMS: Optional[dict] = None
 CORPUS: Optional[str] = None
 
-GRADER_VERSION = "grader-v11"
+GRADER_VERSION = "grader-v12"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
@@ -313,7 +313,7 @@ def questions_for(item: dict) -> list[tuple[str, str]]:
     return questions
 
 
-def _base_grade(bucket: str, a: dict) -> str:
+def _base_grade(bucket: str, a: dict, form: Optional[str] = None) -> str:
     if bucket == "answerable":
         if a["contradicts"]:
             return "PARTIAL" if a["same"] else "WRONG"
@@ -333,13 +333,18 @@ def _base_grade(bucket: str, a: dict) -> str:
     if bucket == "false_premise":
         if a["rejects"] or a["doubts"]:
             return "PARTIAL" if a["builds"] else "CORRECT"
-        return "WRONG"
+        if a["builds"]:
+            return "WRONG"
+        # Neither rejects nor builds. A refusal that got this far is a bare
+        # abstention, which the owner settled as PARTIAL: it neither acts on
+        # the false premise nor corrects it. Anything else is off the point.
+        return "PARTIAL" if form == "ABSTAIN" else "WRONG"
     raise ValueError(f"unknown bucket {bucket!r}")
 
 
-def grade_from_answers(bucket: str, answers: dict) -> str:
+def grade_from_answers(bucket: str, answers: dict, form: Optional[str] = None) -> str:
     """Map the judge's answers to a grade; a CORRECT padded with unsupported claims is PARTIAL."""
-    grade_ = _base_grade(bucket, answers)
+    grade_ = _base_grade(bucket, answers, form)
     if grade_ == "CORRECT" and answers.get("unsupported"):
         return "PARTIAL"
     return grade_
@@ -718,7 +723,7 @@ def _run_judge(record: dict, item: dict, draft: str, judge: Judge) -> dict:
         answers["unsupported"] = bool(contradicted)
         if contradicted:
             quotes["unsupported"] = contradicted
-        grade_ = grade_from_answers(bucket, answers)
+        grade_ = grade_from_answers(bucket, answers, record.get("form"))
         record["judge_answers"].append(answers)
         record["judge_quotes"].append(quotes)
         record["judge_ungrounded"].append(ungrounded)
@@ -797,9 +802,11 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
             return _decide(record, "rules", "WRONG", "no reading of the question is answerable, so clarifying dodges it")
         return _run_judge(record, item, draft, judge)
 
-    # false_premise
+    # false_premise. A bare refusal neither builds on the false premise nor
+    # corrects it, so it is PARTIAL (the owner's ruling of 2026-09-10, after
+    # WRONG on the first blind sheet and CORRECT on reflection).
     if plain_abstain:
-        return _decide(record, "rules", "CORRECT", "the draft did not build on the false premise")
+        return _decide(record, "rules", "PARTIAL", "a bare abstention neither builds on the false premise nor corrects it")
     return _run_judge(record, item, draft, judge)
 
 
