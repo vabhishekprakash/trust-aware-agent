@@ -1,4 +1,4 @@
-# Grader check: rubric fidelity of v10 on the first 40 drafts
+# Grader check: rubric fidelity of v11 on the first 40 drafts
 
 This is NOT a blind number. The owner graded the sheet blind once; that figure stands in
 reports/grader-check-result.md. Here the grader was changed after the owner's rulings and run
@@ -6,7 +6,7 @@ again on the same drafts, and the owner's grades for sheet numbers 9, 16, 33, 34
 ones the owner revised on seeing the disagreements. The figure measures how faithfully the
 fixed grader follows the rubric the owner settled, on drafts the fix was designed against.
 
-Grader grader-v10, judge llama3.1:latest, drafts by the model under test.
+Grader grader-v11, judge llama3.1:latest, drafts by the model under test.
 
 - drafts graded by the owner: 39 of 40 (no grade written for sheet numbers 1)
 - binary label agreement (CORRECT against not CORRECT): 38 of 39 (97 percent)

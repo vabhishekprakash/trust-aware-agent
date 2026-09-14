@@ -67,7 +67,7 @@ PAGES_PATH = ROOT / "data" / "corpus" / "pages.jsonl"
 ACRONYMS: Optional[dict] = None
 CORPUS: Optional[str] = None
 
-GRADER_VERSION = "grader-v10"
+GRADER_VERSION = "grader-v11"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
@@ -184,6 +184,12 @@ def mentions_specifics(text: str, question: str = "") -> bool:
     question's own names and numbers is not offering an invented answer.
     """
     known = set(normalise(question).split()) if question else set()
+
+    def echoed(token: str) -> bool:
+        # "SP-6105" normalises to two words; every one of them must be in the question
+        parts = normalise(token).split()
+        return bool(parts) and all(p in known for p in parts)
+
     for match in _FIGURE.finditer(text):
         start = match.start()
         while start > 0 and text[start - 1].isalnum():
@@ -191,7 +197,7 @@ def mentions_specifics(text: str, question: str = "") -> bool:
         end = match.end()
         while end < len(text) and text[end].isalnum():
             end += 1
-        if normalise(text[start:end]) not in known:
+        if not echoed(text[start:end]):
             return True
     for index, sentence in enumerate(sentences(text)):
         tokens = [t.strip(_TOKEN_TRIM) for t in sentence.split()]
@@ -199,7 +205,7 @@ def mentions_specifics(text: str, question: str = "") -> bool:
         # The first fragment continues the refusal sentence, so its first word is
         # mid-sentence; every later fragment starts a sentence.
         for token in tokens if index == 0 else tokens[1:]:
-            if token != "I" and _PROPER.fullmatch(token) and normalise(token) not in known:
+            if token != "I" and _PROPER.fullmatch(token) and not echoed(token):
                 return True
     return False
 
@@ -600,6 +606,15 @@ def code_quote(item: dict, draft: str, key: str) -> Optional[str]:
     elif key.startswith("reading"):
         answer = item["readings"][int(key[len("reading"):]) - 1]["answer"]
         candidates = [answer] + _PARENTHESISED.findall(answer)
+    elif key == "abstains":
+        # The refusal patterns are the code's own definition of an abstention; a
+        # judge asked to copy "the words that say so" once replied NONE to a
+        # plain "the passage does not specify who wrote ...".
+        match = _ABSTAIN.search(draft.translate(_QUOTES))
+        return match.group(0) if match else None
+    elif key == "flags":
+        match = _CLARIFY_CUES.search(draft.translate(_QUOTES))
+        return match.group(0) if match else None
     else:
         return None
     for text in candidates:

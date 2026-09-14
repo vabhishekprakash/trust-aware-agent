@@ -19,7 +19,7 @@ reference: acceptable forms: MOEs; MOE; Measures of Effectiveness; the MOEs; mea
 
 draft: Measures of Performance (MOPs) are derived from Measures of Excellence (MOEs).
 
-grade:
+grade:PARTIAL
 
 ### 2
 
@@ -30,7 +30,7 @@ reference: acceptable forms: system design processes, product realization proces
 
 draft: The NPR 7123.1 categorizes its common technical processes into three main sets: System Definition, System Design, and System Development.
 
-grade:
+grade:WRONG
 
 ### 3
 
@@ -41,7 +41,7 @@ reference: acceptable forms: NASA payload classification; payload classification
 
 draft: The NASA Systems Engineering Handbook does not say anything about performance metrics addressing the level of formality in verification approaches for missions following NPR 7120.5.
 
-grade:
+grade:WRONG
 
 ### 4
 
@@ -52,7 +52,7 @@ reference: acceptable forms: large impact on cost or schedule; can have a large 
 
 draft: A requirement is considered a key driving requirement if it significantly impacts mission success, safety, cost, schedule, and/or technical performance, often serving as the primary basis for design decisions.
 
-grade:
+grade:PARTIAL
 
 ### 5
 
@@ -62,7 +62,7 @@ reference: the question's assumption is false; the handbook says: The handbook s
 
 draft: The handbook suggests that with a strong project manager and technical team leadership, the systems engineer focuses on strategic planning, risk management, integration of subsystems, and ensuring compliance with system requirements throughout the lifecycle.
 
-grade:
+grade:WRONG
 
 ### 6
 
@@ -72,7 +72,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about workforce rates or how to apply them to direct labor hours for building a baseline budget from the WBS.
 
-grade:
+grade:CORRECT   
 
 ### 7
 
@@ -82,7 +82,7 @@ reference: the question's assumption is false; the handbook says: The handbook c
 
 draft: NPD 8010.3 directs that robotic satellites be deorbited to ensure they do not pose a reentry hazard, while for satellites in geostationary orbit, the directive emphasizes careful and controlled disposal or deorbiting to prevent environmental contamination of sensitive regions on Earth's surface.
 
-grade:
+grade:WRONG
 
 ### 8
 
@@ -93,7 +93,7 @@ reference: acceptable forms: test, inspection, analysis, and demonstration; test
 
 draft: The handbook does not say which verification methods the requirements metadata table lists under the verification method entry.
 
-grade:
+grade:WRONG
 
 ### 9
 
@@ -104,7 +104,7 @@ reference: reading 2: a program or project delegated to a Center seeking a waive
 
 draft: The final approval for tailoring of the System Engineering (SE) NPR requirements, when submitted via a Compliance Matrix, typically comes from the appropriate level of management or the project manager who has overall responsibility for the compliance and implementation of these requirements.
 
-grade:
+grade:WRONG 
 
 ### 10
 
@@ -115,7 +115,7 @@ reference: reading 2: Product Validation -> stakeholder expectations (MOEs) in t
 
 draft: The end product has to be shown to satisfy its stakeholders' expectations within the intended operational environments before moving on.
 
-grade:
+grade:CORRECT
 
 ### 11
 
@@ -125,7 +125,7 @@ reference: the handbook does not answer this question
 
 draft: The NASA Systems Engineering Handbook does not specify a percentage by which baseline requirements are allowed to grow before corrective action is required.
 
-grade:
+grade:CORRECT   
 
 ### 12
 
@@ -136,7 +136,7 @@ reference: acceptable forms: human systems engineering and environmental control
 
 draft: The passage does not provide information about the specific engineering skills required for human-rated systems versus robotic space missions.
 
-grade:
+grade:WRONG
 
 ### 13
 
@@ -146,7 +146,7 @@ reference: the question's assumption is false; the handbook says: A waiver is a 
 
 draft: The NASA Systems Engineering Handbook does not specify whose approval an authorized waiver needs when it touches an external interface.
 
-grade:
+grade:WRONG
 
 ### 14
 
@@ -156,7 +156,7 @@ reference: the question's assumption is false; the handbook says: The handbook l
 
 draft: The passage does not provide information about breaking product validation into specific steps or which step involves writing a validation report.
 
-grade:
+grade:WRONG
 
 ### 15
 
@@ -166,7 +166,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not specify who wrote the original 1995 edition of NASA SP-6105.
 
-grade:
+grade:CORRECT   
 
 ### 16
 
@@ -177,7 +177,7 @@ reference: reading 2: 'acceptable risk' as the handbook defines the term -> the 
 
 draft: The passage does not provide information about who agrees on the acceptable level of risk for a project.
 
-grade:
+grade:WRONG
 
 ### 17
 
@@ -187,7 +187,7 @@ reference: the question's assumption is false; the handbook says: The handbook s
 
 draft: The passage does not provide information about what documentation the FCA verifies the product against.
 
-grade:
+grade:WRONG
 
 ### 18
 
@@ -197,7 +197,7 @@ reference: the handbook does not answer this question
 
 draft: NPR 7123.1, which is a critical document for systems engineering at NASA, was signed into effect by the Associate Administrator for Human Exploration and Operations (HAO).
 
-grade:
+grade:WRONG
 
 ### 19
 
@@ -207,7 +207,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about when the Decommissioning Review should be scheduled relative to the planned end of mission.
 
-grade:
+grade:CORRECT
 
 ### 20
 
@@ -217,7 +217,7 @@ reference: the question's assumption is false; the handbook says: The handbook s
 
 draft: The NASA Systems Engineering Handbook states that while the project plan is a subordinate document to the System Engineering Management Plan (SEMP), it can define specific project-specific tasks and activities not covered by the broader SEMP.
 
-grade:
+grade:WRONG
 
 ### 21
 
@@ -228,7 +228,7 @@ reference: acceptable forms: four; four levels; 4 levels; four proficiency level
 
 draft: The passage does not provide information about how many proficiency levels NASA's systems engineering competency model attaches to each competency.
 
-grade:
+grade:WRONG
 
 ### 22
 
@@ -239,7 +239,7 @@ reference: reading 2: the whole planning hierarchy including the SEMP itself -> 
 
 draft: The handbook does not say which document all of a project's plans have to comply with.
 
-grade:
+grade:WRONG
 
 ### 23
 
@@ -250,7 +250,7 @@ reference: acceptable forms: B; during Phase B; Phase B of a project
 
 draft: The NASA Systems Engineering Handbook says that issuing technical work directives is essential in Phase B of a project.
 
-grade:
+grade:CORRECT
 
 ### 24
 
@@ -261,7 +261,7 @@ reference: acceptable forms: a person with program or project change authority; 
 
 draft: The Configuration Control Board (CCB) at NASA is typically chaired by a senior manager with engineering expertise, often serving as the Chief Engineer or another high-ranking official responsible for overseeing system integrity and compliance.
 
-grade:
+grade:WRONG
 
 ### 25
 
@@ -271,5 +271,5 @@ reference: the handbook does not answer this question
 
 draft: The NASA Systems Engineering Handbook passage does not specify a particular discount rate for use in the system-level cost-effectiveness model.
 
-grade:
+grade:CORRECT
 

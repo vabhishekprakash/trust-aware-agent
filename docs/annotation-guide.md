@@ -393,3 +393,23 @@ figure remains 82 percent. The second sheet, reports/grader-check-sheet-2.md,
 holds 25 fresh drafts the owner has not seen; its blind agreement, once
 graded, is the post-fix figure that gates mass grading. Nothing is locked
 and no split is made.
+
+2026-09-10. Sheet 2, the blind post-fix check. The owner graded all 25
+fresh drafts without seeing the judge, and v10 agreed on the binary label
+on 20 of 25, 80 percent (reports/grader-check-result-2.md). That is the
+honest post-fix number. It sits next to the first blind figure, 32 of 39,
+82 percent for v7, and both are below the bar, so v10 is not signed off.
+Of the five disagreements, one was a grader defect and is fixed in v11: an
+abstention that only echoed the question's own "NASA SP-6105" went to the
+judge because a two-word term was matched as one word, and the judge's
+copying call then failed on a plain refusal. Refusal phrases now ground
+themselves. Regraded after the fact by v11, sheet 2 reads 21 of 25, 84
+percent; that is not a blind number and is reported only as the effect of
+the fix. Three of the remaining four are bare abstentions on false-premise
+items that the owner graded WRONG, against the owner's own ruling on sheet
+16 that a bare abstention on a false premise fails safe and stays CORRECT.
+The owner is asked to settle that rule one way, because it decides both
+the grader check and the sensitivity alternative. The last is an ambiguous
+item (q0115) whose validation reading the owner treated as the natural
+answer; it is one of the twelve close calls. v11 leaves the 21 worked
+examples where v7 had them: 21 of 21 labels, no flip that changes a label.

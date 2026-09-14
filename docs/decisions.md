@@ -463,6 +463,37 @@ sheet-2.md, 25 fresh drafts graded by v10 into data/eval/grader_check_key-2.
 jsonl) is where an honest post-fix figure comes from. Below about 90
 percent there, the grader is still not good enough for mass grading.
 
+## Sheet 2 and grader v11, 2026-09-10
+
+The owner graded the second sheet blind. Result for v10: 20 of 25, 80
+percent binary agreement; answerable 9 of 9, unanswerable 5 of 6, ambiguous
+3 of 4, false premise 3 of 6; by condition, no passage 8 of 8, distractor
+7 of 8, own evidence 5 of 9. That is the honest post-fix number, and it is
+below the bar, so v10 is not signed off. The two blind figures now on record
+are 82 percent for v7 on sheet 1 and 80 percent for v10 on sheet 2.
+
+The five disagreements, read one by one. Sheet 15 was a grader defect: the
+draft "The passage does not specify who wrote the original 1995 edition of
+NASA SP-6105" only echoes the question, but "SP-6105" normalises to two
+words and the echo check compared them as one, so the draft went to the
+judge, whose copying call then answered NONE for an obvious refusal. v11
+compares echoed terms word by word and grounds the "abstains" and "flags"
+answers with the code's own refusal and clarify patterns instead of a
+copying call. Sheets 13, 14 and 17 are bare abstentions on false-premise
+items, CORRECT by rule, which the owner graded WRONG. That is the owner's
+own ruling on sheet 16 in reverse, and it happened three times out of six
+false-premise drafts. The rule has to be settled one way; both the grader
+and the sensitivity alternative depend on it. Sheet 10 is q0115, an
+ambiguous item whose validation reading the owner treated as the natural
+answer, and it is one of the twelve close calls.
+
+v11 numbers. The 21 worked examples are unchanged from v7: 19 of 21
+grades, 21 of 21 labels, one grade-only flip. Rubric fidelity on the first
+40 stays at 38 of 39. Sheet 2 regraded by v11 after the owner's grades were
+seen reads 21 of 25, 84 percent (reports/grader-check-result-2-v11-posthoc.md).
+That last figure is not blind and is not the number that gates anything; it
+only shows what the sheet-15 fix is worth.
+
 ## Ambiguous pass, 2026-09-09
 
 The blind item check put the item problem in the ambiguous bucket, so every

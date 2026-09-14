@@ -262,6 +262,24 @@ def test_same_answer_must_add_something_beyond_the_question():
     assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["same"], ["same"]])
 
 
+def test_mentions_specifics_matches_echoed_terms_word_by_word():
+    question = "Who wrote the original 1995 edition of NASA SP-6105?"
+    assert not mentions_specifics(" who wrote the original 1995 edition of NASA SP-6105.", question)
+    assert mentions_specifics(" who wrote the original 1995 edition of NASA SP-6105; it was Griffin.", question)
+
+
+def test_abstains_and_flags_are_grounded_by_the_code_patterns():
+    draft = "The handbook does not specify a figure, but a CDR would typically run into the millions of dollars."
+    r = grade(UNANSWERABLE, draft, judge=both(True, True, extract=lambda c: "NONE"))
+    assert r["judge_quotes"][0]["abstains"] == "does not specify"
+    assert r["judge_ungrounded"] == [["answers"], ["answers"]]
+    assert r["grade"] == "CORRECT"
+    judge = both(True, False, False, extract=no_extraction)
+    r = grade(AMBIGUOUS, "Do you mean the review before Phase B or before Phase C?", judge=judge)
+    assert r["grade"] == "CORRECT"
+    assert r["judge_quotes"][0]["flags"].lower() == "do you mean"
+
+
 def test_abstain_tail_is_the_text_after_the_refusal_phrase():
     assert abstain_tail("The handbook does not give a cost for a CDR.") == " a cost for a CDR."
     assert abstain_tail("No refusal here.") == "No refusal here."
