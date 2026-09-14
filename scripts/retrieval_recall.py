@@ -14,7 +14,6 @@ cost in words. The test split is never read by this script.
 
 import argparse
 import json
-import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -22,35 +21,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
+from agent.evidence import targets  # noqa: E402
 from agent.retriever import bge_embedder, load_chunks, load_index  # noqa: E402
 
 KS = [1, 3, 5, 8, 10]
-
-
-def key(s: str) -> str:
-    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
-
-
-def page_number(label: str):
-    return int(label) if str(label).isdigit() else None
-
-
-def covers(chunk: dict, page: str) -> bool:
-    p, a, b = page_number(page), page_number(chunk["page_start"]), page_number(chunk["page_end"])
-    if p is None or a is None or b is None:
-        return str(page) in (str(chunk["page_start"]), str(chunk["page_end"]))
-    return a <= p <= b
-
-
-def targets(item: dict, chunks: list[dict]) -> set:
-    found = set()
-    for ev in item.get("evidence", []):
-        words = ev["quote"].split()
-        probes = [key(ev["quote"]), key(" ".join(words[:12])), key(" ".join(words[-12:]))]
-        for c in chunks:
-            if covers(c, ev["page"]) and any(len(p) >= 20 and p in key(c["text"]) for p in probes):
-                found.add(c["id"])
-    return found
 
 
 def main() -> int:

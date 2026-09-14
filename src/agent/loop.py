@@ -119,7 +119,9 @@ class Agent:
         }
 
         # 1. retrieve
+        retrieval_started = time.time()
         hits = self.index.search(question, k=self.k)
+        trace["retrieval_seconds"] = round(time.time() - retrieval_started, 2)
         trace["retrieval"] = [{"id": h.chunk["id"], "page_start": h.chunk["page_start"], "page_end": h.chunk["page_end"], "score": round(h.score, 4)} for h in hits]
         passages = passages_block(hits)
         best = hits[0].score if hits else 0.0
