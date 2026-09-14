@@ -49,6 +49,7 @@ def main() -> int:
     parser.add_argument("--out", default=str(ROOT / "reports" / "dev-run-v1.md"))
     parser.add_argument("--grading-note", default="", help="one sentence about how the grading pass went, appended to the wall clock section")
     parser.add_argument("--previous", default="", help="rows from an earlier grader on the same traces; adds a before-and-after section per bucket")
+    parser.add_argument("--related", action="append", default=[], help="a line pointing at a related report, added under the title")
     parser.add_argument("--before", default="", help="rows from an earlier run of a different loop; adds a labelled before table of actions and labels per bucket")
     args = parser.parse_args()
     rows = [json.loads(l) for l in Path(args.rows).read_text(encoding="utf-8").splitlines() if l.strip()]
@@ -67,6 +68,8 @@ def main() -> int:
         f"{n_all} dev items; the test split was not read. The ambiguous bucket has {len(by_bucket['ambiguous'])} dev items, "
         "so its numbers are indicative only.",
         "",
+        *[f"Related: {line}" for line in args.related],
+        *([""] if args.related else []),
         "Items were drafted and verified by language model agents and graded by a language model judge; human checks so far "
         "are the two blind samples recorded in the annotation guide. Every count below comes from reports/dev-run-v1.jsonl.",
         "",

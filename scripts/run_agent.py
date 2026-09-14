@@ -43,6 +43,7 @@ def main() -> int:
     parser.add_argument("--model", default="qwen2.5:3b-instruct")
     parser.add_argument("--k", type=int, default=8)
     parser.add_argument("--out", default=str(TRACES))
+    parser.add_argument("--premise-check", action="store_true", help="turn the premise step on (off by default; see reports/premise-step.md)")
     args = parser.parse_args()
     if "test" in Path(args.split).name:
         print("refusing to read the test split")
@@ -67,7 +68,7 @@ def main() -> int:
         print("no index for the current chunks; run scripts/build_index.py first")
         return 1
     provider = OllamaProvider(model=args.model, cache_dir=ROOT / "data" / "cache", num_ctx=4096)
-    agent = Agent(provider, index, k=args.k)
+    agent = Agent(provider, index, k=args.k, premise_check=args.premise_check)
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     by_id = {c["id"]: c for c in chunks}
@@ -102,6 +103,7 @@ def main() -> int:
         "split": str(Path(args.split).relative_to(ROOT)) if Path(args.split).is_relative_to(ROOT) else args.split,
         "model": args.model,
         "k": args.k,
+        "premise_check": args.premise_check,
         "items": len(items),
         "ids": [i["id"] for i in items],
         "started_at": started_at,

@@ -852,3 +852,28 @@ correct labels fell from 54 to 41 of 100, with one gain. The step added
 1,492 s to the run, more than half the wall clock. Owner's call pending on
 whether the step stays, is switched off with prompts identical to v1, or
 is reworked. Nothing touched test.
+
+## The premise step is off, 2026-09-11
+
+Owner's decision after run v2: option 1. The step stays in src/agent/loop.py
+behind the premise_check flag, off by default, with its tests, and
+reports/premise-step.md writes the negative result up for the report body.
+With the flag off the answer prompt is the v1 text, checked two ways: a
+test holds the v1 prompt copied from commit 799b58a and asserts equality,
+and a rerun of all 100 dev items with the flag off drew every one of its
+210 model calls from the cache, which only happens when every request is
+byte-identical to v1. That rerun differs from v1 in two actions, both from
+the ONE READING parser fix made after v1 and never rerun: q0082 CLARIFY to
+ABSTAIN and q0126 CLARIFY to ANSWER. Its graded rows (reports/dev-run-v1b.
+jsonl) are therefore the current agent's dev rows; v1 stays as the record
+of the run before the parser fix. The false-premise bucket stays at zero
+and the limitation stands as written.
+
+Reserve: q0118 dropped rather than rewritten, since its gold answer runs
+past the 12-word limit the locked items met and the owner's rule is not to
+rewrite items. The other 34 join dev as a labelled second run.
+
+Reserve run (reports/dev-run-reserve.md): 843 s for 34 items; answerable 6
+of 16 correct, unanswerable 9 of 9, false premise 0 of 9. Merged dev is 134
+items, 70 correct (reports/dev-distribution.md); the decisive stratum,
+answerable with evidence retrieved, is 33 right against 17 wrong.

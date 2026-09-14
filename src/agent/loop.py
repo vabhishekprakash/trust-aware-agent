@@ -29,12 +29,15 @@ ANSWER_SYSTEM = (
     "You answer questions about the NASA Systems Engineering Handbook using only the passages you are given. "
     "If the passages do not contain the answer, reply exactly: The handbook does not say. "
     "If the question could mean two different things that the passages answer differently, ask which is meant "
-    "instead of answering. If the question takes something for granted that the passages contradict, say so and "
-    "give the correction. Answer in one or two sentences. If the answer needs arithmetic on numbers in the "
+    "instead of answering. Answer in one or two sentences. If the answer needs arithmetic on numbers in the "
     "passages, reply with one line of the form CALC: <number> <+ or - or * or /> <number> and nothing else, "
     "for example CALC: 500 - 100; you will be given the result. Only do this when the question asks for a "
     "figure that has to be computed from two numbers in the passages."
 )
+# Only used when the premise check is on. Off by default: measured on dev it made every bucket worse
+# (reports/premise-step.md), and with it off the prompts are byte-identical to the v1 run.
+PREMISE_SENTENCE = "If the question takes something for granted that the passages contradict, say so and give the correction. "
+ANSWER_SYSTEM_WITH_PREMISE = ANSWER_SYSTEM.replace("instead of answering. Answer in one", "instead of answering. " + PREMISE_SENTENCE + "Answer in one")
 READINGS_SYSTEM = (
     "You read a question and passages from the NASA Systems Engineering Handbook. Your only job is to say whether "
     "the question has more than one reading that the passages answer differently. Reply in exactly the format asked."
@@ -138,11 +141,13 @@ def clarify_question(readings: list[dict]) -> str:
 
 
 class Agent:
-    def __init__(self, provider: Provider, index: Index, k: int = DEFAULT_K, seed: int = 42, max_tokens: int = 160):
+    def __init__(self, provider: Provider, index: Index, k: int = DEFAULT_K, seed: int = 42, max_tokens: int = 160,
+                 premise_check: bool = False):
         self.provider = provider
         self.index = index
         self.k = k
         self.seed = seed
+        self.premise_check = premise_check
         self.max_tokens = max_tokens
 
     def _ask(self, messages: list[dict], trace_calls: list, step: str) -> str:
@@ -172,14 +177,19 @@ class Agent:
         passages = passages_block(hits)
         best = hits[0].score if hits else 0.0
 
-        # 2. premise step: the REJECT rule, gated in code
-        premise_raw = self._ask(
-            [{"role": "system", "content": PREMISE_SYSTEM},
-             {"role": "user", "content": f"Passages:\n{passages}\n\nQuestion: {question}\n\n{PREMISE_FOOTER}"}],
-            calls, "premise")
-        premise = parse_premise(premise_raw)
-        grounded = premise is not None and premise_grounded(premise, question, hits)
-        trace["premise"] = {"raw": premise_raw, "parsed": premise, "grounded": grounded, "fired": grounded}
+        # 2. premise step: the REJECT rule, gated in code; off unless asked for
+        premise, grounded = None, False
+        if self.premise_check:
+            premise_raw = self._ask(
+                [{"role": "system", "content": PREMISE_SYSTEM},
+                 {"role": "user", "content": f"Passages:\n{passages}\n\nQuestion: {question}\n\n{PREMISE_FOOTER}"}],
+                calls, "premise")
+            premise = parse_premise(premise_raw)
+            grounded = premise is not None and premise_grounded(premise, question, hits)
+            trace["premise"] = {"raw": premise_raw, "parsed": premise, "grounded": grounded, "fired": grounded}
+        else:
+            trace["premise"] = None
+        trace["premise_check"] = self.premise_check
 
         # 3. readings step: the CLARIFY rule
         readings_raw = self._ask(
@@ -191,7 +201,7 @@ class Agent:
         trace["readings"] = {"raw": readings_raw, "parsed": readings, "fired": readings_fired}
 
         # 3. draft, with one calculator round if asked
-        messages = [{"role": "system", "content": ANSWER_SYSTEM},
+        messages = [{"role": "system", "content": ANSWER_SYSTEM_WITH_PREMISE if self.premise_check else ANSWER_SYSTEM},
                     {"role": "user", "content": f"Passages:\n{passages}\n\nQuestion: {question}"}]
         draft = self._ask(messages, calls, "draft")
         calc_records = []

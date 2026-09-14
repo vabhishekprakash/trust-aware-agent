@@ -1,0 +1,222 @@
+{
+ "run": {
+  "trace_version": "trace-v2",
+  "split": "data/eval/dev_reserve.jsonl",
+  "model": "qwen2.5:3b-instruct",
+  "k": 8,
+  "premise_check": false,
+  "items": 34,
+  "ids": [
+   "q0002",
+   "q0010",
+   "q0016",
+   "q0027",
+   "q0031",
+   "q0033",
+   "q0051",
+   "q0057",
+   "q0059",
+   "q0062",
+   "q0063",
+   "q0064",
+   "q0069",
+   "q0071",
+   "q0077",
+   "q0086",
+   "q0145",
+   "q0150",
+   "q0154",
+   "q0157",
+   "q0167",
+   "q0178",
+   "q0187",
+   "q0188",
+   "q0191",
+   "q0197",
+   "q0202",
+   "q0204",
+   "q0212",
+   "q0216",
+   "q0218",
+   "q0219",
+   "q0222",
+   "q0237"
+  ],
+  "started_at": "2026-09-11T05:54:07+00:00",
+  "wall_seconds": 842.6,
+  "seconds_by_step": {
+   "retrieval": 0.7,
+   "readings": 434.7,
+   "draft": 401.7,
+   "draft_after_calc": 5.5
+  },
+  "cached_calls_by_step": {
+   "readings": 0,
+   "draft": 0,
+   "draft_after_calc": 0
+  },
+  "per_item_seconds": [
+   {
+    "id": "q0002",
+    "seconds": 36.61
+   },
+   {
+    "id": "q0010",
+    "seconds": 26.59
+   },
+   {
+    "id": "q0016",
+    "seconds": 26.25
+   },
+   {
+    "id": "q0027",
+    "seconds": 20.59
+   },
+   {
+    "id": "q0031",
+    "seconds": 20.23
+   },
+   {
+    "id": "q0033",
+    "seconds": 27.15
+   },
+   {
+    "id": "q0051",
+    "seconds": 21.17
+   },
+   {
+    "id": "q0057",
+    "seconds": 27.14
+   },
+   {
+    "id": "q0059",
+    "seconds": 26.65
+   },
+   {
+    "id": "q0062",
+    "seconds": 38.32
+   },
+   {
+    "id": "q0063",
+    "seconds": 20.57
+   },
+   {
+    "id": "q0064",
+    "seconds": 25.73
+   },
+   {
+    "id": "q0069",
+    "seconds": 18.68
+   },
+   {
+    "id": "q0071",
+    "seconds": 39.79
+   },
+   {
+    "id": "q0077",
+    "seconds": 25.19
+   },
+   {
+    "id": "q0086",
+    "seconds": 25.91
+   },
+   {
+    "id": "q0145",
+    "seconds": 18.79
+   },
+   {
+    "id": "q0150",
+    "seconds": 19.15
+   },
+   {
+    "id": "q0154",
+    "seconds": 18.14
+   },
+   {
+    "id": "q0157",
+    "seconds": 17.69
+   },
+   {
+    "id": "q0167",
+    "seconds": 18.78
+   },
+   {
+    "id": "q0178",
+    "seconds": 28.48
+   },
+   {
+    "id": "q0187",
+    "seconds": 19.73
+   },
+   {
+    "id": "q0188",
+    "seconds": 23.68
+   },
+   {
+    "id": "q0191",
+    "seconds": 30.18
+   },
+   {
+    "id": "q0197",
+    "seconds": 25.92
+   },
+   {
+    "id": "q0202",
+    "seconds": 29.2
+   },
+   {
+    "id": "q0204",
+    "seconds": 24.9
+   },
+   {
+    "id": "q0212",
+    "seconds": 23.28
+   },
+   {
+    "id": "q0216",
+    "seconds": 19.57
+   },
+   {
+    "id": "q0218",
+    "seconds": 21.85
+   },
+   {
+    "id": "q0219",
+    "seconds": 27.77
+   },
+   {
+    "id": "q0222",
+    "seconds": 21.38
+   },
+   {
+    "id": "q0237",
+    "seconds": 27.5
+   }
+  ],
+  "actions": {
+   "answerable/ABSTAIN": 6,
+   "answerable/ANSWER": 9,
+   "answerable/CLARIFY": 1,
+   "false_premise/ABSTAIN": 3,
+   "false_premise/ANSWER": 6,
+   "unanswerable/ABSTAIN": 9
+  }
+ },
+ "grader_version": "grader-v13",
+ "judge": "llama3.1:latest",
+ "graded_at": "2026-09-11T06:14:15+00:00",
+ "grading_wall_seconds": 364.3,
+ "decided_by": {
+  "judge": 12,
+  "rules": 18,
+  "exact": 4
+ },
+ "grades": {
+  "answerable/CORRECT": 6,
+  "answerable/PARTIAL": 2,
+  "answerable/WRONG": 8,
+  "false_premise/PARTIAL": 2,
+  "false_premise/WRONG": 7,
+  "unanswerable/CORRECT": 9
+ }
+}

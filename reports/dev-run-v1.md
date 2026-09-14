@@ -2,17 +2,19 @@
 
 Agent: qwen2.5:3b-instruct, k=8, no retrieval-score abstain rule (unset in this run and dropped after it), trace trace-v1. Graded by grader-v13 with judge llama3.1:latest. 100 dev items; the test split was not read. The ambiguous bucket has 9 dev items, so its numbers are indicative only.
 
+Related: reports/premise-step.md, the premise step built after this run and switched off: it made every bucket worse (run v2, reports/dev-run-v2.md).
+
 Items were drafted and verified by language model agents and graded by a language model judge; human checks so far are the two blind samples recorded in the annotation guide. Every count below comes from reports/dev-run-v1.jsonl.
 
 ## Actions per bucket
 
-| bucket | n | ANSWER | CLARIFY | ABSTAIN |
-|---|---|---|---|---|
-| answerable | 46 | 35/46 (76%) | 6/46 (13%) | 5/46 (11%) |
-| ambiguous | 9 | 7/9 (78%) | 2/9 (22%) | 0/9 (0%) |
-| unanswerable | 25 | 0/25 (0%) | 1/25 (4%) | 24/25 (96%) |
-| false_premise | 20 | 12/20 (60%) | 0/20 (0%) | 8/20 (40%) |
-| all | 100 | 54/100 (54%) | 9/100 (9%) | 37/100 (37%) |
+| bucket | n | ANSWER | REJECT | CLARIFY | ABSTAIN |
+|---|---|---|---|---|---|
+| answerable | 46 | 35/46 (76%) | 0/46 (0%) | 6/46 (13%) | 5/46 (11%) |
+| ambiguous | 9 | 7/9 (78%) | 0/9 (0%) | 2/9 (22%) | 0/9 (0%) |
+| unanswerable | 25 | 0/25 (0%) | 0/25 (0%) | 1/25 (4%) | 24/25 (96%) |
+| false_premise | 20 | 12/20 (60%) | 0/20 (0%) | 0/20 (0%) | 8/20 (40%) |
+| all | 100 | 54/100 (54%) | 0/100 (0%) | 9/100 (9%) | 37/100 (37%) |
 
 Which path fired, over all items (an item can show both a clarify and an abstain path; CLARIFY wins):
 
@@ -86,7 +88,7 @@ Evidence rank on answerable items when retrieved: n=38 min 1.000 p25 1.000 med 1
 
 - Judge said the response builds on the premise (grounded, either order): 14/20 (70%).
 - Graded WRONG on false-premise items: 14/20 (70%); PARTIAL 6; CORRECT 0.
-- Actions on false-premise items: ANSWER 12, CLARIFY 0, ABSTAIN 8.
+- Actions on false-premise items: ANSWER 12, REJECT 0, CLARIFY 0, ABSTAIN 8.
 
 ## Grader notes
 
