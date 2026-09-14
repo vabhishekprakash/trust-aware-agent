@@ -985,3 +985,19 @@ length artefact, not a confidence signal, so the logprob features are
 dropped and the cost is stated. Recommended: minus_logprobs with logistic
 plus isotonic. Artifacts for all three variants, fitted on all of dev with
 seed 42 and library versions, are in data/calibrators/. Test untouched.
+
+## Calibrator confirmed, and two reporting rules, 2026-09-12
+
+The owner confirmed minus_logprobs with logistic plus isotonic. Two rules
+for the report from now on. Every headline number carries its interval:
+no bare point estimate in the abstract, the README or the results
+summary, because at 134 items the honest claim is that confidence carries
+real but weak information beyond action and bucket, shown inside the
+stratum where both are fixed. And the lp_tokens diagnostic is written up
+in the results, next to the v9 judge question and the pool-snapshot
+episode, as a worked example of a feature that looks predictive and is an
+artefact. The report also names the finding that the free support
+features beat all three paid signals, which roughly triple the cost per
+question; that runs against the usual expectation that sampling-based
+uncertainty leads. docs/report.md is the standing draft that carries all
+of this.

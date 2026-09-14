@@ -75,3 +75,11 @@ usable for a selective policy: answering the top half by confidence in
 the decisive stratum roughly halves the error rate. It is not a precise
 probability at this data size. The test split, read once at M8, will say
 whether even the directional claim holds.
+
+## Named finding: the free signals beat the paid ones
+
+Lexical support, computed from the trace at no cost, separated correct
+from wrong answers in the decisive stratum more cleanly than verbalized
+confidence, sampling agreement or the log-probabilities, and the paid
+signals roughly triple the cost per question. The full statement is in
+docs/report.md.

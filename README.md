@@ -67,7 +67,15 @@ held-out test set once those parts exist.
 
 ## Results
 
-None yet. See docs/decisions.md for the choices made so far and why.
+Development set only so far, 134 items, every number out of fold with a
+95 percent bootstrap interval. The calibrated probability separates right
+from wrong answers with an AUROC of 0.70 [0.61, 0.79] pooled and 0.63
+[0.45, 0.80] inside the stratum where bucket and retrieval are held
+fixed. The honest claim is that confidence carries real but weak
+information beyond the action taken and the question's bucket. The free
+signals read from the agent's trace beat the three paid signals, which
+roughly triple the cost per question. The test split has not been read.
+Full draft: docs/report.md; the choices and why: docs/decisions.md.
 
 ## License
 
