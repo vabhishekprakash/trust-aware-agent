@@ -7,11 +7,198 @@
   "grader": "grader-v13",
   "grader_sha256": "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485"
  },
+ "attempts": 0,
  "n": 134,
  "strata_counts": {
   "pooled": 134,
   "answerable": 62,
   "decisive": 50
+ },
+ "audit": {
+  "provenance_ok": true,
+  "ground_truth_in_vector": false,
+  "near_duplicates": [
+   {
+    "test_id": "q0011",
+    "test_question": "For space flight projects, into how many incremental phases are the Formulation and Implementation life-cycle phases broken down?",
+    "dev_id": "q0096",
+    "dev_question": "How many phases make up the NASA life cycle?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0096"
+    ]
+   },
+   {
+    "test_id": "q0032",
+    "test_question": "Into how many steps does the handbook break the validation of technical requirements?",
+    "dev_id": "q0209",
+    "dev_question": "The handbook breaks requirements validation into four steps; what does the fourth and final step check for?",
+    "reasons": [
+     "cosine 0.90 with q0209",
+     "same evidence page and cosine >= 0.8 with q0209"
+    ]
+   },
+   {
+    "test_id": "q0046",
+    "test_question": "In the comparison of verification and validation testing, which document does validation testing trace back to?",
+    "dev_id": "q0216",
+    "dev_question": "The handbook ties verification testing back to the ConOps document, so which document does it tie validation testing back to?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0216"
+    ]
+   },
+   {
+    "test_id": "q0053",
+    "test_question": "For a system with several production units, what does the handbook say should be used instead of continued verification and validation to make sure the units after the first one meet stakeholder expectations?",
+    "dev_id": "q0221",
+    "dev_question": "For a system with several production units, the handbook says to keep running the full verification and validation processes on every unit after the first deliverable. What does it give as the reason for repeating them?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0221"
+    ]
+   },
+   {
+    "test_id": "q0058",
+    "test_question": "In the handbook's description of technical planning, what is the SEMP's standing relative to the project plan?",
+    "dev_id": "q0224",
+    "dev_question": "Because the project plan is a subordinate document to the SEMP, what does the handbook say the project plan is allowed to define on its own?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0224"
+    ]
+   },
+   {
+    "test_id": "q0068",
+    "test_question": "Once the requirements baseline is under formal configuration control after the SRR, what body must approve a change to it?",
+    "dev_id": "q0077",
+    "dev_question": "Who normally approves a change to project information that is held under configuration control?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0077"
+    ]
+   },
+   {
+    "test_id": "q0096",
+    "test_question": "How many phases make up the NASA life cycle?",
+    "dev_id": "q0011",
+    "dev_question": "For space flight projects, into how many incremental phases are the Formulation and Implementation life-cycle phases broken down?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0011"
+    ]
+   },
+   {
+    "test_id": "q0209",
+    "test_question": "The handbook breaks requirements validation into four steps; what does the fourth and final step check for?",
+    "dev_id": "q0032",
+    "dev_question": "Into how many steps does the handbook break the validation of technical requirements?",
+    "reasons": [
+     "cosine 0.90 with q0032",
+     "same evidence page and cosine >= 0.8 with q0032"
+    ]
+   },
+   {
+    "test_id": "q0221",
+    "test_question": "For a system with several production units, the handbook says to keep running the full verification and validation processes on every unit after the first deliverable. What does it give as the reason for repeating them?",
+    "dev_id": "q0053",
+    "dev_question": "For a system with several production units, what does the handbook say should be used instead of continued verification and validation to make sure the units after the first one meet stakeholder expectations?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0053"
+    ]
+   },
+   {
+    "test_id": "q0224",
+    "test_question": "Because the project plan is a subordinate document to the SEMP, what does the handbook say the project plan is allowed to define on its own?",
+    "dev_id": "q0058",
+    "dev_question": "In the handbook's description of technical planning, what is the SEMP's standing relative to the project plan?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0058"
+    ]
+   },
+   {
+    "test_id": "q0227",
+    "test_question": "Given that the verification plan is baselined at the Critical Design Review, what kinds of updates to it are allowed after that point?",
+    "dev_id": "q0063",
+    "dev_question": "Which milestone review is the verification plan baselined at?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0063"
+    ]
+   },
+   {
+    "test_id": "q0051",
+    "test_question": "How many major steps make up the Product Validation Process according to the handbook?",
+    "dev_id": "q0218",
+    "dev_question": "The handbook breaks product validation into three major steps. Which of the three involves writing the validation report?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0218"
+    ]
+   },
+   {
+    "test_id": "q0063",
+    "test_question": "Which milestone review is the verification plan baselined at?",
+    "dev_id": "q0227",
+    "dev_question": "Given that the verification plan is baselined at the Critical Design Review, what kinds of updates to it are allowed after that point?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0227"
+    ]
+   },
+   {
+    "test_id": "q0077",
+    "test_question": "Who normally approves a change to project information that is held under configuration control?",
+    "dev_id": "q0068",
+    "dev_question": "Once the requirements baseline is under formal configuration control after the SRR, what body must approve a change to it?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0068"
+    ]
+   },
+   {
+    "test_id": "q0187",
+    "test_question": "In what year was NPR 7123.1 first put into effect?",
+    "dev_id": "q0188",
+    "dev_question": "In what year was NPR 7123.1, NASA Systems Engineering Processes and Requirements, first issued?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0188"
+    ]
+   },
+   {
+    "test_id": "q0188",
+    "test_question": "In what year was NPR 7123.1, NASA Systems Engineering Processes and Requirements, first issued?",
+    "dev_id": "q0187",
+    "dev_question": "In what year was NPR 7123.1 first put into effect?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0187"
+    ]
+   },
+   {
+    "test_id": "q0216",
+    "test_question": "The handbook ties verification testing back to the ConOps document, so which document does it tie validation testing back to?",
+    "dev_id": "q0046",
+    "dev_question": "In the comparison of verification and validation testing, which document does validation testing trace back to?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0046"
+    ]
+   },
+   {
+    "test_id": "q0218",
+    "test_question": "The handbook breaks product validation into three major steps. Which of the three involves writing the validation report?",
+    "dev_id": "q0051",
+    "dev_question": "How many major steps make up the Product Validation Process according to the handbook?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0051"
+    ]
+   }
+  ],
+  "split": {
+   "seed": 42,
+   "source": "scripts/lock_and_split.py, stratified by bucket, halves per bucket",
+   "test_counts_found": {
+    "answerable": 62,
+    "ambiguous": 9,
+    "unanswerable": 34,
+    "false_premise": 29
+   },
+   "expected": {
+    "answerable": 46,
+    "ambiguous": 9,
+    "unanswerable": 25,
+    "false_premise": 20
+   }
+  }
  },
  "label_rate": {
   "pooled": 70,
@@ -770,10 +957,10 @@
   }
  },
  "timings": {
-  "loop": 7.1,
-  "confidence": 1.6,
-  "sampling": 7.7,
-  "grading": 1.7
+  "loop": 3.6,
+  "confidence": 0.1,
+  "sampling": 0.4,
+  "grading": 0.5
  },
  "confounder": {
   "answerable": {
@@ -877,5 +1064,85 @@
    }
   }
  },
- "wall_seconds": 185.1
+ "wall_seconds": 177.0,
+ "metrics_without_flagged": {
+  "pooled": {
+   "auroc": {
+    "point": 0.8269,
+    "lo": 0.7493,
+    "hi": 0.8888,
+    "n": 116
+   },
+   "brier": {
+    "point": 0.1811,
+    "lo": 0.1583,
+    "hi": 0.2052,
+    "n": 116
+   },
+   "ece": {
+    "point": 0.0927,
+    "lo": 0.0414,
+    "hi": 0.1715,
+    "n": 116
+   },
+   "aurc": {
+    "point": 0.2002,
+    "lo": 0.1593,
+    "hi": 0.3263,
+    "n": 116
+   }
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.7939,
+    "lo": 0.6833,
+    "hi": 0.8985,
+    "n": 52
+   },
+   "brier": {
+    "point": 0.1911,
+    "lo": 0.156,
+    "hi": 0.2257,
+    "n": 52
+   },
+   "ece": {
+    "point": 0.0942,
+    "lo": 0.0332,
+    "hi": 0.2169,
+    "n": 52
+   },
+   "aurc": {
+    "point": 0.1953,
+    "lo": 0.1132,
+    "hi": 0.3787,
+    "n": 52
+   }
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.8447,
+    "lo": 0.7083,
+    "hi": 0.9588,
+    "n": 40
+   },
+   "brier": {
+    "point": 0.1683,
+    "lo": 0.1359,
+    "hi": 0.2046,
+    "n": 40
+   },
+   "ece": {
+    "point": 0.1663,
+    "lo": 0.0593,
+    "hi": 0.2797,
+    "n": 40
+   },
+   "aurc": {
+    "point": 0.1261,
+    "lo": 0.0443,
+    "hi": 0.2739,
+    "n": 40
+   }
+  }
+ }
 }

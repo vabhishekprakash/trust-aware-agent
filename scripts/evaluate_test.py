@@ -35,7 +35,8 @@ from agent.evidence import evidence_record  # noqa: E402
 from agent.loop import Agent, draft_messages  # noqa: E402
 from agent.provider import OllamaProvider  # noqa: E402
 from agent.retriever import Hit, bge_embedder, load_chunks, load_index  # noqa: E402
-from calibration.features import admissible_features, matrix, variant_features  # noqa: E402
+from calibration.features import GROUND_TRUTH, PROVENANCE, admissible_features, matrix, variant_features  # noqa: E402
+from calibration.grader import content_words  # noqa: E402
 from calibration.grader import GRADER_VERSION, ProviderJudge, grade  # noqa: E402
 from calibration.metrics import auroc, aurc, bootstrap, brier, ece, reliability  # noqa: E402
 from fit_calibrator import FOLDS, SEED, logistic, oof_scores  # noqa: E402
@@ -46,7 +47,11 @@ from signals.process import leaked_fields, process_features, stratum  # noqa: E4
 from signals.retrieval_support import nli_model, support_features  # noqa: E402
 from signals.verbalized import confidence_features, confidence_messages  # noqa: E402
 
-MARKER = ROOT / "data" / "eval" / "TEST_READ_ONCE"
+MARKER = ROOT / "data" / "eval" / "TEST_READ_ONCE"  # written only when a run completes
+STARTED = ROOT / "data" / "eval" / "TEST_READ_STARTED"  # one line appended per attempt; a crash leaves it without the completion marker
+DUP_JACCARD = 0.6
+DUP_COSINE = 0.9
+DUP_SAME_PAGE_COSINE = 0.8
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
 BASELINES = {
     "verbalized alone": ["vc_confidence", "vc_parsed", "vc_round"],
@@ -92,7 +97,9 @@ def main() -> int:
         split = ROOT / "data" / "eval" / "test.jsonl"
         out = ROOT / "reports" / "m8-test-results"
         trace_dir = ROOT / "data" / "traces" / "test"
-        MARKER.write_text(f"test.jsonl read by scripts/evaluate_test.py at {datetime.now(timezone.utc).isoformat(timespec='seconds')}\n", encoding="utf-8")
+        with STARTED.open("a", encoding="utf-8", newline="\n") as f:
+            f.write(f"attempt started {datetime.now(timezone.utc).isoformat(timespec='seconds')}\n")
+    attempts = len(STARTED.read_text(encoding="utf-8").splitlines()) if (not args.dry_run and STARTED.exists()) else 0
     trace_dir.mkdir(parents=True, exist_ok=True)
     started = time.time()
 
@@ -147,6 +154,47 @@ def main() -> int:
                      "leaked_fields_present_in_trace": leaked_fields(trace)})
         print(f"{n:>3} {item['id']} {item['bucket']:<14} {trace['action']:<8} {record['grade']:<8} {time.time() - started:.0f}s", flush=True)
 
+    # 1b. audits that run regardless of band: provenance, no ground truth in the vector, near-duplicates across the splits
+    for r in rows:
+        for k in r["features"]:
+            assert k in PROVENANCE, f"feature without provenance: {k}"
+            assert k not in GROUND_TRUTH, f"ground truth in the feature vector: {k}"
+    dev_items = [json.loads(l) for l in (ROOT / "data" / "eval" / "dev.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+    dev_q = [d["question"] for d in dev_items]
+    dev_pages = [{str(e["page"]) for e in d.get("evidence", [])} for d in dev_items]
+    dev_vec = embed(dev_q)
+    test_vec = embed([it["question"] for it in items])
+    dev_vec = dev_vec / np.linalg.norm(dev_vec, axis=1, keepdims=True)
+    test_vec = test_vec / np.linalg.norm(test_vec, axis=1, keepdims=True)
+    sims = test_vec @ dev_vec.T
+    for i, it in enumerate(items):  # in the dry run the items are the dev items; a question is not its own duplicate
+        for k, d in enumerate(dev_items):
+            if d["id"] == it["id"]:
+                sims[i, k] = -1.0
+    flagged_pairs = []
+    for i, it in enumerate(items):
+        words = content_words(it["question"])
+        pages = {str(e["page"]) for e in it.get("evidence", [])}
+        j = int(np.argmax(sims[i]))
+        best_cos = float(sims[i, j])
+        jac_all = [0.0 if d["id"] == it["id"] else (len(words & content_words(q)) / len(words | content_words(q)) if (words | content_words(q)) else 0.0)
+                   for q, d in zip(dev_q, dev_items)]
+        jj = int(np.argmax(jac_all))
+        reasons = []
+        if jac_all[jj] >= DUP_JACCARD:
+            reasons.append(f"jaccard {jac_all[jj]:.2f} with {dev_items[jj]['id']}")
+        if best_cos >= DUP_COSINE:
+            reasons.append(f"cosine {best_cos:.2f} with {dev_items[j]['id']}")
+        same_page = [k for k in range(len(dev_items)) if pages & dev_pages[k] and sims[i, k] >= DUP_SAME_PAGE_COSINE]
+        if same_page:
+            reasons.append("same evidence page and cosine >= 0.8 with " + ", ".join(dev_items[k]["id"] for k in same_page))
+        rows[i]["nearest_dev"] = {"id": dev_items[j]["id"], "cosine": round(best_cos, 3), "jaccard_best": round(max(jac_all), 3), "jaccard_id": dev_items[jj]["id"]}
+        rows[i]["duplicate_flag"] = bool(reasons)
+        if reasons:
+            flagged_pairs.append({"test_id": it["id"], "test_question": it["question"], "dev_id": dev_items[j]["id"], "dev_question": dev_q[j], "reasons": reasons})
+    split_check = {"seed": 42, "source": "scripts/lock_and_split.py, stratified by bucket, halves per bucket",
+                   "test_counts_found": dict(Counter(it["bucket"] for it in items)), "expected": {"answerable": 46, "ambiguous": 9, "unanswerable": 25, "false_premise": 20}}
+
     # 2. score with the frozen artifact, apply the policy
     names = artifact["features"]
     X = np.array([[float(r["features"][k]) for k in names] for r in rows])
@@ -181,7 +229,8 @@ def main() -> int:
     def block(pp, yy):
         return {"auroc": bootstrap(auroc, pp, yy), "brier": bootstrap(brier, pp, yy), "ece": bootstrap(ece, pp, yy), "aurc": bootstrap(aurc, pp, yy)}
 
-    results = {"frozen": frozen, "n": len(rows), "strata_counts": {s: int(m.sum()) for s, m in strata.items()},
+    results = {"frozen": frozen, "attempts": attempts, "n": len(rows), "strata_counts": {s: int(m.sum()) for s, m in strata.items()},
+               "audit": {"provenance_ok": True, "ground_truth_in_vector": False, "near_duplicates": flagged_pairs, "split": split_check},
                "label_rate": {s: int(y[m].sum()) for s, m in strata.items()}, "metrics": {}, "baselines": {}, "policy": {}, "timings": {k: round(v, 1) for k, v in timings.items()}}
     for s, m in strata.items():
         results["metrics"][s] = block(p[m], y[m])
@@ -226,21 +275,35 @@ def main() -> int:
     results["per_bucket"] = {b: {"n": int((bucket == b).sum()), "actions": dict(Counter(r["action"] for r in rows if r["strata"]["bucket"] == b)),
                                  "grades": dict(Counter(r["grade"] for r in rows if r["strata"]["bucket"] == b))} for b in BUCKETS}
     results["wall_seconds"] = round(time.time() - started, 1)
+    keep = np.array([not r["duplicate_flag"] for r in rows])
+    results["metrics_without_flagged"] = {s: block(p[m & keep], y[m & keep]) for s, m in strata.items()} if (~keep).any() else None
 
     # 5. write everything verbatim
     with open(str(out) + "-rows.jsonl", "w", encoding="utf-8", newline="\n") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
     Path(str(out) + ".json").write_text(json.dumps(results, indent=1) + "\n", encoding="utf-8", newline="\n")
+    if not args.dry_run:
+        MARKER.write_text(f"test.jsonl read once by scripts/evaluate_test.py; completed {datetime.now(timezone.utc).isoformat(timespec='seconds')} after {attempts} attempt(s)\n", encoding="utf-8")
 
     title = "Dry run on dev (not the test read)" if args.dry_run else "Test split results, read once"
     lines = [f"# {title}", "", f"Preregistered in reports/m8-preregistration.md. Frozen: {json.dumps(frozen)}.",
              f"{len(rows)} items; strata counts {results['strata_counts']}; correct per stratum {results['label_rate']}. Wall clock {results['wall_seconds']:.0f} s "
              f"(loop {timings['loop']:.0f}, confidence {timings['confidence']:.0f}, sampling {timings['sampling']:.0f}, grading {timings['grading']:.0f}).", "",
-             "## Headline: the confirmed vector", "", "| stratum | n | correct | AUROC | Brier | ECE (10 bins) | AURC |", "|---|---|---|---|---|---|---|"]
+             f"Attempts (a crashed attempt leaves a start line and replays from the cache): {attempts}.", "",
+             "## Audit, run regardless of band", "",
+             f"- Provenance: every feature name in the rows is in the provenance lists and none is a ground-truth field (asserted).",
+             f"- Split: seed {split_check['seed']}, {split_check['source']}; test counts found {split_check['test_counts_found']}, expected {split_check['expected']}.",
+             f"- Near-duplicates across dev and test (Jaccard >= {DUP_JACCARD}, cosine >= {DUP_COSINE}, or same evidence page with cosine >= {DUP_SAME_PAGE_COSINE}): {len(flagged_pairs)} flagged.",
+             *[f"  - {fp['test_id']} / {fp['dev_id']} ({'; '.join(fp['reasons'])}): \"{fp['test_question']}\" against \"{fp['dev_question']}\"" for fp in flagged_pairs],
+             "", "## Headline: the confirmed vector", "", "| stratum | n | correct | AUROC | Brier | ECE (10 bins) | AURC |", "|---|---|---|---|---|---|---|"]
     for s, m in strata.items():
         r_ = results["metrics"][s]
         lines.append(f"| {s} | {int(m.sum())} | {int(y[m].sum())} | {fmt(r_['auroc'])} | {fmt(r_['brier'])} | {fmt(r_['ece'])} | {fmt(r_['aurc'])} |")
+    if results["metrics_without_flagged"]:
+        lines += ["", "With the flagged near-duplicate items removed:", "", "| stratum | AUROC | Brier |", "|---|---|---|"]
+        for s, r_ in results["metrics_without_flagged"].items():
+            lines.append(f"| {s} | {fmt(r_['auroc'])} | {fmt(r_['brier'])} |")
     pol = results["policy"]
     lines += ["", f"Policy on the {pol['answered']} answered items ({pol['answered_correct']} correct):", "",
               "| operating point | coverage % | risk % |", "|---|---|---|",

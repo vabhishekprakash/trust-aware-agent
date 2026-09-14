@@ -180,6 +180,15 @@ both questions, and the headline metrics are also reported with the
 flagged test items removed, labelled as such, whichever band the result
 falls in.
 
+Strictness of that rule, measured before the read on dev against itself
+with self-matches excluded: 18 of 134 dev items are flagged, nine pairs,
+all but one by the same-evidence-page rule, and most pair an answerable
+item with the false-premise item drafted from the same passage. That is
+the drafting pipeline's known structure, not leakage, and the same
+pattern is expected across the splits. The flagged-items-removed figures
+are reported next to the full ones so a reader can see whether it
+matters.
+
 ## Markers: a crashed run and a completed run are different
 
 The script appends a line to data/eval/TEST_READ_STARTED at every start

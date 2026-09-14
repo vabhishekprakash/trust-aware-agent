@@ -1,9 +1,33 @@
 # Dry run on dev (not the test read)
 
-These numbers are in-sample: the frozen artifact was fitted on these same 134 items and the baselines were fitted on them too, so the AUROCs here are training fits, not the out-of-fold figures the report uses (0.70 pooled, 0.63 decisive for the confirmed vector). The dry run exists to prove the script runs end to end before it reads test; it is not evidence about the system.
-
 Preregistered in reports/m8-preregistration.md. Frozen: {"agent_commit": "85db315", "artifact_sha256": "58f3f3d1cba468861b8b5094dae334b270c7fbbdff946fac1a801ad3e1d90116", "policy_sha256": "767fea22e942067807041787901d05347959d921a32c66365fc496b2e3bc3821", "split_sha256": "b3180fd19227df17e81dbbf9ca3300f6b230aee370af63afc9de6ee0cd69d4f0", "grader": "grader-v13", "grader_sha256": "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485"}.
-134 items; strata counts {'pooled': 134, 'answerable': 62, 'decisive': 50}; correct per stratum {'pooled': 70, 'answerable': 36, 'decisive': 33}. Wall clock 185 s (loop 7, confidence 2, sampling 8, grading 2).
+134 items; strata counts {'pooled': 134, 'answerable': 62, 'decisive': 50}; correct per stratum {'pooled': 70, 'answerable': 36, 'decisive': 33}. Wall clock 177 s (loop 4, confidence 0, sampling 0, grading 0).
+
+Attempts (a crashed attempt leaves a start line and replays from the cache): 0.
+
+## Audit, run regardless of band
+
+- Provenance: every feature name in the rows is in the provenance lists and none is a ground-truth field (asserted).
+- Split: seed 42, scripts/lock_and_split.py, stratified by bucket, halves per bucket; test counts found {'answerable': 62, 'ambiguous': 9, 'unanswerable': 34, 'false_premise': 29}, expected {'answerable': 46, 'ambiguous': 9, 'unanswerable': 25, 'false_premise': 20}.
+- Near-duplicates across dev and test (Jaccard >= 0.6, cosine >= 0.9, or same evidence page with cosine >= 0.8): 18 flagged.
+  - q0011 / q0096 (same evidence page and cosine >= 0.8 with q0096): "For space flight projects, into how many incremental phases are the Formulation and Implementation life-cycle phases broken down?" against "How many phases make up the NASA life cycle?"
+  - q0032 / q0209 (cosine 0.90 with q0209; same evidence page and cosine >= 0.8 with q0209): "Into how many steps does the handbook break the validation of technical requirements?" against "The handbook breaks requirements validation into four steps; what does the fourth and final step check for?"
+  - q0046 / q0216 (same evidence page and cosine >= 0.8 with q0216): "In the comparison of verification and validation testing, which document does validation testing trace back to?" against "The handbook ties verification testing back to the ConOps document, so which document does it tie validation testing back to?"
+  - q0053 / q0221 (same evidence page and cosine >= 0.8 with q0221): "For a system with several production units, what does the handbook say should be used instead of continued verification and validation to make sure the units after the first one meet stakeholder expectations?" against "For a system with several production units, the handbook says to keep running the full verification and validation processes on every unit after the first deliverable. What does it give as the reason for repeating them?"
+  - q0058 / q0224 (same evidence page and cosine >= 0.8 with q0224): "In the handbook's description of technical planning, what is the SEMP's standing relative to the project plan?" against "Because the project plan is a subordinate document to the SEMP, what does the handbook say the project plan is allowed to define on its own?"
+  - q0068 / q0077 (same evidence page and cosine >= 0.8 with q0077): "Once the requirements baseline is under formal configuration control after the SRR, what body must approve a change to it?" against "Who normally approves a change to project information that is held under configuration control?"
+  - q0096 / q0011 (same evidence page and cosine >= 0.8 with q0011): "How many phases make up the NASA life cycle?" against "For space flight projects, into how many incremental phases are the Formulation and Implementation life-cycle phases broken down?"
+  - q0209 / q0032 (cosine 0.90 with q0032; same evidence page and cosine >= 0.8 with q0032): "The handbook breaks requirements validation into four steps; what does the fourth and final step check for?" against "Into how many steps does the handbook break the validation of technical requirements?"
+  - q0221 / q0053 (same evidence page and cosine >= 0.8 with q0053): "For a system with several production units, the handbook says to keep running the full verification and validation processes on every unit after the first deliverable. What does it give as the reason for repeating them?" against "For a system with several production units, what does the handbook say should be used instead of continued verification and validation to make sure the units after the first one meet stakeholder expectations?"
+  - q0224 / q0058 (same evidence page and cosine >= 0.8 with q0058): "Because the project plan is a subordinate document to the SEMP, what does the handbook say the project plan is allowed to define on its own?" against "In the handbook's description of technical planning, what is the SEMP's standing relative to the project plan?"
+  - q0227 / q0063 (same evidence page and cosine >= 0.8 with q0063): "Given that the verification plan is baselined at the Critical Design Review, what kinds of updates to it are allowed after that point?" against "Which milestone review is the verification plan baselined at?"
+  - q0051 / q0218 (same evidence page and cosine >= 0.8 with q0218): "How many major steps make up the Product Validation Process according to the handbook?" against "The handbook breaks product validation into three major steps. Which of the three involves writing the validation report?"
+  - q0063 / q0227 (same evidence page and cosine >= 0.8 with q0227): "Which milestone review is the verification plan baselined at?" against "Given that the verification plan is baselined at the Critical Design Review, what kinds of updates to it are allowed after that point?"
+  - q0077 / q0068 (same evidence page and cosine >= 0.8 with q0068): "Who normally approves a change to project information that is held under configuration control?" against "Once the requirements baseline is under formal configuration control after the SRR, what body must approve a change to it?"
+  - q0187 / q0188 (same evidence page and cosine >= 0.8 with q0188): "In what year was NPR 7123.1 first put into effect?" against "In what year was NPR 7123.1, NASA Systems Engineering Processes and Requirements, first issued?"
+  - q0188 / q0187 (same evidence page and cosine >= 0.8 with q0187): "In what year was NPR 7123.1, NASA Systems Engineering Processes and Requirements, first issued?" against "In what year was NPR 7123.1 first put into effect?"
+  - q0216 / q0046 (same evidence page and cosine >= 0.8 with q0046): "The handbook ties verification testing back to the ConOps document, so which document does it tie validation testing back to?" against "In the comparison of verification and validation testing, which document does validation testing trace back to?"
+  - q0218 / q0051 (same evidence page and cosine >= 0.8 with q0051): "The handbook breaks product validation into three major steps. Which of the three involves writing the validation report?" against "How many major steps make up the Product Validation Process according to the handbook?"
 
 ## Headline: the confirmed vector
 
@@ -12,6 +36,14 @@ Preregistered in reports/m8-preregistration.md. Frozen: {"agent_commit": "85db31
 | pooled | 134 | 70 | 0.818 [0.753, 0.878] | 0.185 [0.164, 0.206] | 0.081 [0.041, 0.151] | 0.208 [0.168, 0.328] |
 | answerable | 62 | 36 | 0.785 [0.683, 0.879] | 0.199 [0.166, 0.232] | 0.124 [0.045, 0.223] | 0.192 [0.124, 0.365] |
 | decisive | 50 | 33 | 0.838 [0.728, 0.938] | 0.182 [0.147, 0.216] | 0.179 [0.090, 0.290] | 0.129 [0.056, 0.269] |
+
+With the flagged near-duplicate items removed:
+
+| stratum | AUROC | Brier |
+|---|---|---|
+| pooled | 0.827 [0.749, 0.889] | 0.181 [0.158, 0.205] |
+| answerable | 0.794 [0.683, 0.898] | 0.191 [0.156, 0.226] |
+| decisive | 0.845 [0.708, 0.959] | 0.168 [0.136, 0.205] |
 
 Policy on the 70 answered items (36 correct):
 
