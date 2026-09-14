@@ -1081,3 +1081,18 @@ step reaches 1.0, so the dashboard can show "100 percent" on an item the
 out-of-fold score put at 0.88. That is a display choice for the owner:
 cap the shown probability at the isotonic's second-highest step, or show
 the out-of-fold band, or accept the artifact as is with the gap stated.
+
+## The display cap, decided by the owner on 2026-09-12
+
+Option 1: the shown probability is capped at the isotonic's second-highest
+step, with the artifact-to-measured gap stated on the page. Not option 2,
+two probability sources on one screen is worse than one imperfect source
+clearly labelled. The page wording is a design decision, not an apology:
+this system does not report certainty, because a probability calibrated
+on 134 questions cannot justify one, and a trust-aware system applies
+that rule to itself. The report's limitations say plainly that every
+metric describes the out-of-fold calibrator, that the shipped artifact is
+refit on all of dev with its own calibration unmeasured, and that the cap
+is a presentation guard, not a fix. The backwards single-feature pushes
+stay reported as built, family sums leading; the report names the cause
+as correlated inputs in a linear model.

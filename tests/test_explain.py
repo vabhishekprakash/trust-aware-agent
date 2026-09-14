@@ -68,3 +68,16 @@ def test_family_sums_partition_the_contributions():
     members = [m for ms in FAMILIES.values() for m in ms]
     assert len(members) == len(set(members))
     assert "By signal family" in breakdown(e)
+
+
+def test_display_cap_is_the_isotonics_second_highest_step():
+    from explain.contributions import DISPLAY_NOTE
+
+    ex = Explainer(make_artifact(with_isotonic=True))
+    steps = sorted(set(float(v) for v in ex.isotonic.y_thresholds_))
+    assert ex.display_cap == steps[-2]
+    e = ex.explain({"lexical_support_top1": 5.0, "readings_count": -5.0, "response_words": 0.0})
+    assert e.uncapped_probability == 1.0 and e.probability == ex.display_cap < 1.0
+    assert "does not report certainty" in DISPLAY_NOTE
+    ex2 = Explainer(make_artifact(with_isotonic=False))
+    assert ex2.display_cap is None and ex2.explain({"lexical_support_top1": 5.0, "readings_count": -5.0, "response_words": 0.0}).probability < 1.0

@@ -21,6 +21,11 @@ import numpy as np
 
 ARTIFACT_DIR = Path(__file__).resolve().parents[2] / "data" / "calibrators"
 
+# Shown next to the capped probability on the page. A design decision, not an apology: the
+# project's own thesis applied to itself.
+DISPLAY_NOTE = ("This system does not report certainty. Its confidence is capped below 100 percent, because a "
+                "probability calibrated on 134 questions cannot justify one, and a trust-aware system applies that rule to itself.")
+
 # Plain words for each feature, read as "<phrase> (value)". Missing names fall back to the provenance text.
 PHRASES = {
     "action_answer": "the agent gave a direct answer",
@@ -101,11 +106,13 @@ class Contribution:
 
 @dataclass
 class Explanation:
-    probability: float
+    probability: float  # what the page shows: the calibrated probability, capped at the isotonic's second-highest step
     logistic_probability: float
     log_odds: float
     intercept: float
     contributions: list[Contribution] = field(default_factory=list)
+    uncapped_probability: float = 0.0
+    display_cap: Optional[float] = None
 
     def top(self, n: int = 3, sign: int = +1) -> list[Contribution]:
         picked = [c for c in self.contributions if (c.contribution > 0) == (sign > 0) and c.contribution != 0]
@@ -133,6 +140,15 @@ class Explainer:
         self.intercept = float(lr.intercept_[0])
         self.isotonic = artifact.get("isotonic")
         self.variant = artifact.get("variant")
+        self.display_cap = self._cap(self.isotonic)
+
+    @staticmethod
+    def _cap(isotonic) -> Optional[float]:
+        """The isotonic's second-highest step: nothing is shown as certain (owner's display choice, 2026-09-12)."""
+        if isotonic is None:
+            return None
+        steps = sorted(set(float(v) for v in isotonic.y_thresholds_))
+        return steps[-2] if len(steps) >= 2 else steps[-1]
 
     @classmethod
     def load(cls, variant: str = "minus_logprobs", directory: Path = ARTIFACT_DIR) -> "Explainer":
@@ -144,11 +160,13 @@ class Explainer:
         contribs = self.coef * z
         log_odds = float(self.intercept + contribs.sum())
         p_log = 1.0 / (1.0 + math.exp(-log_odds))
-        p = float(self.isotonic.predict([p_log])[0]) if self.isotonic is not None else p_log
+        raw = float(self.isotonic.predict([p_log])[0]) if self.isotonic is not None else p_log
+        p = min(raw, self.display_cap) if self.display_cap is not None else raw
         items = [Contribution(n, float(x[i]), float(self.means[i]), float(self.sds[i]), float(self.coef[i]), float(contribs[i]),
                               PHRASES.get(n, n)) for i, n in enumerate(self.features)]
         items.sort(key=lambda c: -abs(c.contribution))
-        return Explanation(probability=p, logistic_probability=p_log, log_odds=log_odds, intercept=self.intercept, contributions=items)
+        return Explanation(probability=p, logistic_probability=p_log, log_odds=log_odds, intercept=self.intercept, contributions=items,
+                           uncapped_probability=raw, display_cap=self.display_cap)
 
 
 def _fmt_value(c: Contribution) -> str:

@@ -129,6 +129,21 @@ The standing limitations are in docs/annotation-guide.md. In short:
   CORRECT readings of a bare false-premise abstention, and the lenient
   three-way grade.
 
+Every metric in this report describes the out-of-fold calibrator: each
+dev item scored by a model fitted on the other four fifths. The shipped
+artifact is refit on all 134 dev items. Its probabilities differ from the
+measured ones by 0.094 on average and up to 0.415, and its own
+calibration is unmeasured. The displayed probability is capped at the
+isotonic step below the top one, so nothing shows as certain; the cap is
+a presentation guard, not a fix, and the page says so.
+
+The explanation layer reports single-feature contributions as the fit
+gives them. The correlated retrieval-score features receive opposite
+signs from the fit, so individual coefficients are not interpretable as
+effects, which is a known consequence of correlated inputs in a linear
+model. The breakdown therefore leads with the sums by signal family, the
+steadier quantity, and states the caveat every time.
+
 ## Decision policy
 
 VERIFY is a flag, not a verification loop. The problem statement's

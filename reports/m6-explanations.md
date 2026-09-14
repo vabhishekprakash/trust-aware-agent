@@ -1,6 +1,6 @@
 # Sample explanations on dev
 
-Calibrator minus_logprobs, logistic plus isotonic, the artifact fitted on all of dev. The explanation uses that artifact; the metrics in the report use out-of-fold scores. Across the 134 dev items the artifact's probability differs from the out-of-fold one by 0.094 on average (max 0.415), as expected for a model that has now seen every item.
+Calibrator minus_logprobs, logistic plus isotonic, the artifact fitted on all of dev. The explanation uses that artifact; the metrics in the report use out-of-fold scores. Across the 134 dev items the artifact's probability differs from the out-of-fold one by 0.096 on average (max 0.415), as expected for a model that has now seen every item.
 
 ## ANSWER band
 
@@ -10,7 +10,7 @@ Question: What is AS9100 and which industry was it created for?
 
 Answer: AS9100 is a quality management system that is widely adopted and standardized in the commercial aerospace industry.
 
-Confidence 100 percent, so the policy says ANSWER. By signal family, in log-odds: retrieval scores and spread +2.42; the answer's length and hedging +0.22; the readings step -0.22; agreement among resampled answers -0.20. Single features pushing up most: gap between the best and second passage scores (0.07, well above the usual); mean retrieval score of the passages (0.57, well below the usual); retrieval score of the best passage (0.65, well below the usual). Pushing down most: entailment of the answer by any passage (0.12, below the usual); readings the model listed for the question (1, about average for this agent); similarity between the answer and the best passage (0.75, above the usual). Everything else together moved the log-odds by +1.34; the starting point was +0.05. These amounts are exact for the log-odds, not for the percentage; correlated features inside a family can take opposite signs, so the family sums are the steadier reading; and they say what moved the score on this run, not what causes a correct answer.
+Confidence 67 percent, so the policy says ANSWER. By signal family, in log-odds: retrieval scores and spread +2.42; the answer's length and hedging +0.22; the readings step -0.22; agreement among resampled answers -0.20. Single features pushing up most: gap between the best and second passage scores (0.07, well above the usual); mean retrieval score of the passages (0.57, well below the usual); retrieval score of the best passage (0.65, well below the usual). Pushing down most: entailment of the answer by any passage (0.12, below the usual); readings the model listed for the question (1, about average for this agent); similarity between the answer and the best passage (0.75, above the usual). Everything else together moved the log-odds by +1.34; the starting point was +0.05. These amounts are exact for the log-odds, not for the percentage; correlated features inside a family can take opposite signs, so the family sums are the steadier reading; and they say what moved the score on this run, not what causes a correct answer.
 
 ### q0013 (answerable, graded WRONG)
 
