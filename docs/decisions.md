@@ -1052,3 +1052,32 @@ about 34 pass-through abstentions and 11 PARTIAL false-premise
 abstentions wherever they appear. The 20 percent target at threshold
 0.846, six of seventy answered items shown, is reported as the
 alternative so a reader sees what a risk guarantee would cost.
+
+## M6 explanations: contributions in log-odds, plain phrases, 2026-09-12
+
+The explanation of a score is the exact decomposition the calibrator
+allows: coefficient times standardised value per feature, summed with the
+intercept to the log-odds, then the isotonic bend. The breakdown names
+the top three pushes up and down in plain phrases from a fixed table, with
+each feature's value and how unusual it is against the dev mean, sums the
+rest, and states two limits every time: the amounts are exact for the
+log-odds, not the percentage, and they say what moved the score on this
+run, not what causes a correct answer. The isotonic step is now part of
+the artifact, fitted on the 134 out-of-fold logistic scores so it never
+saw its own training predictions (scripts/finalize_calibrator.py). The
+artifact's full-dev probabilities differ from the out-of-fold ones, and
+reports/m6-explanations.md states by how much, since the dashboard shows
+the former and the report's metrics use the latter.
+
+Two things the first sample explanations showed, 2026-09-12. First, with
+correlated features (the three retrieval-score features, the agreement
+features) the logistic fit gives opposite signs inside a family, so a
+single feature's push reads backwards ("mean retrieval score well below
+the usual" pushing the score up). The breakdown now leads with the family
+sums, which are the steadier reading, and states the caveat every time.
+Second, the artifact fitted on all of dev differs from the out-of-fold
+probabilities by 0.094 on average and up to 0.415, and its isotonic top
+step reaches 1.0, so the dashboard can show "100 percent" on an item the
+out-of-fold score put at 0.88. That is a display choice for the owner:
+cap the shown probability at the isotonic's second-highest step, or show
+the out-of-fold band, or accept the artifact as is with the gap stated.
