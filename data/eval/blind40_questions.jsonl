@@ -1,0 +1,40 @@
+{"id": "q0004", "question": "Across the project life cycle, how many more times does the SE engine cycle its technical management processes than its technical development processes?"}
+{"id": "q0005", "question": "When a product is validated, which document do the validation activities trace back to?"}
+{"id": "q0012", "question": "During program Formulation, which major reviews lead up to approval at KDP I?"}
+{"id": "q0014", "question": "At what life-cycle cost does the commitment made at the end of Phase B have to be made with Congress and the Office of Management and Budget?"}
+{"id": "q0015", "question": "Which readiness reviews are the Phase D activities of a space flight project aimed at preparing for?"}
+{"id": "q0018", "question": "How high above the Earth does the handbook place geostationary satellites when explaining why they are boosted to a higher orbit instead of deorbited?"}
+{"id": "q0029", "question": "In the handbook's thrust vector controller example, the force requirement carries a tolerance. What is that tolerance as a percentage of the nominal force?"}
+{"id": "q0032", "question": "Into how many steps does the handbook break the validation of technical requirements?"}
+{"id": "q0036", "question": "Up to which milestone review does the handbook say technology assessment should stay involved in the design and development process, starting from concept development?"}
+{"id": "q0055", "question": "Under which act might environmental documentation or approvals have to be obtained before a site can receive the end product?"}
+{"id": "q0070", "question": "When an interface change needs sign-off from every side of the interface, what level of approval does the handbook require?"}
+{"id": "q0076", "question": "What does the handbook call a documented agreement that deliberately releases a program or project from having to meet a requirement?"}
+{"id": "q0082", "question": "A Production Readiness Review is held when a project is building or buying more than how many similar systems?"}
+{"id": "q0087", "question": "When writing requirements, what does using the word 'should' signify according to the handbook's checklist?"}
+{"id": "q0096", "question": "How many phases make up the NASA life cycle?"}
+{"id": "q0100", "question": "By when does a project need to have its Technology Development Plan in place?"}
+{"id": "q0101", "question": "When is the concept of operations baselined?"}
+{"id": "q0102", "question": "In which project phase is the decommissioning plan developed?"}
+{"id": "q0103", "question": "Which review has to be completed before hardware production can begin in Phase C?"}
+{"id": "q0109", "question": "Who is responsible for writing the ops concept?"}
+{"id": "q0110", "question": "Which system design process produces the measures used to judge whether the system does what it needs to?"}
+{"id": "q0112", "question": "During validation, what is actually being compared against the stakeholder expectations?"}
+{"id": "q0135", "question": "Which NASA Centers have chosen to certify to the AS9100 quality system?"}
+{"id": "q0140", "question": "When was the Mars Science Laboratory, one of the large traditional projects the tailoring discussion contrasts with small projects, launched?"}
+{"id": "q0141", "question": "How many days before a life cycle review like PDR does the handbook say the review material has to be delivered to the board?"}
+{"id": "q0142", "question": "How many slides are in the milestone review presentation templates that the NASA Engineering Network SE Community of Practice provides?"}
+{"id": "q0148", "question": "What fraction of a project's total cost is typically consumed by verification activities?"}
+{"id": "q0149", "question": "What proportion of a project's requirements should be verified by test rather than by analysis?"}
+{"id": "q0151", "question": "What scheduling software does the handbook suggest using to build and maintain a project's network schedule?"}
+{"id": "q0174", "question": "How many degrees beyond the expected flight temperature range must a qualification unit be tested?"}
+{"id": "q0181", "question": "How many processes does ANSI/EIA-632 define, and how does that count compare with the 17 processes in NPR 7123.1?"}
+{"id": "q0189", "question": "What specific systems engineering lesson did NASA take away from the Genesis mission and fold into this handbook?"}
+{"id": "q0193", "question": "Since the handbook makes the systems engineer the one responsible for identifying and controlling the project's cost and schedule, what does it leave for the PP&C function to do?"}
+{"id": "q0196", "question": "The handbook's life-cycle cost curve shows roughly 75% of a project's cost already spent by the time design is done; what share of the total does it say those design decisions commit?"}
+{"id": "q0197", "question": "Since NPR 7120.7 is the directive that defines the life cycle for NASA space flight projects, what two major phases does that directive split the life cycle into?"}
+{"id": "q0200", "question": "Since the handbook says the system-level CDR is normally held first and the lower-level CDRs follow it, what about the next phase does it say that top-down order reflects?"}
+{"id": "q0201", "question": "Since the handbook limits the Post-Flight Assessment Review to robotic missions, in which life-cycle phase is that review listed?"}
+{"id": "q0213", "question": "Since the handbook says the drive toward better design resolution is formalized in Phase C by defining a baseline system definition, what is usually baselined as the requirements portion of that baseline?"}
+{"id": "q0214", "question": "Because the handbook makes baselining the design solution the opening step of the Design Solution Definition Process, how does it recommend keeping alternative concepts open after the baseline is set?"}
+{"id": "q0217", "question": "Given that acceptance testing, like qualification, is run only once per design no matter how many flight units are built, what goes into the single Acceptance Data Package for the design?"}
