@@ -31,6 +31,12 @@ from signals.process import leaked_fields, process_features, stratum  # noqa: E4
 from signals.retrieval_support import NLI_MODEL  # noqa: E402
 from signals.retrieval_support import PROVENANCE as SUPPORT_PROVENANCE  # noqa: E402
 from signals.retrieval_support import nli_model, support_features  # noqa: E402
+from signals.agreement import PROVENANCE as AGREEMENT_PROVENANCE  # noqa: E402
+from signals.agreement import agreement_features  # noqa: E402
+from signals.logprobs import PROVENANCE as LOGPROB_PROVENANCE  # noqa: E402
+from signals.logprobs import logprob_features  # noqa: E402
+from signals.verbalized import PROVENANCE as VERBALIZED_PROVENANCE  # noqa: E402
+from signals.verbalized import confidence_features  # noqa: E402
 
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
 EXCLUDED = {
@@ -55,6 +61,7 @@ def main() -> int:
     parser.add_argument("--rows", nargs="+", required=True)
     parser.add_argument("--out", default=str(ROOT / "reports" / "features-dev"))
     parser.add_argument("--no-nli", action="store_true")
+    parser.add_argument("--paid", nargs="*", default=[], help="paid-signal directories, one per traces directory in the same order")
     args = parser.parse_args()
     if any("test" in Path(p).name for p in args.traces + args.rows):
         print("refusing to read the test split")
@@ -83,6 +90,14 @@ def main() -> int:
             features = process_features(trace)
             features.update(support_features(trace["response"], [by_id[i]["text"] for i in ids], embed=embed,
                                              chunk_vectors=np.stack([vector_of[i] for i in ids]), nli=nli))
+            if args.paid:
+                paid = json.loads((Path(args.paid[args.traces.index(trace_dir)]) / f"{item_id}.json").read_text(encoding="utf-8"))
+                if "logprobs" in paid:
+                    features.update(logprob_features(paid["logprobs"]["logprobs"] or [], paid["logprobs"]["same_text"]))
+                if "verbalized" in paid:
+                    features.update(confidence_features(paid["verbalized"]["reply"]))
+                if "samples" in paid:
+                    features.update(agreement_features([s["text"] for s in paid["samples"]["texts"]], trace["draft"]["final"]))
             out_rows.append({"item_id": item_id, "source": source, "label": row["grade"]["label"], "grade": row["grade"]["grade"],
                              "strata": stratum(trace), "leaked_fields_present_in_trace": leaked_fields(trace), "features": features})
             print(f"{item_id} {trace['bucket']:<14} label={row['grade']['label']} " + " ".join(f"{k}={v}" for k, v in list(features.items())[-5:]), flush=True)
@@ -93,8 +108,8 @@ def main() -> int:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
     names = list(out_rows[0]["features"].keys())
-    provenance = {**PROCESS_PROVENANCE, **SUPPORT_PROVENANCE}
-    lines = ["# Feature table, dev, free signals only", "",
+    provenance = {**PROCESS_PROVENANCE, **SUPPORT_PROVENANCE, **LOGPROB_PROVENANCE, **VERBALIZED_PROVENANCE, **AGREEMENT_PROVENANCE}
+    lines = ["# Feature table, dev" + (" with the paid signals" if args.paid else ", free signals only"), "",
              f"{len(out_rows)} items from {', '.join(Path(t).name for t in args.traces)}; labels from the graded rows (1 = CORRECT). "
              "Every feature below is computed from the agent's own run: the trace it wrote and the texts of the chunks it retrieved. "
              "Each is computable at inference time on a question with no known answer, because none reads the item record. "
@@ -128,6 +143,15 @@ def main() -> int:
         constant = "yes" if len(set(all_values)) <= 1 else ""
         lines.append(f"| {n} | {mean_sd(by_label[1])} | {mean_sd(by_label[0])} | {mean_sd(by_decisive[1])} | {mean_sd(by_decisive[0])} | "
                      + " | ".join(mean_sd(by_bucket[b]) for b in BUCKETS) + f" | {constant} |")
+    if args.paid:
+        lines += ["", "## Cost of the paid signals, per item", "", "| run | signal | items | seconds per item | wall clock | calls from cache |", "|---|---|---|---|---|---|"]
+        for paid_dir in args.paid:
+            m = json.loads((Path(paid_dir) / "_signals.json").read_text(encoding="utf-8"))
+            for sig, v in m["signals"].items():
+                lines.append(f"| {Path(paid_dir).name} | {sig}{' (k=' + str(v['k']) + ')' if v.get('k') else ''} | {v['items']} | {v['seconds_per_item']} | {v['wall_seconds']:.0f} s | {v['cached_calls']} |")
+        lines += ["", "Sampling agreement is lexical (the grader's normalise, stopwords and stems), so paraphrases read as disagreement and the "
+                      "signal partly measures lexical variance; the raw samples are stored so M4 can try another agreement function without resampling. "
+                      "The confidence follow-up sees the passages and the draft. The log-probability sequence is stored raw per draft."]
     missing = [n for n in provenance if n not in names]
     if missing:
         lines += ["", f"Not computed in this table: {', '.join(missing)}."]

@@ -926,3 +926,19 @@ lexical support 0.73 against 0.49, cosine to the best chunk 0.77 against
 abstained sits there. NLI entailment does not separate (0.33 against
 0.33). One feature is constant on dev, clarify_by_prompt, and is dropped
 at M4. The paid signals wait for the owner's read of the table.
+
+## Guard for M4, decided before any fitting, 2026-09-11
+
+The action features separate inside the decisive stratum because every
+wrong clarify and abstain lands there. That is partly circular: the action
+is downstream of the same model state the signals try to measure. So M4
+fits and reports two variants, not one: the full vector, and the full
+vector minus the action features (action_answer, action_abstain,
+action_clarify, clarify_by_prompt, abstain_by_prompt, response_form_answer,
+response_abstain_phrase, readings_fired). If most of the apparent skill
+disappears without them, the calibrator is largely an action detector and
+the report says so. Recorded now so it is not a decision made after
+seeing results. Two smaller rules for the paid signals: the raw token
+log-probability sequence is stored per draft, not only mean and min, so a
+third summary needs no rerun; and each paid signal's time per item is
+recorded and reported, so the report can state what the approach costs.

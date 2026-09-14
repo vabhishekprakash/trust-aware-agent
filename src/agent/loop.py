@@ -106,6 +106,12 @@ def passages_block(hits: list[Hit]) -> str:
     )
 
 
+def draft_messages(question: str, hits: list[Hit], premise_check: bool = False) -> list[dict]:
+    """The exact messages of the draft call; the paid signals rebuild them from a trace."""
+    return [{"role": "system", "content": ANSWER_SYSTEM_WITH_PREMISE if premise_check else ANSWER_SYSTEM},
+            {"role": "user", "content": f"Passages:\n{passages_block(hits)}\n\nQuestion: {question}"}]
+
+
 def parse_readings(text: str) -> list[dict]:
     """Readings the model listed with their answers, one per line or run together with pipes.
 
@@ -201,8 +207,7 @@ class Agent:
         trace["readings"] = {"raw": readings_raw, "parsed": readings, "fired": readings_fired}
 
         # 3. draft, with one calculator round if asked
-        messages = [{"role": "system", "content": ANSWER_SYSTEM_WITH_PREMISE if self.premise_check else ANSWER_SYSTEM},
-                    {"role": "user", "content": f"Passages:\n{passages}\n\nQuestion: {question}"}]
+        messages = draft_messages(question, hits, self.premise_check)
         draft = self._ask(messages, calls, "draft")
         calc_records = []
         for expression in calc_lines(draft):
