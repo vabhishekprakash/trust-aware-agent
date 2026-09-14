@@ -23,8 +23,7 @@ test asks whether the same features predict the bucket. Every metric
 carries a bootstrap interval.
 
 A common misconception: a low expected calibration error means a good
-calibrator. A constant base-rate prediction scores well on it too; the
-ranking metrics and the strata say whether it discriminates.
-
+calibrator. A constant base-rate guess scores well on it too; the ranking
+metrics and the strata say whether it discriminates.
 Summary: out-of-fold scores, two fits, three variants, three strata,
-intervals on everything, and a bucket-detector test.
+intervals everywhere, a bucket-detector test.
