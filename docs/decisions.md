@@ -516,8 +516,8 @@ reports/ambiguous-calls.md and data/eval/ambiguous_pass.jsonl). Ten agreed
 with the pass's lean; two reversed it, and each reversal carries a rule.
 q0095 moves to answerable because the handbook's unqualified sentence, "the
 SE engine cycles five times", settles a question that treats the engine as
-one object, while the seven is explicitly scoped; gold five, with a scoped
-seven accepted. q0111 moves because one figure gives both halves of the
+one object, while the seven is explicitly scoped. The gold is five, with a
+scoped seven accepted. q0111 moves because one figure gives both halves of the
 answer, so a single two-part answer satisfies every asker; the gold is the
 compound. q0104 and q0115 are dropped, q0097, q0106, q0114 and q0123 kept,
 and q0108, q0117, q0119 and q0132 moved with the golds the owner named,
@@ -529,18 +529,19 @@ golds. The ambiguous bucket ends at 24 items; the pool is 236: answerable
 
 The two reversals generalise, and were not applied beyond their items. The
 q0095 rule, that an unqualified statement beats a scoped one, fits q0096,
-"How many phases make up the NASA life cycle?", where "NPR 7120.5 defines
+"How many phases make up the NASA life cycle?". There, "NPR 7120.5 defines
 the major NASA life cycle phases as Formulation and Implementation" is the
-unqualified sentence and the seven are its "incremental pieces"; the owner
+unqualified sentence and the seven are its "incremental pieces". The owner
 labelled q0096 ambiguous in the blind check, so it stays until they say
 otherwise. The q0111 rule, that one passage giving both halves makes a
-compound answer rather than two readings, fits q0106 (both approvers on
-page 40, which the owner kept narrowly and asked to have rewritten), q0118
-(both recipients in one sentence on page 106) and q0122 (two adjacent
-sentences on page 152). The q0104 rule, that two passages disagreeing is
-inconsistency and not ambiguity, may fit q0101 (the ConOps baselined in
-three different phases across tables, which the owner called worse than a
-two-way split) and q0125 (verification plans approved at both CDR and SIR).
+compound answer rather than two readings, fits three kept items. q0106 has
+both approvers on page 40; the owner kept it narrowly and asked to have it
+rewritten. q0118 has both recipients in one sentence on page 106. q0122 has
+two adjacent sentences on page 152. The q0104 rule, that two passages
+disagreeing is inconsistency and not ambiguity, may fit two more. q0101 has
+the ConOps baselined in three different phases across tables, which the
+owner called worse than a two-way split. q0125 has verification plans
+approved at both CDR and SIR.
 The q0132 rule, that the glossary's unqualified line makes one TRL
 dominant, fits q0131 (system prototype at TRL 6 or 7). If the owner extends
 all of those, the bucket falls from 24 to 17.
@@ -557,7 +558,7 @@ item check). That leaves 18 answerable, 9 unanswerable and 9 false-premise
 items in reserve for fixes and drops from the review sample, and no
 ambiguous reserve: any ambiguous item the review drops is replaced from
 answerable. The alternative is a second drafting round for ambiguous items
-only; the first round kept 24 of 48 drafted after the dominant-reading
+only. The first round kept 24 of 48 drafted after the dominant-reading
 pass, so reaching 40 would mean drafting about 35 more and running the
 pass again. The proposal awaits the owner's approval; nothing is locked.
 

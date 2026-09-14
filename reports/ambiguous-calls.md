@@ -8,8 +8,8 @@ closest calls are left to the owner. Write keep, move or drop after 'decision:' 
 scripts/apply_ambiguous_pass.py with --owner-decisions.
 
 - kept: 24
-- moved to answerable: 0 (none)
-- dropped: 0 (none)
+- moved to answerable: 10 (q0095, q0108, q0109, q0110, q0111, q0112, q0117, q0119, q0124, q0132)
+- dropped: 5 (q0098, q0104, q0105, q0115, q0121)
 - awaiting the owner's decision: 0 (none)
 - ambiguous items in the pool now: 24, of which 0 pending
 - candidates in the pool: 236 (blind hold-back merged back in; blind40_key.jsonl keeps the drafted record)

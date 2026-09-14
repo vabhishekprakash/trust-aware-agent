@@ -102,6 +102,21 @@ def main() -> int:
             actions["owner"] += 1
     write_jsonl(CANDIDATES, out)
 
+    # The summary counts the recorded outcome of every call, not only what this
+    # run changed, so a rerun on an already-applied pool reports the same numbers.
+    outcome = Counter()
+    moved, dropped, pending = [], [], []
+    for item_id, call in calls.items():
+        verdict = call.get("owner_decision") or decisions.get(item_id) or call["verdict"]
+        if verdict == "owner":
+            pending.append(item_id)
+        elif verdict == "move":
+            moved.append(item_id)
+        elif verdict == "drop":
+            dropped.append(item_id)
+        outcome[verdict] += 1
+    actions = outcome
+
     lines = [
         "# Ambiguous pass: dominant-reading check",
         "",
