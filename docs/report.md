@@ -1,237 +1,308 @@
-# Trust-aware agent: report (draft, dev results only)
+# Trust-aware agent: report
 
-This is the standing draft of the final report. Sections fill in as the
-milestones complete; the test split is read once, at M8, and its numbers
-replace nothing here, they are added next to the dev numbers. Every
-headline number carries its 95 percent bootstrap interval. The reader
-should assume every claim is directional at this data size.
+A retrieval question-answering agent over the NASA Systems Engineering
+Handbook, on a 3B local model, that outputs a calibrated probability that
+its answer is correct and acts on it. Every number carries a 95 percent
+bootstrap interval. Dev numbers are out of fold on 134 items; test
+numbers come from a single preregistered read of 100 held-out items. The
+reader should assume every claim is directional at this data size.
 
 ## Abstract
 
-A retrieval question-answering agent over the NASA Systems Engineering
-Handbook, built on a 3B local model, outputs a calibrated probability that
-its answer is correct and chooses among answering, asking which reading is
-meant, and abstaining. On 134 development items the out-of-fold
-probability separates right from wrong answers with an AUROC of 0.70
-[0.61, 0.79] pooled and 0.63 [0.45, 0.80] inside the decisive stratum.
-That stratum is the answerable questions whose evidence was retrieved,
-where bucket and retrieval are held fixed and the model's judgement
-decides. The confidence carries real but weak information beyond the action taken and
-the question's bucket. The free signals computed from the agent's own
-trace outperform three paid signals that roughly triple the cost per
-question. A premise-check step built to move the false-premise bucket off
-zero made every bucket worse and is reported as a negative result.
-The decision policy above the score escalates about a quarter of answered
-items as a coverage choice, not a risk guarantee: the error rate among
-shown answers on dev moves from 49 [37, 60] to 41 [28, 55] percent, an
-interval that does not exclude no effect. Whether the policy reduces error
-is settled by the single read of the test split.
+The calibrated confidence did not transfer to the held-out test split,
+and the decision policy built on it withheld correct answers: at the
+frozen thresholds the error rate among shown answers on test was 64 [49,
+80] percent against a base rate of 56 [43, 70] percent. The read landed
+in the preregistered "worse" band and is reported as the result, with no
+refitting and no second read.
 
-## Results summary (dev, out of fold, 5-fold, seed 42)
+On the development set the confidence separated right from wrong answers
+weakly but above chance, AUROC 0.70 [0.61, 0.79] pooled and 0.63 [0.45,
+0.80] in the decisive stratum, the answerable questions whose evidence
+was retrieved. On test the pooled AUROC was 0.66 [0.56, 0.76], inside the
+dev interval, and the decisive-stratum point estimate was at chance, 0.49
+[0.29, 0.72], on 26 correct against 10 wrong; that sample cannot support
+a strong claim in either direction. Two findings did hold direction on
+test. Retrieval decides most of the outcome: answerable items were
+correct 26 of 36 times with the evidence retrieved and 0 of 10 without.
+And the cheap signals beat the expensive ones: agreement alone at 0.71
+[0.60, 0.80] pooled and the free trace signals at 0.70 [0.59, 0.80]
+scored above the confirmed 39-feature vector at 0.66 [0.56, 0.76], with
+overlapping intervals, the same ordering the dev data suggested. A
+premise-check step built to move the false-premise bucket off zero made
+every bucket worse and is reported as a negative result. The grader's
+labels were checked blind three times, most recently at 19 of 20 on real
+agent outputs.
 
-Calibrator: logistic regression plus isotonic on 39 features (the vector
-without log-probabilities, see the integrity section), confirmed by the
-owner on 2026-09-12. Base rate: 70 of 134 correct.
+## What was built
 
-| stratum | n | AUROC | ECE | Brier | AURC (base rate) |
-|---|---|---|---|---|---|
-| pooled | 134 | 0.70 [0.61, 0.79] | 0.10 [0.07, 0.19] | 0.22 [0.19, 0.25] | 0.31 [0.23, 0.42] (0.40) |
-| answerable | 62 | 0.62 [0.47, 0.76] | 0.13 [0.08, 0.26] | 0.24 [0.20, 0.29] | 0.31 [0.18, 0.47] (0.38) |
-| decisive | 50 | 0.63 [0.45, 0.80] | 0.18 [0.12, 0.31] | 0.22 [0.18, 0.26] | 0.24 [0.11, 0.42] (0.33) |
+The agent retrieves eight chunks of the handbook with a small embedding
+model, asks the language model whether the question has two readings
+the passages answer differently, drafts an answer, runs a two-operand
+calculator when the draft asks for one, and decides among answering,
+asking which reading is meant, and saying the handbook does not say.
+Every step is written to a trace. Thirty-nine features computed from the
+trace and the retrieved text alone, never from the item record, feed a
+logistic regression with an isotonic bend, fitted on dev. A policy above
+the score shows the answer, flags it, or withholds it and hands the
+question to a person. A dashboard serves the measured system at its real
+cost, about 50 seconds a question, of which the two paid signals in the
+vector (a confidence call and five resampled drafts) take 31 seconds.
+Details are in docs/explanations, numbered 00 to 09.
 
-The action features, removed as a planned variant, change nothing:
-pooled AUROC 0.73 [0.64, 0.81] without them against 0.73 [0.64, 0.82]
-for the full vector. The calibrator is not an action detector. The same
-features predict the bucket at 0.59 [0.50, 0.67] against a prior of
-0.46, so it is partly a bucket detector. But the discrimination survives
-inside the decisive stratum, where bucket and retrieval are fixed.
-Per-bucket action and label tables are in reports/dev-distribution.md;
-the ambiguous bucket (9 items) is indicative only.
-- Policy, 70 answered dev items: error among shown answers 49 [37, 60]
-  percent with everything shown, 41 [28, 55] percent at the chosen
-  threshold (coverage 73 [61, 83] percent). Direction as expected,
-  interval includes no effect. A 20 percent risk target would show 6 of
-  70.
+## The data and the grader
 
-## Named finding: the free signals beat the paid ones
+Two hundred questions in four buckets, drafted and verified by language
+model agents over the handbook and graded by a language model judge
+inside a staged grader: answerable, ambiguous, unanswerable, and built on
+a false premise. Split 100 and 100, stratified by bucket, seed 42; 34
+reserve items joined dev later, so dev is 134. The test split was read
+by one script, once, after the analysis was preregistered
+(reports/m8-preregistration.md). The ambiguous bucket has 9 items in
+each split and its numbers are indicative only throughout.
 
-The usual expectation is that sampling-based uncertainty leads. Here it
-did not. In the decisive stratum the widest gap by label is lexical
-support, the share of the answer's words found in the best retrieved
-chunk. It is 0.73 for correct answers against 0.49 for wrong ones, and it
-is computed from the trace at no cost. Verbalized confidence saturated at 100 on
-every correct item and averaged 83 on wrong ones, a round-number habit
-rather than a scale. Sampling agreement with the graded draft separated
-(maximum Jaccard 0.85 against 0.70), agreement among the samples alone
-did not (0.53 against 0.54), and the log-probability summaries were flat
-where they described the graded text. The three paid signals cost 12 to
-15 s, 8 s and 23 s per item on top of an 18 s answer. Read as a design
-result: on a small model over a niche corpus, whether the answer's words
-are in the passage tells you more than asking the model how sure it is.
-
-## Measurement integrity: four numbers that looked better than they were
-
-The grader, the item pool and the feature vector each produced one
-episode where a number improved for a reason that had nothing to do with
-what it claimed to measure. They are reported together because the
-pattern is the same and a reader should expect more of it.
-
-1. The v9 judge question. Adding a fourth yes-or-no question to the judge
-   ("does the draft assert anything unsupported?") produced YES on true
-   statements and flipped three binary labels on the 21 worked examples.
-   The question was removed and the support check moved into code that
-   reads the corpus. Rule since then: no judge prompt changes without
-   rerunning the examples.
-2. The pool snapshot. A rerun of grader v13 on the first blind sheet
-   showed 39 of 39 against 38 of 39 for v12. The one changed row was
-   sheet 19, whose item sits as answerable in the pool snapshot and as
-   ambiguous in the pool the v12 rerun used; the new rule never touched
-   it. Rule since then: a rubric-fidelity rerun grades against the exact
-   pool the sheet was drawn from, by a script that takes the snapshot as
-   an argument and regenerates nothing.
-3. The lp_tokens feature. The full feature vector beat the vector without
-   log-probabilities by 0.04 AUROC pooled and 0.10 in the decisive
-   stratum. A post-hoc diagnostic, labelled as such, showed the entire
-   gain was lp_tokens, the token count of a draft regenerated with
-   log-probabilities on. That text differs from the graded draft on 40
-   percent of the stratum. Adding that one feature back restored the full
-   result; the five probability summaries alone added nothing, and on the
-   matched subset their means by label were flat. The coefficient paired
-   with a negative one on the response's own length: a length difference
-   between two generations, not a confidence signal, and one that would
-   not transfer. The log-probability features were dropped and the cost
-   is stated above.
-4. The halving figure. An earlier reading of the M4 results said that
-   answering the most confident half of the decisive stratum roughly
-   halved the error rate. That came from a rank-ordered risk-coverage
-   curve. The isotonic probabilities carry many ties, and a rank order
-   splits a tie at a point no real threshold can reach. The tie-aware
-   curve gives 49 [37, 60] to about 40 [26, 57] percent at half coverage
-   among answered items. The earlier figure was wrong and is recorded
-   here rather than deleted; the authors found it themselves, and the
-   rule since then is that every point on a risk-coverage curve must be a
-   threshold someone could set.
-
-## The grader's three blind figures
-
-The correctness labels come from a language-model judge inside a staged
-grader. Its agreement with the owner was checked blind three times, each
-on drafts or outputs the owner graded without seeing the judge's key:
+The grader's agreement with the owner was checked blind three times, on
+material the owner graded without seeing the judge's key:
 
 | check | drafts | grader | binary agreement |
 |---|---|---|---|
 | sheet 1, model drafts under three passage conditions | 39 graded of 40 | v7 | 32 of 39 (82 percent) |
 | sheet 2, fresh model drafts | 25 | v10 | 20 of 25 (80 percent) |
-| final check, real agent outputs from dev | 20 | v13, the grader that graded dev and test | 19 of 20 (95 percent) |
+| final check, real agent outputs from dev, before the test read | 20 | v13, the grader that graded dev and test | 19 of 20 (95 percent) |
 
-The final check is the signed-off figure: the same grader version that
-produced every label in this report, on the agent's own outputs, 10
-answerable, 1 ambiguous, 5 unanswerable, 4 false premise, three-way
-agreement 18 of 20. The one binary disagreement is a false-premise output
-that states the handbook's correction and then abstains; the owner graded
-it CORRECT and the judge WRONG while its own reason called the
-interpretation correct. On that item the owner is right and the grader
-is not, and the grader was not changed after the check. The later
-rubric-fidelity reruns of sheets 1 and 2 (38 of 39 and 24 of 25) are not
-blind figures and are reported as such in the annotation guide. Twenty
-items give a wide interval on 95 percent; it is a check, not a
-certificate.
+The final check is the signed-off figure. Its one binary disagreement is
+a false-premise output that states the handbook's correction and then
+abstains; the owner graded it CORRECT and the judge WRONG while the
+judge's own reason called the interpretation correct. The owner is right
+on that item and the grader was not changed after its check. The later
+rubric-fidelity reruns of sheets 1 and 2 (38 of 39, 24 of 25) are not
+blind and are labelled as such in docs/annotation-guide.md. Twenty items
+give a wide interval on 95 percent; it is a check, not a certificate.
+
+## Results: dev and test side by side
+
+The confirmed vector is the 39 features without log-probabilities, with
+logistic regression plus isotonic; the artifact and the policy were frozen
+by hash before the read. Dev numbers are out of fold (5 folds, seed 42);
+test numbers are from the artifact refit on all of dev.
+
+| stratum | dev n (correct) | dev AUROC | test n (correct) | test AUROC |
+|---|---|---|---|---|
+| pooled | 134 (70) | 0.70 [0.61, 0.79] | 100 (50) | 0.66 [0.56, 0.76] |
+| answerable | 62 (36) | 0.62 [0.47, 0.76] | 46 (26) | 0.59 [0.44, 0.74] |
+| decisive | 50 (33) | 0.63 [0.45, 0.80] | 36 (26) | 0.49 [0.29, 0.72] |
+
+| stratum | dev Brier | test Brier | dev ECE | test ECE | dev AURC | test AURC |
+|---|---|---|---|---|---|---|
+| pooled | 0.22 [0.19, 0.25] | 0.25 [0.22, 0.29] | 0.10 [0.07, 0.19] | 0.15 [0.08, 0.24] | 0.31 [0.23, 0.42] | 0.40 [0.27, 0.53] |
+| answerable | 0.24 [0.20, 0.29] | 0.28 [0.23, 0.33] | 0.13 [0.08, 0.26] | 0.22 [0.14, 0.36] | 0.31 [0.18, 0.47] | 0.42 [0.20, 0.56] |
+| decisive | 0.22 [0.18, 0.26] | 0.31 [0.25, 0.37] | 0.18 [0.12, 0.31] | 0.30 [0.20, 0.44] | 0.24 [0.11, 0.42] | 0.34 [0.10, 0.52] |
+
+Pooled discrimination on test sits inside the dev interval. In the
+decisive stratum, where bucket and retrieval are held fixed and the
+model's judgement decides, the test point estimate is at chance. With 26
+correct against 10 wrong the interval runs from 0.29 to 0.72, so the
+sample cannot support a strong claim in either direction: it is not
+evidence that the confidence works there, and it is not proof that it
+does not. The reliability figure shows why the curve is a sketch: 60 of
+the 100 test items land in a single bin.
+
+![Reliability, dev and test, pooled and decisive](assets/reliability.png)
+
+The preregistered band. Pooled and decisive AUROC point estimates fell
+inside the dev intervals. The policy risk at the frozen thresholds was
+above the base risk, and the preregistration defined that alone as
+"worse". The read is reported in the worse band, and nothing was refit.
+
+## The policy failure
+
+This is the sharpest result in the project and it gets its own section.
+The policy showed an answer at or above a probability of 0.58, flagged it
+between 0.35 and 0.58, and withheld it below 0.35, thresholds chosen on
+dev as a coverage choice because no error target of 10 to 25 percent was
+reachable there with meaningful coverage.
+
+| answered items | dev (70, 36 correct) | test (54, 24 correct) |
+|---|---|---|
+| show everything: risk | 49 [37, 60] percent | 56 [43, 70] percent |
+| frozen thresholds: coverage | 73 [61, 83] percent | 72 [61, 85] percent |
+| frozen thresholds: risk | 41 [28, 55] percent | 64 [49, 80] percent |
+| ANSWER band only: coverage | 31 [21, 41] percent | 56 [43, 70] percent |
+| ANSWER band only: risk | 45 [25, 67] percent | 53 [36, 73] percent |
+
+On test the policy escalated 12 answerable items, and 10 of them were
+correct. Escalation precision was 0.33 and recall 0.17; counting the
+flagged band as well, 0.58 and 0.47. The error rate among shown answers
+rose from 56 to 64 percent. Two thresholds tuned on 134 dev items did
+not transfer, which is exactly the overfitting risk the preregistration
+existed to expose. A deployed version of this system would withhold
+correct answers. On dev the same policy had moved the error rate from
+49 to 41 percent with an interval that already included no effect; the
+report said then that the claim waited for the test read, and the test
+read settled it the other way.
+
+![Risk against coverage, dev and test](assets/risk-coverage.png)
+
+![Policy outcomes per bucket, dev and test](assets/buckets.png)
+
+The deployed view, all items with the agent's own abstentions and
+clarifications passing through, is flattered by the unanswerable bucket
+(24 of 25 correct abstentions on test, untouched by any threshold) and
+punished by false-premise abstentions graded PARTIAL. The answered
+population above is the policy's real work.
+
+## The free signals beat the paid ones, on dev and in direction on test
+
+The usual expectation is that sampling-based uncertainty leads and that
+a richer vector beats a poorer one. Neither held here.
+
+| system (features) | dev pooled | test pooled | dev decisive | test decisive |
+|---|---|---|---|---|
+| verbalized confidence alone (3) | 0.58 [0.47, 0.66] | 0.67 [0.57, 0.75] | 0.37 [0.22, 0.55] | 0.48 [0.44, 0.50] |
+| sampling agreement alone (7) | 0.66 [0.57, 0.76] | 0.71 [0.60, 0.80] | 0.57 [0.37, 0.77] | 0.62 [0.42, 0.80] |
+| free trace signals alone (29) | 0.68 [0.59, 0.77] | 0.70 [0.59, 0.80] | 0.65 [0.49, 0.80] | 0.58 [0.38, 0.79] |
+| confirmed vector (39) | 0.70 [0.61, 0.79] | 0.66 [0.56, 0.76] | 0.63 [0.45, 0.80] | 0.49 [0.29, 0.72] |
+
+![Baselines and the confirmed vector, AUROC with intervals](assets/baselines.png)
+
+On test the two smaller systems scored above the confirmed vector, with
+overlapping intervals, and the free signals, computed from the trace at
+no cost, matched agreement, which costs 23 seconds of sampling per
+question. On dev the widest gap by label in the decisive stratum was
+lexical support, the share of the answer's words found in the best
+retrieved chunk, 0.73 for correct answers against 0.49 for wrong ones.
+Verbalized confidence clustered at round numbers and inverted inside the
+answerable bucket on both splits. This is reported as directional and
+confirmed in direction, not as a proven ranking: the intervals overlap
+everywhere. Read as a design result, on a small model over a niche
+corpus, whether the answer's words are in the passage tells you more
+than asking the model how sure it is, and adding the expensive signals
+to the vector did not help on held-out data.
+
+## The retrieval confounder
+
+Most of the variance in correctness is retrieval, not judgement.
+
+| bucket | dev, evidence retrieved | dev, not retrieved | test, evidence retrieved | test, not retrieved |
+|---|---|---|---|---|
+| answerable | 33/50 (66%) | 3/12 (25%) | 26/36 (72%) | 0/10 (0%) |
+| unanswerable | 18/19 (95%) | 14/15 (93%) | 15/16 (94%) | 9/9 (100%) |
+| false premise | 0/26 (0%) | 0/3 (0%) | 0/18 (0%) | 0/2 (0%) |
+
+Dev is the merged 134 items (reports/features-dev.jsonl strata); the
+unanswerable rows show that abstention does not depend on retrieval.
+A quarter of dev questions never had their evidence in front of the
+model at k=8, and the same k feeds the retrieval-support signals and the
+answer itself. The report separates retrieval failure from confidence
+failure by reporting the decisive stratum, and the decisive-stratum test
+result says the confidence contributed little once retrieval was held
+fixed.
+
+## The premise step: a negative result
+
+The false-premise bucket sat at zero correct answers in 20. The obvious
+fix, a step that asks the model whether the question assumes something
+the passages contradict and gates its claim in code, was built and run
+on the whole dev set. It made every bucket worse: correct labels fell
+from 54 to 41 of 100, the four rejections it produced on false-premise
+items were all wrong, and it added 1,492 seconds to the run. Premise
+rejection is a judgement this model does not have at 3B. The step is
+off, behind a flag, and the full account is reports/premise-step.md. On
+test the bucket stayed at 0 of 20.
+
+## Measurement integrity: four numbers that looked better than they were
+
+The grader, the item pool, the feature vector and a curve each produced
+one episode where a number improved for a reason that had nothing to do
+with what it claimed to measure. They are reported together because the
+pattern is the same and a reader should expect more of it.
+
+1. The v9 judge question. A fourth yes-or-no question added to the judge
+   produced YES on true statements and flipped three binary labels on
+   the 21 worked examples. It was removed and the support check moved
+   into code that reads the corpus. Rule since then: no judge prompt
+   change without rerunning the examples.
+2. The pool snapshot. A rerun of grader v13 on the first blind sheet
+   showed 39 of 39 against 38 of 39 for v12. The one changed row was an
+   item that sat as answerable in the pool snapshot and as ambiguous in
+   the pool the earlier rerun used; the new rule never touched it. Rule
+   since then: a rubric-fidelity rerun grades against the exact pool the
+   sheet was drawn from, by a script that takes the snapshot as an
+   argument and regenerates nothing.
+3. The lp_tokens feature. The full vector beat the vector without
+   log-probabilities by 0.04 AUROC pooled and 0.10 in the decisive
+   stratum on dev. A post-hoc diagnostic, labelled as such, showed the
+   entire gain was lp_tokens, the token count of a draft regenerated with
+   log-probabilities on, a text that differs from the graded draft on 40
+   percent of the stratum. Its coefficient paired with a negative one on
+   the response's own length: a length difference between two
+   generations, not a confidence signal, and one that would not
+   transfer. The log-probability features were dropped and the cost
+   stated.
+4. The halving figure. An earlier reading said that answering the most
+   confident half of the decisive stratum roughly halved the error rate.
+   That came from a rank-ordered risk-coverage curve; the isotonic
+   probabilities carry many ties and a rank order splits a tie at a point
+   no real threshold can reach. The tie-aware curve gave 49 [37, 60] to
+   about 40 [26, 57] percent. The earlier figure was wrong and is
+   recorded rather than deleted; the authors found it themselves.
+
+The test read adds a fifth entry of a different kind: the preregistered
+audit ran regardless of band. Provenance held on every row, the split's
+seed and counts matched, and 15 test items were flagged as
+near-duplicates of dev items, 14 by the same-evidence-page rule that
+pairs an item with the false-premise item drafted from the same passage.
+Removing them changed nothing: pooled AUROC 0.67 [0.56, 0.77], decisive
+0.50 [0.28, 0.75].
 
 ## Limitations
 
-The standing limitations are in docs/annotation-guide.md. In short:
-
 - Items were drafted and verified by language model agents and graded by
-  a language model judge. Human checks: two blind samples, 82 percent
-  under v7 on sheet 1 and 80 percent under v10 on sheet 2. Later figures
-  are rubric fidelity, not blind.
-- The retrieval confounder: answerable items were correct 27 of 38 times
-  with the evidence retrieved and 2 of 8 without.
-- The false-premise bucket is at 0 of 29 with the premise step switched
-  off (reports/premise-step.md).
-- The ambiguous bucket has 9 dev items; its numbers are indicative only.
-- Sensitivity alternatives carried to M8: the owner's earlier WRONG and
-  CORRECT readings of a bare false-premise abstention, and the lenient
-  three-way grade.
+  a language model judge. Human checks are the three blind samples
+  above; the signed-off one is 19 of 20 on real outputs.
+- Every dev metric describes the out-of-fold calibrator. The shipped
+  artifact is refit on all 134 dev items, its probabilities differ from
+  the measured ones by 0.094 on average and up to 0.415 on dev, and its
+  calibration was measured only by the test read above. The dashboard
+  caps the shown probability at the isotonic step below the top one, so
+  nothing displays as certain; the cap is a presentation guard, not a
+  fix, and the page says so.
+- The explanation layer reports single-feature contributions as the fit
+  gives them. The correlated retrieval-score features receive opposite
+  signs, so individual coefficients are not interpretable as effects, a
+  known consequence of correlated inputs in a linear model; the
+  breakdown leads with sums by signal family and states the caveat.
+- VERIFY is a flag, not a verification loop. The problem statement's
+  tool-based verification is not implemented: retrieval recall is the
+  same at k=10 as at k=8, a second draft mostly repeats the first, and
+  the premise step is the precedent for a second pass making things
+  worse.
+- The false-premise bucket has no positive examples on either split.
+  The ambiguous bucket has 9 items per split.
+- Sensitivity alternatives not rerun on test: the owner's earlier WRONG
+  and CORRECT readings of a bare false-premise abstention, and the
+  lenient three-way grade. Both would move the false-premise labels only.
+- The paid signals cost about 31 seconds per question on top of the 20
+  second loop and did not improve held-out discrimination.
 
-Every metric in this report describes the out-of-fold calibrator: each
-dev item scored by a model fitted on the other four fifths. The shipped
-artifact is refit on all 134 dev items. Its probabilities differ from the
-measured ones by 0.094 on average and up to 0.415, and its own
-calibration is unmeasured. The displayed probability is capped at the
-isotonic step below the top one, so nothing shows as certain; the cap is
-a presentation guard, not a fix, and the page says so.
+## What would be needed
 
-The explanation layer reports single-feature contributions as the fit
-gives them. The correlated retrieval-score features receive opposite
-signs from the fit, so individual coefficients are not interpretable as
-effects, which is a known consequence of correlated inputs in a linear
-model. The breakdown therefore leads with the sums by signal family, the
-steadier quantity, and states the caveat every time.
+A larger held-out set before any operating threshold is trusted; the
+decisive stratum needs hundreds of items, not 36, to resolve an AUROC
+between 0.5 and 0.7. A retrieval stage that gets the evidence in front
+of the model more often than three times in four, since that is where
+most of the error is. And for the false-premise bucket, a larger model
+for the premise judgement or a classifier fine-tuned on
+premise-contradiction pairs; both were out of scope on a 4 GB card.
 
-## Decision policy
+## Reproduction
 
-VERIFY is a flag, not a verification loop. The problem statement's
-tool-based verification is not implemented, for two reasons. Retrieval
-recall on dev is 77 percent at k=8 and the same at k=10, so re-retrieving
-buys little, and a second draft from the same model mostly repeats the
-first. The premise step is the precedent: a second model pass built to
-fix a measured gap made every bucket worse (reports/premise-step.md).
-The agent's own CLARIFY and ABSTAIN stand; the policy gates only the
-items the agent answered.
-
-The thresholds are a coverage choice, not a risk guarantee. On the
-out-of-fold probabilities no error target of 10, 15, 20 or 25 percent
-among answered items was reachable with meaningful coverage: the risk
-stays near 40 percent from 20 to 80 percent coverage. The owner chose to
-escalate about the bottom quarter of answered items and flag the middle
-tertile: ANSWER at or above 0.58, VERIFY from 0.35 to 0.58, ESCALATE
-below 0.35 (reports/m5-policy.md).
-
-On the 70 answered dev items, 36 correct, the error rate among shown
-answers is 49 [37, 60] percent when everything is shown. At the chosen
-threshold it is 41 [28, 55] percent, at 73 [61, 83] percent coverage. The
-point estimate moves in the expected direction and the interval does not
-exclude no effect. No claim that the policy reduces error is made on
-dev; the single read of the test split at M8 is where that is settled.
-The alternative is in the same table. A 20 percent risk target needs a
-threshold of 0.846 and shows 6 of 70 answered items: 9 [3, 16] percent
-coverage at 17 [0, 55] percent risk. That is what a risk guarantee would
-cost here.
-
-Outcomes per bucket, counts with rates and the correct count in each
-(ambiguous is indicative only):
-
-| bucket | n | ANSWER | VERIFY | ESCALATE | pass-through ABSTAIN, CLARIFY |
-|---|---|---|---|---|---|
-| answerable | 62 | 16 (26%), 12 correct | 20 (32%), 18 correct | 8 (13%), 5 correct | 12 and 6, 1 correct |
-| ambiguous | 9 | 1, 0 correct | 4, 0 correct | 3, 1 correct | 0 and 1, 1 correct |
-| unanswerable | 34 | 0 | 0 | 0 | 33 and 1, 32 correct |
-| false premise | 29 | 5 (17%), 0 correct | 5 (17%), 0 correct | 8 (28%), 0 correct | 11 and 0, 0 correct |
-
-The bands do not order as a reliable calibrator's would. Accuracy per
-band, with bootstrap intervals over the band's items:
-
-| population | ANSWER band | VERIFY band | ESCALATE band |
-|---|---|---|---|
-| answerable items the agent answered | 12/16 (75% [50, 94]) | 18/20 (90% [75, 100]) | 5/8 (62% [25, 88]) |
-| all answered items | 12/22 (55% [32, 77]) | 18/29 (62% [45, 79]) | 6/19 (32% [11, 53]) |
-
-At this sample size the calibrator's ordering is not reliable enough for
-the top band to outperform the middle one. That is one finding seen
-three ways, not three findings: the band accuracies here, the AUROC of
-0.69 [0.59, 0.78], and the flat risk-coverage curve. The intervals cover
-the reversal, and the report does not treat it as a separate effect.
-
-The deployed columns, wherever they appear, carry this caveat. Deployed
-coverage, 86 [80, 92] percent at the chosen threshold, is flattered by 34
-pass-through abstentions on unanswerable items that the policy never
-touches, 32 of them correct. Deployed risk, 44 [35, 54] percent, is
-punished by 11 false-premise bare abstentions graded PARTIAL and counted
-as errors. The answered-population figures are the policy's real work.
-
-## Still to come
-
-M5 policy thresholds on dev; M6 explanations; M7 API and dashboard; M8 the
-test split read once, the final blind grader check of about 20 real agent
-outputs (the signed-off grader number), baselines, plots.
+Everything in this report comes from a script and its committed output:
+reports/dev-run-v1b.jsonl and reports/dev-run-reserve.jsonl (agent runs,
+graded), reports/features-dev.jsonl, reports/m4-calibration.json,
+reports/m5-policy.json, reports/m8-preregistration.md,
+reports/m8-test-results.json with its rows and log, and
+reports/m8-dev-baselines.json. The figures are drawn by
+scripts/make_plots.py from those files. Every model call is cached, so
+the runs replay; the test split has been read once and the script that
+read it refuses to run again.

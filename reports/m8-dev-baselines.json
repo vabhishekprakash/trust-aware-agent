@@ -1,0 +1,182 @@
+{
+ "verbalized alone": {
+  "pooled": {
+   "auroc": {
+    "point": 0.576,
+    "lo": 0.4737,
+    "hi": 0.6645,
+    "n": 134
+   },
+   "brier": {
+    "point": 0.2405,
+    "lo": 0.2198,
+    "hi": 0.265,
+    "n": 134
+   }
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.3435,
+    "lo": 0.2052,
+    "hi": 0.496,
+    "n": 62
+   },
+   "brier": {
+    "point": 0.2954,
+    "lo": 0.2653,
+    "hi": 0.331,
+    "n": 62
+   }
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.3708,
+    "lo": 0.2152,
+    "hi": 0.5535,
+    "n": 50
+   },
+   "brier": {
+    "point": 0.2729,
+    "lo": 0.2522,
+    "hi": 0.2932,
+    "n": 50
+   }
+  },
+  "n_features": 3
+ },
+ "agreement alone": {
+  "pooled": {
+   "auroc": {
+    "point": 0.6585,
+    "lo": 0.5686,
+    "hi": 0.7549,
+    "n": 134
+   },
+   "brier": {
+    "point": 0.2328,
+    "lo": 0.1991,
+    "hi": 0.2651,
+    "n": 134
+   }
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.5823,
+    "lo": 0.421,
+    "hi": 0.7408,
+    "n": 62
+   },
+   "brier": {
+    "point": 0.2631,
+    "lo": 0.215,
+    "hi": 0.3158,
+    "n": 62
+   }
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.5651,
+    "lo": 0.3713,
+    "hi": 0.7717,
+    "n": 50
+   },
+   "brier": {
+    "point": 0.2552,
+    "lo": 0.2063,
+    "hi": 0.3055,
+    "n": 50
+   }
+  },
+  "n_features": 7
+ },
+ "free signals alone": {
+  "pooled": {
+   "auroc": {
+    "point": 0.6815,
+    "lo": 0.5914,
+    "hi": 0.7709,
+    "n": 134
+   },
+   "brier": {
+    "point": 0.2346,
+    "lo": 0.1987,
+    "hi": 0.2732,
+    "n": 134
+   }
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.6165,
+    "lo": 0.4804,
+    "hi": 0.7511,
+    "n": 62
+   },
+   "brier": {
+    "point": 0.2616,
+    "lo": 0.2047,
+    "hi": 0.3199,
+    "n": 62
+   }
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.6488,
+    "lo": 0.4901,
+    "hi": 0.7997,
+    "n": 50
+   },
+   "brier": {
+    "point": 0.2451,
+    "lo": 0.1878,
+    "hi": 0.3109,
+    "n": 50
+   }
+  },
+  "n_features": 29
+ },
+ "confirmed minus_logprobs": {
+  "pooled": {
+   "auroc": {
+    "point": 0.7003,
+    "lo": 0.6072,
+    "hi": 0.7856,
+    "n": 134
+   },
+   "brier": {
+    "point": 0.2187,
+    "lo": 0.1892,
+    "hi": 0.2513,
+    "n": 134
+   }
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.6207,
+    "lo": 0.4731,
+    "hi": 0.7617,
+    "n": 62
+   },
+   "brier": {
+    "point": 0.2394,
+    "lo": 0.1968,
+    "hi": 0.2849,
+    "n": 62
+   }
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.6337,
+    "lo": 0.4463,
+    "hi": 0.7982,
+    "n": 50
+   },
+   "brier": {
+    "point": 0.2194,
+    "lo": 0.1781,
+    "hi": 0.2631,
+    "n": 50
+   }
+  },
+  "n_features": 39
+ }
+}
