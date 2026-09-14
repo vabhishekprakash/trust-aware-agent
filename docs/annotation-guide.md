@@ -380,9 +380,10 @@ stage 2, stage 4 and the bucket table above, and in docs/decisions.md. The
 grader is now v10. It keeps the v7 judge questions and adds the
 question-aware specifics trigger. The unsupported-assertion check is done
 in code with the whole corpus. It covers acronym expansions against
-Appendix A, claims that the handbook does not mention a term it contains,
-names and acronyms from outside the handbook, and a "same answer" that
-must add something beyond the question. On the 21 worked examples v10 matches v7: 19 of 21 grades,
+Appendix A and claims that the handbook does not mention a term it
+contains. It also covers names and acronyms from outside the handbook, and
+a "same answer" that must add something beyond the question. On the 21
+worked examples v10 matches v7: 19 of 21 grades,
 21 of 21 labels, one grade-only order flip, none that change the label.
 Rerun on the first 40 drafts and scored against the owner's grades, with
 the four rule-based revisions applied (sheets 9, 16, 33 and 34), v10 agrees
@@ -399,15 +400,15 @@ fresh drafts without seeing the judge, and v10 agreed on the binary label
 on 20 of 25, 80 percent (reports/grader-check-result-2.md). That is the
 honest post-fix number. It sits next to the first blind figure, 32 of 39,
 82 percent for v7, and both are below the bar, so v10 is not signed off.
-Of the five disagreements, one was a grader defect and is fixed in v11: an
+Of the five disagreements, one was a grader defect and is fixed in v11. An
 abstention that only echoed the question's own "NASA SP-6105" went to the
-judge because a two-word term was matched as one word, and the judge's
-copying call then failed on a plain refusal. Refusal phrases now ground
-themselves. Regraded after the fact by v11, sheet 2 reads 21 of 25, 84
-percent; that is not a blind number and is reported only as the effect of
-the fix. Three of the remaining four are bare abstentions on false-premise
-items that the owner graded WRONG, against the owner's own ruling on sheet
-16 that a bare abstention on a false premise fails safe and stays CORRECT.
+judge because a two-word term was matched as one word. The judge's copying
+call then failed on a plain refusal. Refusal phrases now ground themselves.
+Regraded after the fact by v11, sheet 2 reads 21 of 25, 84 percent; that is
+not a blind number and is reported only as the effect of the fix. Three of
+the remaining four are bare abstentions on false-premise items that the
+owner graded WRONG. That goes against the owner's own ruling on sheet 16,
+that a bare abstention on a false premise fails safe and stays CORRECT.
 The owner is asked to settle that rule one way, because it decides both
 the grader check and the sensitivity alternative. The last is an ambiguous
 item (q0115) whose validation reading the owner treated as the natural

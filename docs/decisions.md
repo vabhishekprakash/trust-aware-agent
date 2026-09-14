@@ -446,7 +446,7 @@ evidence supports in example 9. Its presence also changed the first three
 answers in one order. The sheet-1 gains, meanwhile, had come from the code
 checks, not from that question. v10 therefore drops the fourth question,
 returns the judge prompt to the v7 form, and keeps every code check. It
-adds one more check: a capitalised name or acronym in the draft that is in
+adds one more check. A capitalised name or acronym in the draft that is in
 neither the question, nor the item's reference and evidence, nor anywhere
 in the handbook is a claim brought in from outside. That is the
 padded-answer case of sheet 32. The check also runs before the exact stage,
@@ -466,16 +466,16 @@ percent there, the grader is still not good enough for mass grading.
 ## Sheet 2 and grader v11, 2026-09-10
 
 The owner graded the second sheet blind. Result for v10: 20 of 25, 80
-percent binary agreement; answerable 9 of 9, unanswerable 5 of 6, ambiguous
-3 of 4, false premise 3 of 6; by condition, no passage 8 of 8, distractor
-7 of 8, own evidence 5 of 9. That is the honest post-fix number, and it is
+percent binary agreement. Per bucket: answerable 9 of 9, unanswerable 5 of
+6, ambiguous 3 of 4, false premise 3 of 6. Per condition: no passage 8 of
+8, distractor 7 of 8, own evidence 5 of 9. That is the honest post-fix number, and it is
 below the bar, so v10 is not signed off. The two blind figures now on record
 are 82 percent for v7 on sheet 1 and 80 percent for v10 on sheet 2.
 
-The five disagreements, read one by one. Sheet 15 was a grader defect: the
+The five disagreements, read one by one. Sheet 15 was a grader defect. The
 draft "The passage does not specify who wrote the original 1995 edition of
 NASA SP-6105" only echoes the question, but "SP-6105" normalises to two
-words and the echo check compared them as one, so the draft went to the
+words and the echo check compared them as one. So the draft went to the
 judge, whose copying call then answered NONE for an obvious refusal. v11
 compares echoed terms word by word and grounds the "abstains" and "flags"
 answers with the code's own refusal and clarify patterns instead of a
@@ -508,6 +508,58 @@ pass is one too. The bucket will end between 20 and 32 items depending on
 those calls, so the 40-item target for ambiguous is out of reach without
 more drafting. The 200-item plan (70/40/50/40) needs either fewer ambiguous
 items or a second drafting round for that bucket only.
+
+## The owner's twelve ambiguous calls, 2026-09-10
+
+The owner decided the twelve close calls (their words are kept in
+reports/ambiguous-calls.md and data/eval/ambiguous_pass.jsonl). Ten agreed
+with the pass's lean; two reversed it, and each reversal carries a rule.
+q0095 moves to answerable because the handbook's unqualified sentence, "the
+SE engine cycles five times", settles a question that treats the engine as
+one object, while the seven is explicitly scoped; gold five, with a scoped
+seven accepted. q0111 moves because one figure gives both halves of the
+answer, so a single two-part answer satisfies every asker; the gold is the
+compound. q0104 and q0115 are dropped, q0097, q0106, q0114 and q0123 kept,
+and q0108, q0117, q0119 and q0132 moved with the golds the owner named,
+including a scoped TRL 5 as an accepted form. q0109 was reworded to name
+the ConOps, because the owner moved q0108 ("operations concept") to the
+operational team and the two near-identical questions had contradictory
+golds. The ambiguous bucket ends at 24 items; the pool is 236: answerable
+104, ambiguous 24, unanswerable 59, false premise 49.
+
+The two reversals generalise, and were not applied beyond their items. The
+q0095 rule, that an unqualified statement beats a scoped one, fits q0096,
+"How many phases make up the NASA life cycle?", where "NPR 7120.5 defines
+the major NASA life cycle phases as Formulation and Implementation" is the
+unqualified sentence and the seven are its "incremental pieces"; the owner
+labelled q0096 ambiguous in the blind check, so it stays until they say
+otherwise. The q0111 rule, that one passage giving both halves makes a
+compound answer rather than two readings, fits q0106 (both approvers on
+page 40, which the owner kept narrowly and asked to have rewritten), q0118
+(both recipients in one sentence on page 106) and q0122 (two adjacent
+sentences on page 152). The q0104 rule, that two passages disagreeing is
+inconsistency and not ambiguity, may fit q0101 (the ConOps baselined in
+three different phases across tables, which the owner called worse than a
+two-way split) and q0125 (verification plans approved at both CDR and SIR).
+The q0132 rule, that the glossary's unqualified line makes one TRL
+dominant, fits q0131 (system prototype at TRL 6 or 7). If the owner extends
+all of those, the bucket falls from 24 to 17.
+
+## Target for the set, proposed 2026-09-10
+
+Drafted plan: 200 items as 70 answerable, 40 ambiguous, 50 unanswerable,
+40 false premise, with 240 if drafting was fast. The pool after the pass
+cannot supply 40 ambiguous items and 240 is out of reach. Proposed: 200
+items as 86 answerable, 24 ambiguous, 50 unanswerable, 40 false premise.
+The 16 items the ambiguous bucket cannot fill go to answerable, which has
+the largest surplus and the most reliable labels (14 of 14 in the blind
+item check). That leaves 18 answerable, 9 unanswerable and 9 false-premise
+items in reserve for fixes and drops from the review sample, and no
+ambiguous reserve: any ambiguous item the review drops is replaced from
+answerable. The alternative is a second drafting round for ambiguous items
+only; the first round kept 24 of 48 drafted after the dominant-reading
+pass, so reaching 40 would mean drafting about 35 more and running the
+pass again. The proposal awaits the owner's approval; nothing is locked.
 
 ## M2 must implement CLARIFY and ABSTAIN as real actions
 

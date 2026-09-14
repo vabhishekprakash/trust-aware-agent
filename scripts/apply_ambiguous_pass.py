@@ -41,6 +41,10 @@ def move_to_answerable(item, call):
     # page matches, otherwise fall back to any quote on the reading's page.
     aligned = item["evidence"][index:index + 1] if index < len(item["evidence"]) and str(item["evidence"][index]["page"]) == str(reading["page"]) else []
     evidence = aligned or [e for e in item["evidence"] if str(e["page"]) == str(reading["page"])] or item["evidence"][:1]
+    if call.get("evidence_indices"):
+        # a compound gold drawn from more than one reading keeps every quote it rests on
+        evidence = [item["evidence"][i] for i in call["evidence_indices"] if i < len(item["evidence"])]
+    evidence = evidence + list(call.get("extra_evidence") or [])
     other = [r for i, r in enumerate(item["readings"]) if i != call["reading_index"]]
     return {
         **item,
@@ -50,7 +54,7 @@ def move_to_answerable(item, call):
         "readings": [],
         "expected": "answer",
         "evidence": evidence,
-        "notes": (item["notes"] + " | Moved from ambiguous in the dominant-reading pass of 2026-09-09: " + call["reason"]
+        "notes": (item["notes"] + " | Moved from ambiguous in the dominant-reading pass: " + call.get("owner_reason", call["reason"])
                   + " The other reading was: " + "; ".join(f"{r['reading']} -> {r['answer']} (page {r['page']})" for r in other)),
     }
 
@@ -130,6 +134,10 @@ def main() -> int:
     lines += ["", "## Every call", ""]
     for item_id, call in calls.items():
         lines.append(f"- {item_id}: {call['verdict']}" + (f" (lean {call['lean']})" if call.get("lean") else "") + f". {call['reason']}")
+        if call.get("owner_decision"):
+            lines.append(f"    - owner's decision: {call['owner_decision']}")
+        if call.get("owner_decision_text"):
+            lines.append(f"    - owner's words: {call['owner_decision_text']}")
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print("\n".join(lines[9:15]))
     return 0
