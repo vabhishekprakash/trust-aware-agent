@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trust-aware agent</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --ink: #1c1c1c; --muted: #5f5f5f; --line: #d9d9d9; --answer: #1b6e3a; --verify: #9a6a00; --escalate: #a1261f; --other: #3b5b8a; --bg: #fbfbf9; }
+  body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  header { padding: 18px 28px 10px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 18px; }
+  header h1 { font-size: 18px; margin: 0; }
+  header nav a { margin-right: 14px; color: var(--other); cursor: pointer; text-decoration: underline; }
+  main { max-width: 980px; margin: 0 auto; padding: 18px 28px 60px; }
+  .row { display: flex; gap: 10px; }
+  input[type=text] { flex: 1; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; }
+  button { font: inherit; padding: 10px 16px; border: 1px solid var(--ink); background: var(--ink); color: white; border-radius: 6px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-top: 14px; background: white; }
+  .outcome { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  .ANSWER { color: var(--answer); } .VERIFY { color: var(--verify); } .ESCALATE { color: var(--escalate); } .CLARIFY, .ABSTAIN { color: var(--other); }
+  .conf { font-size: 34px; font-weight: 700; margin: 6px 0 0; }
+  .bar { height: 8px; background: #eee; border-radius: 4px; margin: 6px 0 8px; position: relative; }
+  .bar > i { display: block; height: 100%; border-radius: 4px; background: var(--other); }
+  .bar > b { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--ink); }
+  .note { border-left: 3px solid var(--ink); padding: 6px 10px; margin: 8px 0; font-size: 14px; }
+  .fam { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px; font-size: 14px; }
+  .fam b { font-variant-numeric: tabular-nums; }
+  details summary { cursor: pointer; color: var(--other); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .steps li { margin: 2px 0; }
+  .passage { margin: 8px 0; font-size: 14px; } .passage .pg { color: var(--muted); }
+  #status { margin-top: 10px; min-height: 20px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Trust-aware agent</h1>
+  <nav><a id="nav-ask">Ask</a><a id="nav-dev">Dev gallery</a><a id="nav-health">Health</a></nav>
+  <span class="muted">NASA Systems Engineering Handbook, qwen2.5 3B, local</span>
+</header>
+<main>
+  <section id="ask">
+    <div class="row">
+      <input id="q" type="text" placeholder="Ask a question about the handbook" maxlength="500">
+      <button id="go">Ask</button>
+    </div>
+    <div class="muted">A live question takes about 50 seconds on a 4 GB card: the agent loop (about 20 s), the confidence call (about 8 s) and five resampled drafts (about 23 s). The page shows each step as it finishes.</div>
+    <div id="status" class="muted"></div>
+    <div id="result" class="hidden">
+      <div class="card">
+        <p class="outcome" id="outcome"></p>
+        <div id="outcome_text" class="muted"></div>
+        <p id="response"></p>
+      </div>
+      <div class="card" id="confcard">
+        <div class="muted">Calibrated confidence that the answer is correct</div>
+        <p class="conf" id="conf"></p>
+        <div class="bar"><i id="confbar"></i><b id="cap-mark" title="display cap"></b></div>
+        <div class="note" id="note"></div>
+        <div class="muted" id="capline"></div>
+      </div>
+      <div class="card">
+        <details open>
+          <summary>Why this number</summary>
+          <div class="fam" id="families"></div>
+          <p id="breakdown" style="margin-top:10px"></p>
+        </details>
+      </div>
+      <div class="card">
+        <details>
+          <summary>Passages the answer rested on</summary>
+          <div id="passages"></div>
+        </details>
+      </div>
+      <div class="card">
+        <details>
+          <summary>Trace</summary>
+          <ul class="steps" id="steps"></ul>
+          <div class="muted" id="samples"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="dev" class="hidden">
+    <p class="muted" id="devnote"></p>
+    <table id="devtable"><thead><tr><th>item</th><th>bucket</th><th>agent</th><th>outcome</th><th>confidence</th><th>grade</th><th>question</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section id="health" class="hidden">
+    <pre id="healthbox" class="card"></pre>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const sections = { ask: $("ask"), dev: $("dev"), health: $("health") };
+function show(name) { for (const k in sections) sections[k].classList.toggle("hidden", k !== name); }
+$("nav-ask").onclick = () => show("ask");
+$("nav-dev").onclick = async () => { show("dev"); await loadDev(); };
+$("nav-health").onclick = async () => { show("health"); const r = await fetch("/health"); $("healthbox").textContent = JSON.stringify(await r.json(), null, 1); };
+
+const pct = (x) => Math.round(100 * x) + "%";
+function render(r) {
+  $("result").classList.remove("hidden");
+  const o = $("outcome"); o.textContent = r.outcome; o.className = "outcome " + r.outcome;
+  $("outcome_text").textContent = r.outcome_text;
+  $("response").textContent = r.response;
+  $("conf").textContent = pct(r.confidence);
+  $("confbar").style.width = pct(r.confidence);
+  $("cap-mark").style.left = pct(r.display_cap);
+  $("note").textContent = r.note;
+  $("capline").textContent = "Shown value capped at " + pct(r.display_cap) + " (uncapped " + pct(r.confidence_uncapped) + "). The shipped calibrator is refit on all 134 dev items; the report's metrics are out of fold, and the two differ by 0.09 on average. The cap is a presentation guard, not a fix." + (r.gated ? "" : " The policy did not gate this output: the agent's own action stands.");
+  $("families").innerHTML = r.families.filter(f => Math.abs(f.log_odds) >= 0.05).map(f => `<span>${f.family}</span><b>${f.log_odds > 0 ? "+" : ""}${f.log_odds.toFixed(2)}</b>`).join("");
+  $("breakdown").textContent = r.breakdown;
+  $("passages").innerHTML = r.passages.map(p => `<div class="passage"><span class="pg">[${p.rank}] page ${p.page}, score ${p.score}</span><br>${escapeHtml(p.text)}</div>`).join("");
+  const t = r.timings;
+  $("steps").innerHTML = r.steps.map(s => `<li>${s.step}: ${s.seconds}s${s.cached ? " (cached)" : ""}</li>`).join("") +
+    `<li>confidence call: ${t.confidence_call}s, model said "${escapeHtml(r.stated_confidence)}"</li><li>five resampled drafts: ${t.sampling}s</li><li>total: ${t.total}s</li>`;
+  $("samples").innerHTML = "Resampled drafts: " + r.samples.map(s => `<div>- ${escapeHtml(s)}</div>`).join("");
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+async function ask() {
+  const q = $("q").value.trim();
+  if (q.length < 3) return;
+  $("go").disabled = true; $("result").classList.add("hidden");
+  const t0 = Date.now();
+  const timer = setInterval(() => { $("status").textContent = "Working: retrieval, readings step, draft, confidence call, five resampled drafts... " + Math.round((Date.now() - t0) / 1000) + "s"; }, 500);
+  try {
+    const r = await fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q }) });
+    if (!r.ok) throw new Error(await r.text());
+    render(await r.json());
+    $("status").textContent = "";
+  } catch (e) { $("status").textContent = "Failed: " + e.message; }
+  clearInterval(timer); $("go").disabled = false;
+}
+$("go").onclick = ask;
+$("q").addEventListener("keydown", (e) => { if (e.key === "Enter") ask(); });
+
+async function loadDev() {
+  const r = await fetch("/dev"); const d = await r.json();
+  $("devnote").textContent = d.note;
+  $("devtable").querySelector("tbody").innerHTML = d.items.map(i => `<tr><td>${i.item_id}</td><td>${i.bucket}</td><td>${i.agent_action}</td><td class="${i.outcome}">${i.outcome}</td><td>${pct(i.confidence)}</td><td>${i.grade || ""}</td><td>${escapeHtml(i.question || "")}</td></tr>`).join("");
+}
+</script>
+</body>
+</html>

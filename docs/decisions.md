@@ -1096,3 +1096,21 @@ refit on all of dev with its own calibration unmeasured, and that the cap
 is a presentation guard, not a fix. The backwards single-feature pushes
 stay reported as built, family sums leading; the report names the cause
 as correlated inputs in a linear model.
+
+## M7: the API, the page and the GIF, 2026-09-12
+
+The dashboard runs the measured system at its real cost, about 50 seconds
+a question, rather than a cheaper free-signals calibrator that would not
+be the system the report describes; the README states the cost near the
+top with its split (loop about 20 s, confidence call about 8 s, five
+resampled drafts about 23 s) next to the free-signals finding. One page:
+outcome, capped confidence with the certainty sentence and the
+artifact-gap line, family breakdown, passages, trace. A dev gallery tab
+shows bucket and grade as ground truth for review; the live path never
+reads them. Localhost only, no authentication, no Docker in M7 (kept in
+the plan). The demo GIF is one Playwright take of four captioned frames,
+12 seconds, with the waits cut and the first caption saying it is speeded
+up; the questions are two dev items whose calls are cached, so the
+recording did not wait on the model. Playwright is installed for the
+recording only and is not added to requirements.txt, since the served app
+does not need it.

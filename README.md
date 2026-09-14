@@ -8,6 +8,17 @@ plain-language breakdown of the signals behind it.
 
 Built for L&T Technology Services problem statement Tech2607 (Techgium).
 
+![Demo: a confident answer with its capped confidence, an escalated one, and the explanation panel](docs/assets/demo.gif)
+
+The GIF is speeded up. A live question costs about 50 seconds on a 4 GB
+card: the agent loop (retrieval, readings step, draft) about 20 s, the
+confidence call about 8 s, and five resampled drafts about 23 s. The
+calibrator was fitted with those paid signals in its vector, so the
+dashboard runs the system that was measured rather than a cheaper
+stand-in. The counterpoint is the project's main finding: the free
+signals read from the trace carried more of the usable signal than any of
+the paid ones, so a cheaper deployment would start there.
+
 Status: early scaffolding. There are no results yet. The evaluation arrives in
 milestone M8, and every number that appears in this file will come from a run
 you can repeat.
@@ -41,11 +52,33 @@ push unless ALLOW_PUSH=1 is set, so nothing leaves the machine by accident.
 The last script confirms that the model provider returns token log
 probabilities, which one of the confidence signals depends on.
 
+## Running the dashboard
+
+With Ollama running and the model pulled (ollama pull qwen2.5:3b-instruct):
+
+    python scripts/fetch_corpus.py
+    python scripts/build_chunks.py
+    python scripts/build_index.py
+    python scripts/serve.py
+
+Then open http://127.0.0.1:8000. The health tab says whether Ollama
+answers. The dev gallery tab lists the 134 development items with their
+outcome, confidence, grade and bucket, read from the committed reports.
+The demo GIF is recorded with scripts/demo/record_gif.py, which needs
+Playwright (uv pip install playwright; python -m playwright install
+chromium); it is not in requirements.txt because the served app does not
+need it.
+
 ## Running the evaluation
 
-Not available yet. This section will hold the commands that build the index,
-run the agent over the development set, train the calibrator, and score the
-held-out test set once those parts exist.
+The development-set pipeline, in order: scripts/run_agent.py (traces),
+scripts/grade_run.py (grader v13 with the local judge),
+scripts/build_features.py with scripts/paid_signals.py (features),
+scripts/fit_calibrator.py and scripts/finalize_calibrator.py (the
+calibrator), scripts/policy_curve.py and scripts/policy_apply.py (the
+thresholds). Every model call is cached under data/cache, so reruns are
+cheap. The test split is read by one script, once, at the end; that
+script arrives with milestone M8.
 
 ## Layout
 
