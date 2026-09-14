@@ -942,3 +942,27 @@ seeing results. Two smaller rules for the paid signals: the raw token
 log-probability sequence is stored per draft, not only mean and min, so a
 third summary needs no rerun; and each paid signal's time per item is
 recorded and reported, so the report can state what the approach costs.
+
+## Paid signals measured, 2026-09-11 and 2026-09-12
+
+All three paid signals ran on the 134 dev items (reports/features-dev.md,
+raw records in reports/paid-signals-dev.jsonl: token sequences, confidence
+replies, five samples per item). Cost per item, uncached: log-probabilities
+12 to 15 s, verbalized confidence 8 s, sampling with k=5 at 0.7 about 23 s,
+so the paid signals add about 45 s to an 18 s answer.
+
+A finding about determinism. The log-probability draft is regenerated at
+temperature 0 with the run's seed, and the plain call for the same
+messages is served from the cache, yet the regenerated text differed from
+the traced draft on 44 of 134 items (37 of 100 and 7 of 34). Ollama's
+greedy decoding is not identical across sessions or with logprobs on. The
+sequence therefore describes the model's state on the same prompt, not
+the graded text's tokens; the mismatch is a feature (lp_same_text) and
+the caveat goes in the report.
+
+In the decisive stratum (33 right, 17 wrong): verbalized confidence is 100
+on every correct item and 83 on average for wrong ones, with almost every
+reply a round number; agreement with the graded draft separates (max
+Jaccard 0.85 against 0.70, form agreement 0.95 against 0.77); the
+log-probability summaries barely move (first-token -0.16 against -0.28,
+mean -0.18 against -0.19, minimum reversed). Nothing is fitted yet.

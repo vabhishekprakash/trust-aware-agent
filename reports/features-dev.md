@@ -1,4 +1,4 @@
-# Feature table, dev, free signals only
+# Feature table, dev with the paid signals
 
 134 items from dev-v1check, dev-reserve; labels from the graded rows (1 = CORRECT). Every feature below is computed from the agent's own run: the trace it wrote and the texts of the chunks it retrieved. Each is computable at inference time on a question with no known answer, because none reads the item record. The strata block kept next to the features (bucket, evidence retrieved, rank, calculator flag) is ground truth for reporting only.
 
@@ -43,6 +43,24 @@
 | nli_entail_top1 | NLI cross-encoder P(entailment) with the best chunk as premise and the response as hypothesis | yes, from the run |
 | nli_entail_max | the same, maximum over the k chunks | yes, from the run |
 | nli_contradict_max | NLI P(contradiction), maximum over the k chunks | yes, from the run |
+| lp_mean | mean token log-probability of the draft (regenerated with logprobs on) | yes, from the run |
+| lp_min | minimum token log-probability of the draft | yes, from the run |
+| lp_p10 | 10th percentile of the token log-probabilities | yes, from the run |
+| lp_share_below_1 | share of tokens with log-probability below -1 (probability under 0.37) | yes, from the run |
+| lp_first | log-probability of the first token | yes, from the run |
+| lp_tokens | number of tokens in the draft | yes, from the run |
+| lp_same_text | 1 when the regenerated draft matched the trace's draft exactly | yes, from the run |
+| vc_confidence | the number the model gave when asked, with the passages and its answer in view, how likely its answer is correct (0 to 100; 50 when it gave none) | yes, from the run |
+| vc_parsed | 1 when the reply held a number from 0 to 100 | yes, from the run |
+| vc_round | 1 when the number is a multiple of 10, the clustering small models show | yes, from the run |
+| sa_mean_pairwise | mean content-word Jaccard between pairs of the k samples | yes, from the run |
+| sa_min_pairwise | minimum pairwise Jaccard among the k samples | yes, from the run |
+| sa_mean_to_draft | mean Jaccard between each sample and the graded draft; the label belongs to the draft | yes, from the run |
+| sa_min_to_draft | minimum Jaccard between a sample and the graded draft | yes, from the run |
+| sa_max_to_draft | maximum Jaccard between a sample and the graded draft | yes, from the run |
+| sa_abstain_share | share of samples that abstain (grader's abstain pattern) | yes, from the run |
+| sa_form_agree | share of samples whose abstain-or-not form matches the graded draft | yes, from the run |
+| sa_samples | number of samples (k) | yes, from the run |
 
 ## Mean by label (1 = CORRECT), pooled and in the decisive stratum, then by bucket
 
@@ -80,5 +98,36 @@ Pooled means mix the buckets, and the buckets differ in label rate, so a pooled 
 | nli_entail_top1 | 0.058 (sd 0.101) | 0.077 (sd 0.119) | 0.094 (sd 0.108) | 0.106 (sd 0.122) | 0.092 (sd 0.118) | 0.170 (sd 0.226) | 0.015 (sd 0.030) | 0.043 (sd 0.052) |  |
 | nli_entail_max | 0.212 (sd 0.192) | 0.240 (sd 0.212) | 0.327 (sd 0.196) | 0.327 (sd 0.231) | 0.302 (sd 0.220) | 0.263 (sd 0.180) | 0.114 (sd 0.127) | 0.182 (sd 0.170) |  |
 | nli_contradict_max | 0.760 (sd 0.291) | 0.618 (sd 0.304) | 0.583 (sd 0.286) | 0.636 (sd 0.293) | 0.625 (sd 0.283) | 0.378 (sd 0.201) | 0.963 (sd 0.090) | 0.615 (sd 0.329) |  |
+| lp_mean | -0.136 (sd 0.135) | -0.228 (sd 0.175) | -0.180 (sd 0.126) | -0.188 (sd 0.154) | -0.194 (sd 0.141) | -0.253 (sd 0.198) | -0.077 (sd 0.115) | -0.250 (sd 0.183) |  |
+| lp_min | -1.268 (sd 1.199) | -1.629 (sd 1.085) | -1.780 (sd 1.083) | -1.376 (sd 1.075) | -1.682 (sd 1.105) | -1.887 (sd 0.964) | -0.595 (sd 0.946) | -1.778 (sd 1.090) |  |
+| lp_p10 | -0.517 (sd 0.558) | -0.821 (sd 0.652) | -0.617 (sd 0.493) | -0.679 (sd 0.666) | -0.679 (sd 0.549) | -0.768 (sd 0.567) | -0.357 (sd 0.574) | -0.952 (sd 0.701) |  |
+| lp_share_below_1 | 0.045 (sd 0.057) | 0.072 (sd 0.078) | 0.060 (sd 0.055) | 0.057 (sd 0.064) | 0.066 (sd 0.064) | 0.078 (sd 0.095) | 0.020 (sd 0.047) | 0.081 (sd 0.077) |  |
+| lp_first | -0.119 (sd 0.228) | -0.227 (sd 0.258) | -0.162 (sd 0.236) | -0.276 (sd 0.282) | -0.206 (sd 0.276) | -0.357 (sd 0.242) | -0.059 (sd 0.148) | -0.167 (sd 0.231) |  |
+| lp_tokens | 25.543 (sd 22.834) | 31.266 (sd 26.006) | 34.667 (sd 21.163) | 26.353 (sd 16.248) | 30.710 (sd 20.953) | 46.778 (sd 34.931) | 13.147 (sd 15.414) | 35.069 (sd 28.491) |  |
+| lp_same_text | 0.714 (sd 0.455) | 0.625 (sd 0.488) | 0.606 (sd 0.496) | 0.588 (sd 0.507) | 0.613 (sd 0.491) | 0.333 (sd 0.500) | 0.882 (sd 0.327) | 0.655 (sd 0.484) |  |
+| vc_confidence | 56.929 (sd 48.209) | 74.219 (sd 38.237) | 100.000 (sd 0.000) | 83.235 (sd 33.863) | 86.290 (sd 31.152) | 98.333 (sd 5.000) | 7.353 (sd 17.975) | 77.586 (sd 36.219) |  |
+| vc_parsed | 1.000 (sd 0.000) | 0.984 (sd 0.125) | 1.000 (sd 0.000) | 1.000 (sd 0.000) | 0.984 (sd 0.127) | 1.000 (sd 0.000) | 1.000 (sd 0.000) | 1.000 (sd 0.000) |  |
+| vc_round | 0.986 (sd 0.120) | 0.891 (sd 0.315) | 1.000 (sd 0.000) | 0.941 (sd 0.243) | 0.952 (sd 0.216) | 0.889 (sd 0.333) | 1.000 (sd 0.000) | 0.862 (sd 0.351) |  |
+| sa_mean_pairwise | 0.615 (sd 0.284) | 0.440 (sd 0.245) | 0.529 (sd 0.237) | 0.538 (sd 0.278) | 0.520 (sd 0.264) | 0.318 (sd 0.102) | 0.705 (sd 0.303) | 0.416 (sd 0.207) |  |
+| sa_min_pairwise | 0.445 (sd 0.375) | 0.241 (sd 0.286) | 0.352 (sd 0.274) | 0.318 (sd 0.330) | 0.333 (sd 0.307) | 0.145 (sd 0.076) | 0.539 (sd 0.447) | 0.216 (sd 0.249) |  |
+| sa_mean_to_draft | 0.687 (sd 0.252) | 0.472 (sd 0.267) | 0.603 (sd 0.230) | 0.531 (sd 0.314) | 0.561 (sd 0.273) | 0.423 (sd 0.147) | 0.775 (sd 0.260) | 0.461 (sd 0.231) |  |
+| sa_min_to_draft | 0.471 (sd 0.363) | 0.252 (sd 0.284) | 0.396 (sd 0.273) | 0.321 (sd 0.324) | 0.354 (sd 0.306) | 0.182 (sd 0.086) | 0.553 (sd 0.434) | 0.231 (sd 0.253) |  |
+| sa_max_to_draft | 0.889 (sd 0.180) | 0.709 (sd 0.283) | 0.851 (sd 0.184) | 0.703 (sd 0.309) | 0.782 (sd 0.254) | 0.742 (sd 0.288) | 0.931 (sd 0.171) | 0.717 (sd 0.264) |  |
+| sa_abstain_share | 0.466 (sd 0.453) | 0.362 (sd 0.368) | 0.048 (sd 0.087) | 0.165 (sd 0.226) | 0.181 (sd 0.280) | 0.111 (sd 0.267) | 0.935 (sd 0.145) | 0.407 (sd 0.357) |  |
+| sa_form_agree | 0.926 (sd 0.149) | 0.794 (sd 0.259) | 0.952 (sd 0.087) | 0.765 (sd 0.310) | 0.852 (sd 0.237) | 0.889 (sd 0.267) | 0.935 (sd 0.145) | 0.793 (sd 0.217) |  |
+| sa_samples | 5.000 (sd 0.000) | 5.000 (sd 0.000) | 5.000 (sd 0.000) | 5.000 (sd 0.000) | 5.000 (sd 0.000) | 5.000 (sd 0.000) | 5.000 (sd 0.000) | 5.000 (sd 0.000) | yes |
 
-A gap between the decisive-stratum label columns is the signal that matters. A gap between the bucket columns says the feature may be a bucket detector; the M4 test decides. Constant on dev, to be dropped at M4: clarify_by_prompt.
+## Cost of the paid signals, per item
+
+| run | signal | items | seconds per item | wall clock | calls from cache |
+|---|---|---|---|---|---|
+| dev-v1check-signals | logprobs | 100 | 12.44 | 1244 s | 1 |
+| dev-v1check-signals | verbalized | 100 | 2.75 | 275 s | 67 |
+| dev-v1check-signals | samples (k=5) | 100 | 23.19 | 2319 s | 0 |
+| dev-reserve-signals | logprobs | 34 | 14.56 | 495 s | 0 |
+| dev-reserve-signals | verbalized | 34 | 8.14 | 277 s | 0 |
+| dev-reserve-signals | samples (k=5) | 34 | 22.71 | 772 s | 0 |
+
+Sampling agreement is lexical (the grader's normalise, stopwords and stems), so paraphrases read as disagreement and the signal partly measures lexical variance; the raw samples are stored so M4 can try another agreement function without resampling. The confidence follow-up sees the passages and the draft. The log-probability sequence is stored raw per draft.
+
+A gap between the decisive-stratum label columns is the signal that matters. A gap between the bucket columns says the feature may be a bucket detector; the M4 test decides. Constant on dev, to be dropped at M4: clarify_by_prompt, sa_samples.
