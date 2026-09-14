@@ -877,3 +877,52 @@ Reserve run (reports/dev-run-reserve.md): 843 s for 34 items; answerable 6
 of 16 correct, unanswerable 9 of 9, false premise 0 of 9. Merged dev is 134
 items, 70 correct (reports/dev-distribution.md); the decisive stratum,
 answerable with evidence retrieved, is 33 right against 17 wrong.
+
+## M3 rules, decided by the owner on 2026-09-11
+
+The five M3 positions stand: all five signals, built in cost order (trace
+process signals and retrieval support first, log-probabilities, verbalized
+confidence, sampling agreement last); agreement with k=5 at temperature
+0.7 measured by the grader's own normalise-and-overlap rather than a second
+embedding model; both bge cosine and a small NLI cross-encoder for
+retrieval support; a single follow-up call for a 0 to 100 confidence; a
+binary label, CORRECT against not. Four additions from the owner:
+
+1. Leakage, the most important rule. Anything derived from the item record
+   rather than from the run is ground truth and never enters the feature
+   vector: the evidence-retrieved flag and rank, bucket membership, the
+   gold answer, the expected action, the calculator flag and the spurious
+   CALC flag that depends on it. They are stratification variables for
+   reporting only. Before anything is fitted at M4, every feature is listed
+   with where it comes from and a statement that it is computable at
+   inference time on a question with no known answer. A feature that fails
+   that test is out. A calibrator that silently sees ground truth looks
+   excellent and means nothing.
+2. Sampling agreement stores the raw k samples in the trace, so the
+   agreement function can change at M4 without a rerun, and measures
+   agreement between the graded draft and the k samples as well as among
+   the samples, because the label belongs to the graded draft. The report
+   notes that token overlap reads paraphrases as disagreement, so the
+   signal partly measures lexical variance; the raw samples let M4 check.
+3. The verbalized-confidence call sees the retrieved passages as well as
+   the question and answer, so it rates a grounded answer rather than
+   guessing from memory. The trace records that choice and the raw reply.
+4. Build stops after the free signals and retrieval support for a first
+   feature table on dev, before the paid ones run.
+
+## First feature table, free signals, 2026-09-11
+
+reports/features-dev.md lists 30 features from the run alone, each with
+its provenance and the statement that it exists at inference time, and
+the ground-truth fields kept out (evidence flag and rank, bucket, gold,
+expected action, calculator flags). Built on the 134 merged dev items.
+What the table shows: the pooled label gaps are mostly bucket gaps
+(unanswerable items abstain, are short, and score high on NLI
+contradiction because "the handbook does not say" contradicts any
+passage). In the decisive stratum, answerable with evidence retrieved, 33
+right against 17 wrong, the features that separate are the support ones:
+lexical support 0.73 against 0.49, cosine to the best chunk 0.77 against
+0.71, and the action itself, since every wrong item that clarified or
+abstained sits there. NLI entailment does not separate (0.33 against
+0.33). One feature is constant on dev, clarify_by_prompt, and is dropped
+at M4. The paid signals wait for the owner's read of the table.
