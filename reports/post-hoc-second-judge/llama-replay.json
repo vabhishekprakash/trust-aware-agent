@@ -1,0 +1,14 @@
+{
+ "judge": "llama3.1:latest",
+ "reproduced": {
+  "final": 20,
+  "sheet1": 40,
+  "sheet2": 25
+ },
+ "differing": {
+  "final": 0,
+  "sheet1": 0,
+  "sheet2": 0
+ },
+ "mismatches": []
+}

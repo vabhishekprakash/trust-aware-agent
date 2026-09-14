@@ -1125,3 +1125,60 @@ percent (sheet 1, v7), 80 percent (sheet 2, v10), 95 percent (final,
 v13, real outputs). The one disagreement is a judge miss on a
 false-premise output that states the correction and abstains; the owner
 is right; the grader is not changed.
+
+## Post hoc: a second judge on the three blind sheets, planned 2026-09-13
+
+After the tagged evaluation (v1.0.2), the owner asked whether judge choice
+or rubric quality dominated the gap between the judge and the owner's
+blind labels. This entry is written and committed before any call to the
+second judge. It touches no test item and refits nothing.
+
+Design. The 85 drafts on the three blind sheets (84 carry a hand label;
+sheet 1, draft 1 was never graded) are regraded with grader v13 unchanged
+(src/calibration/grader.py SHA-256 a2eb938e...), same prompts, same
+parser, same 200-token cap, seed 42, temperature 0, num_ctx 4096, with
+mistral:latest (Mistral 7B Instruct, Q4_K_M) as the judge. Inputs are
+identical to the llama3.1 v13 grades: sheets 1 and 2 against the item pool
+at commit 7a2a82d with no form hint, the final sheet against
+data/eval/dev.jsonl with the agent's action as the form hint. The llama3.1
+grades are first replayed from the cache with a transport that refuses any
+live call; if a single replayed grade differs from the committed key, the
+run stops. All Mistral judging happens in one pass with only Mistral
+loaded. Every call's reply is kept verbatim with its stop reason and token
+counts. Forty of the 85 drafts are decided by code rules and 10 by exact
+match under v13, so the judge can change at most 35 grades; that is part
+of the result, not a footnote.
+
+What is reported, final sheet first because it is the only sheet the rubric
+was never developed against, then sheets 1 and 2 with the home advantage
+stated beside their numbers: binary and three-way agreement of each judge
+with the owner's blind labels, with bootstrap intervals; the paired
+difference between the judges; agreement between the two judges on all
+drafts and on the judged ones; the overlap of the drafts each judge gets
+wrong; unreadable replies, position disagreements and YES answers removed
+by grounding, per judge. Sheet 1 is scored against the blind grades as
+written, with the owner's later change to sheet 34 on a secondary line.
+
+Unreadable replies. The parser was built around llama3.1's output, so an
+unreadable Mistral reply is first a question about the harness. Each is
+kept verbatim and placed in one category by code: format (a lenient
+reading recovers a yes or no for every question: markdown stripped,
+"Question 1" and "1." read as Q1, the first YES or NO on a question's line
+or the line after it), truncated (the reply stopped at the 200-token cap
+before answering), or task (a complete reply that answers no recoverable
+question). Independent readers then classify the same replies without
+seeing the code's category, and disagreements are reported. A diagnostic
+regrade, labelled as such and never the headline, reruns only the
+unreadable drafts with the lenient reading and a 600-token cap, in the same
+pass. If the unreadable replies are format or truncation and the
+diagnostic closes the gap, the report says plainly that a judge swap is not
+free because the harness carries the first judge's conventions.
+
+How the headline is read, fixed now. On the final sheet llama3.1 agrees
+with the owner on 19 of 20. Mistral within one draft of that (18 of 20 or
+better) counts as agreeing about as well, which supports rubric over
+model. Two or more drafts fewer counts as noticeably worse, which weakens
+that claim, and the paper says so. Sheets 1 and 2 and the pooled 84 are
+reported with the paired interval as supporting evidence under the home
+advantage caveat. Twenty items give wide intervals; the conclusion is
+directional either way.
