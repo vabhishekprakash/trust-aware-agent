@@ -1,0 +1,1121 @@
+{
+ "frozen": {
+  "agent_commit": "85db315",
+  "artifact_sha256": "58f3f3d1cba468861b8b5094dae334b270c7fbbdff946fac1a801ad3e1d90116",
+  "policy_sha256": "767fea22e942067807041787901d05347959d921a32c66365fc496b2e3bc3821",
+  "split_sha256": "3c344521a08865da402a50558c8fbb8eab1b5b0098799b1ba93e84db1f18ad1c",
+  "grader": "grader-v13",
+  "grader_sha256": "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485"
+ },
+ "attempts": 1,
+ "n": 100,
+ "strata_counts": {
+  "pooled": 100,
+  "answerable": 46,
+  "decisive": 36
+ },
+ "audit": {
+  "provenance_ok": true,
+  "ground_truth_in_vector": false,
+  "near_duplicates": [
+   {
+    "test_id": "q0006",
+    "test_question": "In the handbook's life-cycle cost example, by how many percentage points does the share of life-cycle cost committed by the design exceed the share of cost actually spent during design?",
+    "dev_id": "q0196",
+    "dev_question": "The handbook's life-cycle cost curve shows roughly 75% of a project's cost already spent by the time design is done; what share of the total does it say those design decisions commit?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0196"
+    ]
+   },
+   {
+    "test_id": "q0026",
+    "test_question": "According to the handbook's definitions of needs, goals and objectives, how many criteria should an objective generally satisfy?",
+    "dev_id": "q0207",
+    "dev_question": "Since the handbook says objectives are derived from the baselined requirements set, what four criteria should those objectives meet?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0207"
+    ]
+   },
+   {
+    "test_id": "q0036",
+    "test_question": "Up to which milestone review does the handbook say technology assessment should stay involved in the design and development process, starting from concept development?",
+    "dev_id": "q0212",
+    "dev_question": "The handbook wants technology assessment to keep running from concept development all the way through the Critical Design Review. Where does it say the technology development lessons learned should be captured after that point?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0212"
+    ]
+   },
+   {
+    "test_id": "q0066",
+    "test_question": "In which project phase does the handbook say issuing technical work directives to cost account managers is essential?",
+    "dev_id": "q0229",
+    "dev_question": "Since issuing technical work directives to the Cost Account Managers is described as essential during Phase D, what three things does that step produce?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0229"
+    ]
+   },
+   {
+    "test_id": "q0067",
+    "test_question": "After which review are a project's requirements put under formal configuration control?",
+    "dev_id": "q0068",
+    "dev_question": "Once the requirements baseline is under formal configuration control after the SRR, what body must approve a change to it?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0068"
+    ]
+   },
+   {
+    "test_id": "q0072",
+    "test_question": "In what month and year did NASA change its risk management approach to make it more proactive?",
+    "dev_id": "q0231",
+    "dev_question": "According to the handbook, Continuous Risk Management is applied first to establish the baseline performance requirements and Risk-Informed Decision Making then manages the risks during development and implementation; in what year did NASA adopt this two-process approach?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0231"
+    ]
+   },
+   {
+    "test_id": "q0097",
+    "test_question": "At which life-cycle review does the SEMP get baselined?",
+    "dev_id": "q0120",
+    "dev_question": "At which life cycle review does the baseline get established?",
+    "reasons": [
+     "jaccard 0.60 with q0120",
+     "same evidence page and cosine >= 0.8 with q0198"
+    ]
+   },
+   {
+    "test_id": "q0108",
+    "test_question": "Which team is responsible for producing the operations concept?",
+    "dev_id": "q0027",
+    "dev_question": "In the handbook's distinction between a concept of operations and an operations concept, which team normally produces the operations concept?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0027"
+    ]
+   },
+   {
+    "test_id": "q0117",
+    "test_question": "What is being checked when the handbook talks about validation?",
+    "dev_id": "q0209",
+    "dev_question": "The handbook breaks requirements validation into four steps; what does the fourth and final step check for?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0051, q0218"
+    ]
+   },
+   {
+    "test_id": "q0124",
+    "test_question": "Which Phase D review signs off that the system is ready?",
+    "dev_id": "q0126",
+    "dev_question": "What does the readiness review have to show the system is ready for?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0126"
+    ]
+   },
+   {
+    "test_id": "q0139",
+    "test_question": "What joint cost and schedule confidence level must the Agency Baseline Commitment be funded to at KDP C?",
+    "dev_id": "q0179",
+    "dev_question": "What joint cost and schedule confidence level does a project's baseline have to reach before it can pass KDP C?",
+    "reasons": [
+     "cosine 0.92 with q0179"
+    ]
+   },
+   {
+    "test_id": "q0141",
+    "test_question": "How many days before a life cycle review like PDR does the handbook say the review material has to be delivered to the board?",
+    "dev_id": "q0143",
+    "dev_question": "How many working days before a milestone review does the handbook say the review data package must be delivered to the board members?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0143"
+    ]
+   },
+   {
+    "test_id": "q0203",
+    "test_question": "The handbook defines tailoring as modifying the recommended SE practices used to accomplish the SE requirements; where does it say significant tailoring of that kind should be documented?",
+    "dev_id": "q0019",
+    "dev_question": "What term does the handbook introduce for modifying the recommended SE practices that are used to meet the SE requirements, as opposed to seeking relief from the requirements themselves?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0019"
+    ]
+   },
+   {
+    "test_id": "q0234",
+    "test_question": "Since the handbook makes the manager of the technical data management system solely responsible for entering data into it, how are the people who originate the data supposed to hand it over?",
+    "dev_id": "q0079",
+    "dev_question": "According to the handbook, who is solely responsible for entering data into the technical data management system?",
+    "reasons": [
+     "cosine 0.92 with q0079",
+     "same evidence page and cosine >= 0.8 with q0079"
+    ]
+   },
+   {
+    "test_id": "q0240",
+    "test_question": "Because the final Technology Maturity Assessment is carried out just before the Critical Design Review, which report does it provide the basis for?",
+    "dev_id": "q0130",
+    "dev_question": "When in the life cycle is the Technology Maturity Assessment carried out?",
+    "reasons": [
+     "same evidence page and cosine >= 0.8 with q0130"
+    ]
+   }
+  ],
+  "split": {
+   "seed": 42,
+   "source": "scripts/lock_and_split.py, stratified by bucket, halves per bucket",
+   "test_counts_found": {
+    "answerable": 46,
+    "ambiguous": 9,
+    "unanswerable": 25,
+    "false_premise": 20
+   },
+   "expected": {
+    "answerable": 46,
+    "ambiguous": 9,
+    "unanswerable": 25,
+    "false_premise": 20
+   }
+  }
+ },
+ "label_rate": {
+  "pooled": 50,
+  "answerable": 26,
+  "decisive": 26
+ },
+ "metrics": {
+  "pooled": {
+   "auroc": {
+    "point": 0.6568,
+    "lo": 0.5554,
+    "hi": 0.7564,
+    "n": 100
+   },
+   "brier": {
+    "point": 0.2518,
+    "lo": 0.2173,
+    "hi": 0.2898,
+    "n": 100
+   },
+   "ece": {
+    "point": 0.1478,
+    "lo": 0.0772,
+    "hi": 0.2439,
+    "n": 100
+   },
+   "aurc": {
+    "point": 0.4017,
+    "lo": 0.2652,
+    "hi": 0.5246,
+    "n": 100
+   },
+   "reliability": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 12,
+     "confidence": 0.188,
+     "accuracy": 0.083
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 19,
+     "confidence": 0.309,
+     "accuracy": 0.632
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 1,
+     "confidence": 0.484,
+     "accuracy": 0.0
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 60,
+     "confidence": 0.576,
+     "accuracy": 0.517
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 4,
+     "confidence": 0.654,
+     "accuracy": 1.0
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 4,
+     "confidence": 1.0,
+     "accuracy": 0.5
+    }
+   ]
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.5875,
+    "lo": 0.4352,
+    "hi": 0.7381,
+    "n": 46
+   },
+   "brier": {
+    "point": 0.2812,
+    "lo": 0.2321,
+    "hi": 0.333,
+    "n": 46
+   },
+   "ece": {
+    "point": 0.222,
+    "lo": 0.1376,
+    "hi": 0.3617,
+    "n": 46
+   },
+   "aurc": {
+    "point": 0.4201,
+    "lo": 0.1957,
+    "hi": 0.5595,
+    "n": 46
+   },
+   "reliability": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 4,
+     "confidence": 0.188,
+     "accuracy": 0.0
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 14,
+     "confidence": 0.31,
+     "accuracy": 0.786
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 1,
+     "confidence": 0.484,
+     "accuracy": 0.0
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 24,
+     "confidence": 0.583,
+     "accuracy": 0.542
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 1,
+     "confidence": 0.667,
+     "accuracy": 1.0
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 2,
+     "confidence": 1.0,
+     "accuracy": 0.5
+    }
+   ]
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.4904,
+    "lo": 0.2879,
+    "hi": 0.7167,
+    "n": 36
+   },
+   "brier": {
+    "point": 0.3058,
+    "lo": 0.2452,
+    "hi": 0.3658,
+    "n": 36
+   },
+   "ece": {
+    "point": 0.2949,
+    "lo": 0.1967,
+    "hi": 0.4416,
+    "n": 36
+   },
+   "aurc": {
+    "point": 0.3399,
+    "lo": 0.0997,
+    "hi": 0.5147,
+    "n": 36
+   },
+   "reliability": [
+    {
+     "lo": 0.0,
+     "hi": 0.1,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.1,
+     "hi": 0.2,
+     "n": 2,
+     "confidence": 0.188,
+     "accuracy": 0.0
+    },
+    {
+     "lo": 0.2,
+     "hi": 0.3,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.3,
+     "hi": 0.4,
+     "n": 11,
+     "confidence": 0.311,
+     "accuracy": 1.0
+    },
+    {
+     "lo": 0.4,
+     "hi": 0.5,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.5,
+     "hi": 0.6,
+     "n": 20,
+     "confidence": 0.584,
+     "accuracy": 0.65
+    },
+    {
+     "lo": 0.6,
+     "hi": 0.7,
+     "n": 1,
+     "confidence": 0.667,
+     "accuracy": 1.0
+    },
+    {
+     "lo": 0.7,
+     "hi": 0.8,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.8,
+     "hi": 0.9,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "lo": 0.9,
+     "hi": 1.0,
+     "n": 2,
+     "confidence": 1.0,
+     "accuracy": 0.5
+    }
+   ]
+  }
+ },
+ "baselines": {
+  "verbalized alone": {
+   "pooled": {
+    "auroc": {
+     "point": 0.6646,
+     "lo": 0.5697,
+     "hi": 0.7531,
+     "n": 100
+    },
+    "brier": {
+     "point": 0.2243,
+     "lo": 0.2017,
+     "hi": 0.2502,
+     "n": 100
+    }
+   },
+   "answerable": {
+    "auroc": {
+     "point": 0.3846,
+     "lo": 0.2903,
+     "hi": 0.4722,
+     "n": 46
+    },
+    "brier": {
+     "point": 0.2856,
+     "lo": 0.2602,
+     "hi": 0.3161,
+     "n": 46
+    }
+   },
+   "decisive": {
+    "auroc": {
+     "point": 0.4808,
+     "lo": 0.4375,
+     "hi": 0.5,
+     "n": 36
+    },
+    "brier": {
+     "point": 0.2785,
+     "lo": 0.2563,
+     "hi": 0.3123,
+     "n": 36
+    }
+   }
+  },
+  "agreement alone": {
+   "pooled": {
+    "auroc": {
+     "point": 0.7062,
+     "lo": 0.6006,
+     "hi": 0.7987,
+     "n": 100
+    },
+    "brier": {
+     "point": 0.2292,
+     "lo": 0.1924,
+     "hi": 0.2674,
+     "n": 100
+    }
+   },
+   "answerable": {
+    "auroc": {
+     "point": 0.6423,
+     "lo": 0.4771,
+     "hi": 0.7876,
+     "n": 46
+    },
+    "brier": {
+     "point": 0.2541,
+     "lo": 0.1952,
+     "hi": 0.3177,
+     "n": 46
+    }
+   },
+   "decisive": {
+    "auroc": {
+     "point": 0.6173,
+     "lo": 0.4166,
+     "hi": 0.7972,
+     "n": 36
+    },
+    "brier": {
+     "point": 0.2773,
+     "lo": 0.2113,
+     "hi": 0.3501,
+     "n": 36
+    }
+   }
+  },
+  "free signals alone": {
+   "pooled": {
+    "auroc": {
+     "point": 0.6964,
+     "lo": 0.5853,
+     "hi": 0.8003,
+     "n": 100
+    },
+    "brier": {
+     "point": 0.2305,
+     "lo": 0.1892,
+     "hi": 0.2762,
+     "n": 100
+    }
+   },
+   "answerable": {
+    "auroc": {
+     "point": 0.6337,
+     "lo": 0.4817,
+     "hi": 0.7885,
+     "n": 46
+    },
+    "brier": {
+     "point": 0.2498,
+     "lo": 0.1918,
+     "hi": 0.3085,
+     "n": 46
+    }
+   },
+   "decisive": {
+    "auroc": {
+     "point": 0.5788,
+     "lo": 0.3817,
+     "hi": 0.7938,
+     "n": 36
+    },
+    "brier": {
+     "point": 0.2732,
+     "lo": 0.2025,
+     "hi": 0.3439,
+     "n": 36
+    }
+   }
+  },
+  "confirmed minus_logprobs (frozen artifact)": {
+   "pooled": {
+    "auroc": {
+     "point": 0.6568,
+     "lo": 0.5554,
+     "hi": 0.7564,
+     "n": 100
+    },
+    "brier": {
+     "point": 0.2518,
+     "lo": 0.2173,
+     "hi": 0.2898,
+     "n": 100
+    }
+   },
+   "answerable": {
+    "auroc": {
+     "point": 0.5875,
+     "lo": 0.4352,
+     "hi": 0.7381,
+     "n": 46
+    },
+    "brier": {
+     "point": 0.2812,
+     "lo": 0.2321,
+     "hi": 0.333,
+     "n": 46
+    }
+   },
+   "decisive": {
+    "auroc": {
+     "point": 0.4904,
+     "lo": 0.2879,
+     "hi": 0.7167,
+     "n": 36
+    },
+    "brier": {
+     "point": 0.3058,
+     "lo": 0.2452,
+     "hi": 0.3658,
+     "n": 36
+    }
+   }
+  }
+ },
+ "policy": {
+  "answered": 54,
+  "answered_correct": 24,
+  "base": {
+   "coverage": 1.0,
+   "risk": 0.556,
+   "risk_ci": [
+    0.426,
+    0.704
+   ]
+  },
+  "escalate_threshold": {
+   "coverage": 0.722,
+   "coverage_ci": [
+    0.611,
+    0.852
+   ],
+   "risk": 0.641,
+   "risk_ci": [
+    0.488,
+    0.8
+   ]
+  },
+  "answer_threshold": {
+   "coverage": 0.556,
+   "coverage_ci": [
+    0.426,
+    0.704
+   ],
+   "risk": 0.533,
+   "risk_ci": [
+    0.36,
+    0.727
+   ]
+  },
+  "risk_coverage": [
+   {
+    "threshold": 1.0,
+    "coverage": 0.056,
+    "risk": 0.667,
+    "cov_lo": 0.0,
+    "cov_hi": 0.111,
+    "risk_lo": 0.0,
+    "risk_hi": 1.0
+   },
+   {
+    "threshold": 0.6667,
+    "coverage": 0.074,
+    "risk": 0.5,
+    "cov_lo": 0.019,
+    "cov_hi": 0.148,
+    "risk_lo": 0.0,
+    "risk_hi": 1.0
+   },
+   {
+    "threshold": 0.5913,
+    "coverage": 0.093,
+    "risk": 0.4,
+    "cov_lo": 0.019,
+    "cov_hi": 0.185,
+    "risk_lo": 0.0,
+    "risk_hi": 1.0
+   },
+   {
+    "threshold": 0.5846,
+    "coverage": 0.556,
+    "risk": 0.533,
+    "cov_lo": 0.426,
+    "cov_hi": 0.704,
+    "risk_lo": 0.36,
+    "risk_hi": 0.727
+   },
+   {
+    "threshold": 0.5714,
+    "coverage": 0.667,
+    "risk": 0.611,
+    "cov_lo": 0.555,
+    "cov_hi": 0.796,
+    "risk_lo": 0.455,
+    "risk_hi": 0.778
+   },
+   {
+    "threshold": 0.5489,
+    "coverage": 0.685,
+    "risk": 0.622,
+    "cov_lo": 0.556,
+    "cov_hi": 0.815,
+    "risk_lo": 0.469,
+    "risk_hi": 0.789
+   },
+   {
+    "threshold": 0.547,
+    "coverage": 0.704,
+    "risk": 0.632,
+    "cov_lo": 0.574,
+    "cov_hi": 0.833,
+    "risk_lo": 0.475,
+    "risk_hi": 0.795
+   },
+   {
+    "threshold": 0.5,
+    "coverage": 0.722,
+    "risk": 0.641,
+    "cov_lo": 0.611,
+    "cov_hi": 0.852,
+    "risk_lo": 0.488,
+    "risk_hi": 0.8
+   },
+   {
+    "threshold": 0.3411,
+    "coverage": 0.741,
+    "risk": 0.625,
+    "cov_lo": 0.63,
+    "cov_hi": 0.852,
+    "risk_lo": 0.476,
+    "risk_hi": 0.784
+   },
+   {
+    "threshold": 0.3077,
+    "coverage": 0.981,
+    "risk": 0.547,
+    "cov_lo": 0.944,
+    "cov_hi": 1.0,
+    "risk_lo": 0.415,
+    "risk_hi": 0.692
+   },
+   {
+    "threshold": 0.1875,
+    "coverage": 1.0,
+    "risk": 0.556,
+    "cov_lo": 1.0,
+    "cov_hi": 1.0,
+    "risk_lo": 0.426,
+    "risk_hi": 0.704
+   }
+  ],
+  "escalation": {
+   "escalate_only": {
+    "precision": 0.333,
+    "recall": 0.167,
+    "n": 15
+   },
+   "flagged": {
+    "precision": 0.583,
+    "recall": 0.467,
+    "n": 24
+   }
+  },
+  "outcomes_per_bucket": {
+   "answerable": {
+    "ANSWER": {
+     "n": 20,
+     "correct": 14
+    },
+    "VERIFY": {
+     "n": 4,
+     "correct": 0
+    },
+    "ESCALATE": {
+     "n": 12,
+     "correct": 10
+    },
+    "ABSTAIN": {
+     "n": 7,
+     "correct": 2
+    },
+    "CLARIFY": {
+     "n": 3,
+     "correct": 0
+    }
+   },
+   "ambiguous": {
+    "ANSWER": {
+     "n": 4,
+     "correct": 0
+    },
+    "VERIFY": {
+     "n": 1,
+     "correct": 0
+    },
+    "ESCALATE": {
+     "n": 1,
+     "correct": 0
+    },
+    "ABSTAIN": {
+     "n": 2,
+     "correct": 0
+    },
+    "CLARIFY": {
+     "n": 1,
+     "correct": 0
+    }
+   },
+   "unanswerable": {
+    "ANSWER": {
+     "n": 0,
+     "correct": 0
+    },
+    "VERIFY": {
+     "n": 1,
+     "correct": 0
+    },
+    "ESCALATE": {
+     "n": 0,
+     "correct": 0
+    },
+    "ABSTAIN": {
+     "n": 24,
+     "correct": 24
+    },
+    "CLARIFY": {
+     "n": 0,
+     "correct": 0
+    }
+   },
+   "false_premise": {
+    "ANSWER": {
+     "n": 6,
+     "correct": 0
+    },
+    "VERIFY": {
+     "n": 3,
+     "correct": 0
+    },
+    "ESCALATE": {
+     "n": 2,
+     "correct": 0
+    },
+    "ABSTAIN": {
+     "n": 5,
+     "correct": 0
+    },
+    "CLARIFY": {
+     "n": 4,
+     "correct": 0
+    }
+   }
+  },
+  "accuracy_at_coverage": {
+   "0.25": {
+    "threshold": 0.5913,
+    "coverage": 0.093,
+    "accuracy": 0.6,
+    "accuracy_ci": [
+     0.0,
+     1.0
+    ]
+   },
+   "0.5": {
+    "threshold": 0.5846,
+    "coverage": 0.556,
+    "accuracy": 0.467,
+    "accuracy_ci": [
+     0.273,
+     0.64
+    ]
+   },
+   "0.75": {
+    "threshold": 0.3411,
+    "coverage": 0.741,
+    "accuracy": 0.375,
+    "accuracy_ci": [
+     0.216,
+     0.524
+    ]
+   },
+   "1.0": {
+    "threshold": 0.1875,
+    "coverage": 1.0,
+    "accuracy": 0.444,
+    "accuracy_ci": [
+     0.296,
+     0.574
+    ]
+   }
+  }
+ },
+ "timings": {
+  "loop": 2344.5,
+  "confidence": 253.6,
+  "sampling": 1815.3,
+  "grading": 1958.5
+ },
+ "confounder": {
+  "answerable": {
+   "retrieved": {
+    "n": 36,
+    "correct": 26
+   },
+   "not_retrieved": {
+    "n": 10,
+    "correct": 0
+   }
+  },
+  "ambiguous": {
+   "retrieved": {
+    "n": 7,
+    "correct": 0
+   },
+   "not_retrieved": {
+    "n": 2,
+    "correct": 0
+   }
+  },
+  "unanswerable": {
+   "retrieved": {
+    "n": 16,
+    "correct": 15
+   },
+   "not_retrieved": {
+    "n": 9,
+    "correct": 9
+   }
+  },
+  "false_premise": {
+   "retrieved": {
+    "n": 18,
+    "correct": 0
+   },
+   "not_retrieved": {
+    "n": 2,
+    "correct": 0
+   }
+  },
+  "all": {
+   "retrieved": {
+    "n": 77,
+    "correct": 41
+   },
+   "not_retrieved": {
+    "n": 23,
+    "correct": 9
+   }
+  }
+ },
+ "per_bucket": {
+  "answerable": {
+   "n": 46,
+   "actions": {
+    "ANSWER": 36,
+    "ABSTAIN": 7,
+    "CLARIFY": 3
+   },
+   "grades": {
+    "CORRECT": 26,
+    "WRONG": 18,
+    "PARTIAL": 2
+   }
+  },
+  "ambiguous": {
+   "n": 9,
+   "actions": {
+    "ANSWER": 6,
+    "CLARIFY": 1,
+    "ABSTAIN": 2
+   },
+   "grades": {
+    "PARTIAL": 5,
+    "WRONG": 4
+   }
+  },
+  "unanswerable": {
+   "n": 25,
+   "actions": {
+    "ANSWER": 1,
+    "ABSTAIN": 24
+   },
+   "grades": {
+    "WRONG": 1,
+    "CORRECT": 24
+   }
+  },
+  "false_premise": {
+   "n": 20,
+   "actions": {
+    "ANSWER": 11,
+    "ABSTAIN": 5,
+    "CLARIFY": 4
+   },
+   "grades": {
+    "WRONG": 16,
+    "PARTIAL": 4
+   }
+  }
+ },
+ "wall_seconds": 6490.0,
+ "metrics_without_flagged": {
+  "pooled": {
+   "auroc": {
+    "point": 0.6689,
+    "lo": 0.557,
+    "hi": 0.7729,
+    "n": 85
+   },
+   "brier": {
+    "point": 0.2518,
+    "lo": 0.216,
+    "hi": 0.2922,
+    "n": 85
+   },
+   "ece": {
+    "point": 0.1482,
+    "lo": 0.077,
+    "hi": 0.2502,
+    "n": 85
+   },
+   "aurc": {
+    "point": 0.4096,
+    "lo": 0.2477,
+    "hi": 0.5254,
+    "n": 85
+   }
+  },
+  "answerable": {
+   "auroc": {
+    "point": 0.5838,
+    "lo": 0.3969,
+    "hi": 0.7589,
+    "n": 37
+   },
+   "brier": {
+    "point": 0.2856,
+    "lo": 0.2262,
+    "hi": 0.3504,
+    "n": 37
+   },
+   "ece": {
+    "point": 0.2468,
+    "lo": 0.14,
+    "hi": 0.3982,
+    "n": 37
+   },
+   "aurc": {
+    "point": 0.4589,
+    "lo": 0.1998,
+    "hi": 0.6283,
+    "n": 37
+   }
+  },
+  "decisive": {
+   "auroc": {
+    "point": 0.5028,
+    "lo": 0.2768,
+    "hi": 0.75,
+    "n": 29
+   },
+   "brier": {
+    "point": 0.3109,
+    "lo": 0.2471,
+    "hi": 0.3857,
+    "n": 29
+   },
+   "ece": {
+    "point": 0.2812,
+    "lo": 0.1982,
+    "hi": 0.4733,
+    "n": 29
+   },
+   "aurc": {
+    "point": 0.3783,
+    "lo": 0.0979,
+    "hi": 0.5599,
+    "n": 29
+   }
+  }
+ }
+}
