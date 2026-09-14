@@ -113,3 +113,43 @@ def overlap(first_wrong: set, second_wrong: set) -> dict:
     """How the two judges' disagreements with the owner overlap."""
     return {"first": sorted(first_wrong), "second": sorted(second_wrong), "both": sorted(first_wrong & second_wrong),
             "first_only": sorted(first_wrong - second_wrong), "second_only": sorted(second_wrong - first_wrong)}
+
+
+# The copy-the-words instruction names the phrase it wants found in three shapes:
+#   give "X" as the answer, in any wording / contradict this answer: "X" / state this correction: "X"
+# The first shape has no colon; an earlier pattern that required one missed it and undercounted echoes.
+_TARGET = re.compile(r'(?:\bgive\s+|this answer:\s*|this correction:\s*)"([^"]+)"')
+
+
+def classify_copy(reply: str, source: str, instruction: str) -> str:
+    """What a copy-the-words reply did: copied words found in the source, echoed the instruction's phrase, not found, or none."""
+    copied = grader.parse_extraction(reply)
+    if copied is None:
+        return "none"
+    if grader.quote_in(source, copied):
+        return "copied"
+    target = _TARGET.search(instruction)
+    if target and grader.normalise(copied) == grader.normalise(target.group(1)):
+        return "echoed"
+    return "not found"
+
+
+def split_extraction_message(user_message: str) -> tuple[str, str]:
+    """(source text, instruction) from a grader copy-the-words user message."""
+    body = user_message.split("Text:\n", 1)[1]
+    source, instruction = body.rsplit("\n\n" + grader.EXTRACT_MARK, 1)
+    return source, grader.EXTRACT_MARK + instruction
+
+
+def order_rule_effect(records: list[dict], owner_grades: list[str]) -> dict:
+    """Among drafts whose two answer orders gave different grades: did keeping the stricter one cost or save binary agreement?"""
+    out = {"cost": 0, "saved": 0, "no effect": 0}
+    for rec, own in zip(records, owner_grades):
+        if rec.get("flag") != "position_disagreement":
+            continue
+        grades = [g for g in rec["judge_grades"] if g is not None]
+        stricter = max(grades, key=lambda g: grader._STRICTNESS[g])
+        lenient = min(grades, key=lambda g: grader._STRICTNESS[g])
+        kept_ok, other_ok = binary(stricter) == binary(own), binary(lenient) == binary(own)
+        out["saved" if kept_ok and not other_ok else "cost" if other_ok and not kept_ok else "no effect"] += 1
+    return out

@@ -52,3 +52,30 @@ def test_agreement_intervals_and_overlap():
     assert diff == 0.5 and dlo <= diff <= dhi
     o = overlap({1, 2, 3}, {3, 4})
     assert o["both"] == [3] and o["first_only"] == [1, 2] and o["second_only"] == [4]
+
+
+def test_classify_copy_catches_an_echo_of_the_instruction_phrase_without_a_colon():
+    from calibration.grader import build_extraction_messages
+    from calibration.judge_compare import classify_copy, split_extraction_message
+
+    item = {"bucket": "ambiguous", "question": "When is the TMA done?", "readings": [
+        {"reading": "initial", "answer": "at program/project outset", "page": "1"},
+        {"reading": "final", "answer": "just prior to the PDR", "page": "1"}]}
+    draft = "It is performed at program/project outset and just prior to the Preliminary Design Review (PDR)."
+    message = build_extraction_messages(item, draft, "reading2")[-1]["content"]
+    source, instruction = split_extraction_message(message)
+    assert source == draft
+    assert classify_copy(' "just prior to the PDR"', source, instruction) == "echoed"
+    assert classify_copy('"just prior to the Preliminary Design Review (PDR)"', source, instruction) == "copied"
+    assert classify_copy("NONE", source, instruction) == "none"
+    assert classify_copy('"at the critical design review"', source, instruction) == "not found"
+
+
+def test_order_rule_effect_counts_cost_and_saved():
+    from calibration.judge_compare import order_rule_effect
+
+    records = [{"flag": "position_disagreement", "judge_grades": ["PARTIAL", "CORRECT"]},
+               {"flag": "position_disagreement", "judge_grades": ["WRONG", "CORRECT"]},
+               {"flag": "position_disagreement", "judge_grades": ["PARTIAL", "WRONG"]},
+               {"flag": None, "judge_grades": ["CORRECT", "CORRECT"]}]
+    assert order_rule_effect(records, ["CORRECT", "WRONG", "CORRECT", "WRONG"]) == {"cost": 1, "saved": 1, "no effect": 1}

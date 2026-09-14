@@ -1,0 +1,145 @@
+[
+ {
+  "id": "L1",
+  "type": "one answer line",
+  "question": "Does the candidate state a different answer, or something that contradicts the reference answer?",
+  "answer_line": "Q2: YES, the candidate provides an answer related to Design Documentation instead of the Human Rating Certification Package.",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L2",
+  "type": "one answer line",
+  "question": "Does the candidate leave out a part of the reference answer that carries meaning, such as an item in a list, a number, or a condition?",
+  "answer_line": "Q3: YES, the candidate leaves out the specific project type (Type A) that is fully compliant for the Human Rating Certification Package.",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L3",
+  "type": "one answer line",
+  "question": "Does the candidate say that the handbook does not contain the answer, or that it could not find one?",
+  "answer_line": "Q2: No, the candidate does not state that the handbook does not contain the answer or could not find one. Instead, they acknowledge that the handbook does not answer the question directly.",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "L4",
+  "type": "one answer line",
+  "question": "Does the candidate leave out a part of the reference answer that carries meaning, such as an item in a list, a number, or a condition?",
+  "answer_line": "Q3: YES (The candidate leaves out the System Definition Review (SDR) as one of the reviews that can be merged with SRR in a small project.)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L5",
+  "type": "one answer line",
+  "question": "Does the candidate state a different answer, or something that contradicts the reference answer?",
+  "answer_line": "Q2: YES, the candidate states a different answer that contradicts the reference answer.",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L6",
+  "type": "one answer line",
+  "question": "Does the candidate say that the handbook does not contain the answer, or that it could not find one?",
+  "answer_line": "Q2: No, the candidate does not say that the handbook does not contain the answer or that it could not find one.",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "L7",
+  "type": "one answer line",
+  "question": "Does the candidate state a different answer, or something that contradicts the reference answer?",
+  "answer_line": "Q2: YES (The candidate states a different answer)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L8",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the Operational Readiness Review (ORR)\" as the answer for reading 1?",
+  "answer_line": "Q2: NO (The candidate mentions the Flight Readiness Review, not Operational Readiness Review.)",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "L9",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the Post-Launch Assessment Review (PLAR)\" as the answer for reading 2?",
+  "answer_line": "Q3: NO (The candidate does not mention Post-Launch Assessment Review.)",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "L10",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the Operational Readiness Review (ORR)\" as the answer for reading 1?",
+  "answer_line": "Q2: YES (the Operational Readiness Review (ORR) is given as the answer for reading 1)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L11",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the Post-Launch Assessment Review (PLAR)\" as the answer for reading 2?",
+  "answer_line": "Q3: YES (the Post-Launch Assessment Review (PLAR) is given as the answer for reading 2)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L12",
+  "type": "one answer line",
+  "question": "Does the candidate leave out a part of the reference answer that carries meaning, such as an item in a list, a number, or a condition?",
+  "answer_line": "Q3: YES (The candidate states that the TRL falls by one or two levels, while the reference answer specifies a drop to TRL 5 initially.)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L13",
+  "type": "one answer line",
+  "question": "Does the candidate state a different answer, or something that contradicts the reference answer?",
+  "answer_line": "Q2: YES, the candidate states a different answer that contradicts the reference answer.",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L14",
+  "type": "one answer line",
+  "question": "Does the candidate express doubt about the assumption without correcting it?",
+  "answer_line": "Q2: NO (The answer implies that the systems engineer focuses on different tasks, but does not state that the assumption is incorrect.)",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "U15",
+  "type": "whole reply that the parser could not read",
+  "questions": [
+   "Q1: Does the candidate say that the assumption in the question is wrong, or state the correction: \"The handbook says the technical team is led by the systems engineer, while the project manager concentrates on managing the overall project life cycle.\"?",
+   "Q2: Does the candidate express doubt about the assumption without correcting it?",
+   "Q3: Does the candidate answer the question as if the assumption were true?"
+  ],
+  "reply": " REASON: The candidate does not directly address the assumption but provides information that contradicts it.\nQ1: NO\nQ2: Implicitly, as they provide information that contradicts the assumption without explicitly stating it.\nQ3: Yes, in a way, as their answer suggests that the systems engineer focuses on different tasks than what was assumed in the question."
+ },
+ {
+  "id": "L16",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the Office of the Chief Engineer (OCE)\" as the answer for reading 1?",
+  "answer_line": "Q2: NO (The candidate gives \"the appropriate level of management or the project manager\" as the answer for reading 1.)",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "L17",
+  "type": "one answer line",
+  "question": "Does the candidate give \"all of its specified requirements\" as the answer for reading 1?",
+  "answer_line": "Q2: NO (The candidate gives \"stakeholder expectations within the intended operational environments\" as the answer for both readings.)",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "L18",
+  "type": "one answer line",
+  "question": "Does the candidate give \"all of its specified requirements\" as the answer for reading 1?",
+  "answer_line": "Q2: YES (The candidate gives \"all of its specified requirements\" as the answer for reading 1.)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L19",
+  "type": "one answer line",
+  "question": "Does the candidate give \"stakeholder expectations (MOEs) in the intended operational environment\" as the answer for reading 2?",
+  "answer_line": "Q3: YES (The candidate gives \"stakeholder expectations (MOEs) in the intended operational environment\" as the answer for reading 2.)",
+  "parser_read_as": "YES"
+ },
+ {
+  "id": "L20",
+  "type": "one answer line",
+  "question": "Does the candidate state a different answer, or something that contradicts the reference answer?",
+  "answer_line": "Q2: YES, the candidate states a different answer as they mention a senior manager with engineering expertise, while the reference answer refers to someone with program/project change authority.",
+  "parser_read_as": "YES"
+ }
+]

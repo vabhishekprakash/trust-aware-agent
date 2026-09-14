@@ -1,0 +1,169 @@
+{
+ "reviewed": "the first rendering of reports/post-hoc-second-judge.md",
+ "defects": [
+  {
+   "requirement": "6 (traceable, no overstated claims); conclusions must not misattribute between judges",
+   "quote": "That is not a Mistral habit: each judge echoed the instruction's phrase instead of the draft's words, Mistral once and llama3.1 once, and only Mistral's echo landed on a draft where it mattered.",
+   "problem": "This is false, and nothing in the JSON links an echo to a draft. The call logs show Mistral's only echo was on sheet 2, draft 20, where its grade agrees with the owner. llama3.1's echo was on sheet 1, draft 31. The grade the copy check cost Mistral (final sheet, draft 5) came from a different failure. In both answer orders Mistral copied 'just prior to the PDR', a shortened form of the draft's 'just prior to the Preliminary Design Review (PDR)', and the code files that as 'not found in the text', not as an echo. llama3.1 has 8 such not-found copies too. The current working-tree script still generates the wrong link ('on an echo of the instruction's phrase that llama3.1 also made'), so regenerating the report will not fix this.",
+   "fix": "Replace with: 'The copy-the-words check cost Mistral one grade that its own answers had right (final sheet, draft 5), where it copied \"just prior to the PDR\" and the draft says \"just prior to the Preliminary Design Review (PDR)\". llama3.1 had as many copies that failed the check (9 each, counting echoes), and none of its failures changed agreement with the owner.' Fix the template in scripts/second_judge.py as well, and add the per-draft extraction category to the JSON so the sentence can be traced."
+  },
+  {
+   "requirement": "6 (no overstated claims); consistency with the report's own tables",
+   "quote": "The shared errors are the rubric's, since two independently trained judges make them together; the extra ones are the judge swap's.",
+   "problem": "One of the 3 shared errors (sheet 1, draft 34) is marked in the report's own table as 'code rules (no judge involved)', so no judge made it. It is shared by construction because both judges take the same route. The owner also later changed that label, and under the secondary line both judges agree. The other two are one draft each from a 20- and a 25-draft sheet. Two small models agreeing on an error does not show the rubric caused it: they could share a bias, or the question could be worded badly. The script now in the working tree already says something softer ('point to the rubric, the question wording or a code rule rather than to either judge'), so this report is also out of date with its generator.",
+   "fix": "Write: 'Of the 3 shared errors, one (sheet 1, draft 34) is decided by a code rule, and the owner later changed that label. The other two (final draft 10, sheet 2 draft 10) are errors both judges make, which points to the rubric or the question wording rather than to either judge. With two cases that is a pointer, not a finding.' Regenerate the report from the current script."
+  },
+  {
+   "requirement": "1 and 5 (what was fixed before the run must be stated accurately)",
+   "quote": "Drafts where either judge's binary grade differs from the owner's, with the cause assigned by a fixed rule over the committed records:",
+   "problem": "Here and in 'By the fixed cause rule', the text implies the cause rule was registered in advance. It was not. The docs/decisions.md entry has no cause rule, and cause_of does not exist in scripts/second_judge.py at commit 1514552. It appears only in the uncommitted working-tree diff, written after the run: the Mistral records date from 23:18 IST and the script was modified at 23:29. The records are not committed either: mistral-calls.jsonl, mistral-strict.jsonl and llama-calls.jsonl are untracked. The answer-habits table and the order-rule analysis were also added after the run.",
+   "fix": "Write: 'with the cause assigned by a rule written after the run (scripts/second_judge.py, cause_of) over the saved call records'. Drop 'fixed' from 'By the fixed cause rule'. Add a sentence to the opening paragraph: 'The cause rule and the answer-habits count were written after the run and are descriptive.' Commit the script together with the records."
+  },
+  {
+   "requirement": "4 (task or format, decided as planned); 6 (no overstated claims)",
+   "quote": "Format was not the problem. Mistral's replies parsed under llama3.1's conventions 69 times out of 70.",
+   "problem": "The plan committed in docs/decisions.md says independent readers classify the unreadable replies without seeing the code's category, and that disagreements are reported. The JSON has independent_classification: null and verification: null, and the report never mentions the step (reader-entries.json is prepared but has no results). 'Parsed' only means the parser found a yes or a no. It does not show the line was read as meant. 20 of Mistral's 195 answer lines carry extra words (llama3.1: 0), and some prepared reader entries are self-contradictory, for example 'Q2: No, the candidate does not state that the handbook does not contain the answer ... Instead, they acknowledge that the handbook does not answer the question directly.', which the parser read as NO. A blanket 'Format was not the problem' goes further than the code's count supports.",
+   "fix": "Write: 'By the code's categories the one unreadable reply is a task failure, not a format failure, and the parser found a yes or no in the other 69. The independent reading of that reply and of the 20 answer lines with extra words is not yet in; its result goes here, with any disagreement.' Keep 'format was not the problem' out until the readers agree."
+  },
+  {
+   "requirement": "4 and 6 (describe the failure accurately)",
+   "quote": "The one unreadable reply was a task failure, a hedged non-answer where a yes or no was asked for, and it stayed unreadable at 600 tokens under the lenient reading.",
+   "problem": "The verbatim reply shown just above answers Q1 'NO' and Q3 'Yes, in a way'. Only Q2 ('Implicitly, ...') has no yes or no. Calling the whole reply a non-answer overstates it. The diagnostic pass also made 2 judge calls for this draft (adapted categories: parsed 1, task 1), so one order parsed; only the same order stayed unreadable. The report does not say this.",
+   "fix": "Write: 'It answered Q1 (NO), gave a qualified yes to Q3, and gave no yes or no to Q2 (\"Implicitly, ...\"). The code counts that as a task failure. In the diagnostic pass at 600 tokens the other answer order parsed and this one again gave no yes or no to Q2.'"
+  },
+  {
+   "requirement": "Conclusions must not attribute to one judge what the tables show the other did; 3 (home advantage beside the numbers)",
+   "quote": "There the judge does differ: Mistral's grade changed with the order on 7 drafts against llama3.1's 2, and the rule decides what that sensitivity costs.",
+   "problem": "The 7 against 2 is a pooled figure. The per-sheet tables show that on sheet 2 llama3.1 did the same thing as often (2 and 2). 4 of Mistral's 7 are on sheet 1, where v8 to v13 were developed against llama3.1's disagreements, so llama3.1's 0 there is partly home advantage. On the clean final sheet the difference is 1 draft against 0. The home advantage is not mentioned next to this number.",
+   "fix": "Write: 'Mistral's grade changed with the answer order on 7 drafts and llama3.1's on 2: 1 against 0 on the final sheet, 4 against 0 on sheet 1 (where the rubric was tuned on llama3.1's disagreements), and 2 against 2 on sheet 2. Only the final sheet's 1 against 0 is free of home advantage, and it is a single draft.'"
+  },
+  {
+   "requirement": "6 (no overstated or one-sided claims)",
+   "quote": "The rule that keeps the stricter of two answer orders cost Mistral one grade.",
+   "problem": "This gives only one side. The same rule saved Mistral a grade on sheet 1, draft 12: the two orders gave WRONG and CORRECT, the owner says WRONG, and the stricter WRONG was kept. The cost is sheet 1, draft 8 (PARTIAL and CORRECT, owner CORRECT). Across Mistral's 7 order-sensitive drafts the rule cost 1, saved 1 and changed nothing binary on 5, so its net effect on binary agreement is zero. The script has order_rule_effect, but its output is not in the JSON, so the claim cannot be traced.",
+   "fix": "Add order_rule_effect per judge and sheet to the JSON and write: 'Keeping the stricter of the two answer orders cost Mistral one binary grade (sheet 1, draft 8) and saved one (sheet 1, draft 12). On its other 5 order-sensitive drafts it changed nothing.'"
+  },
+  {
+   "requirement": "5 and 6 (headline read by the fixed rule, intervals where given, no overstatement)",
+   "quote": "By the rule fixed before the run, Mistral agrees **about as well** as llama3.1. That supports the claim that the rubric, not the choice of judge, carried the agreement.",
+   "problem": "The headline gives the final-sheet figures without the intervals that exist (Mistral 90% [75, 100], llama3.1 95% [85, 100], paired +5 [+0, +15]), yet the pooled figures in the next paragraph do carry intervals. It does not say that 18 of 20 is exactly the pre-registered threshold, so one more miss would flip the verdict. It also drops the plan's own caveat ('Twenty items give wide intervals; the conclusion is directional either way'). And 'the rubric, not the choice of judge, carried the agreement' is stronger than the registered reading, which is 'supports rubric over model'.",
+   "fix": "Write: 'On the final sheet ... Mistral agrees with the owner on 18 of 20, 90% [75, 100], and llama3.1 on 19 of 20, 95% [85, 100]; paired difference +5 points [0, +15]. 18 of 20 is exactly the threshold fixed before the run, so by that rule Mistral agrees about as well, which points toward the rubric mattering more than the judge. With 20 drafts this is directional only, and one more miss would have reversed it.'"
+  },
+  {
+   "requirement": "6 (no overstated claims)",
+   "quote": "On the final sheet, the only one the rubric was never developed against, Mistral agrees with the owner on 18 of 20 (90%) and llama3.1 on 19 of 20 (95%).",
+   "problem": "The report says 11 of the 20 final-sheet drafts never reach a judge (judged: 9), so both judges get those 11 identical by construction. The judge comparison therefore rests on 9 drafts, where the judges agree with the owner on 8 of 9 and 7 of 9 (derivable from the overlap and decided_by fields). The 90% and 95% figures blur this, and the headline never ties the structure paragraph back to the verdict.",
+   "fix": "Add after the figures: 'Only 9 of these 20 drafts reach a judge. On those 9, llama3.1 agrees with the owner on 8 and Mistral on 7; the other 11 are graded by code and are the same for both.' Put the 8 of 9 and 7 of 9 into the JSON."
+  },
+  {
+   "requirement": "6 (no overstated claims)",
+   "quote": "Structure matters as much as the judge: of the 85 drafts, 50 are decided by code rules or exact match and get the same grade under any judge.",
+   "problem": "Nothing in the experiment measures structure against the judge, so 'as much as' has no support. The numbers only show that 35 of 85 grades could move.",
+   "fix": "Write: 'Of the 85 drafts, 50 are decided by code rules or exact match and get the same grade under any judge. Only 35 reach the judge, so a judge swap can move at most 35 grades.'"
+  },
+  {
+   "requirement": "2 (overlap of disagreement cases, clearly stated); 6 (numbers consistent within the report)",
+   "quote": "Drafts graded against the owner: llama3.1 wrong on 1, Mistral wrong on 2, both wrong on 1 (34); llama3.1 only none; Mistral only 8.",
+   "problem": "The line mixes counts with draft numbers. 'wrong on 1' and 'wrong on 2' are counts, '(34)' is a draft number, and 'Mistral only 8' is draft 8, not 8 drafts. Read plainly, it says Mistral is wrong on 2 drafts but wrong alone on 8, which contradicts itself. The final-sheet line ('Mistral only 5') and the sheet 2 line ('Mistral only 2, 4') have the same problem. 'Graded against the owner' is also the wrong phrase; it should be 'differently from the owner'.",
+   "fix": "Use a single form, for example: 'Drafts graded differently from the owner: llama3.1 1 (draft 34), Mistral 2 (drafts 8 and 34); both: draft 34; llama3.1 alone: none; Mistral alone: draft 8.' Apply the same form on all three sheets."
+  },
+  {
+   "requirement": "3 (home advantage stated next to sheet 1 and 2 numbers)",
+   "quote": "llama3.1 has 0 errors of its own and Mistral 4.",
+   "problem": "The overlap paragraph in the headline pools all three sheets without the home-advantage caveat. On sheets 1 and 2 the rubric was revised until llama3.1's disagreements were fixed, so llama3.1 having no errors of its own there is partly by construction. 3 of Mistral's 4 own errors, including both 'judging' causes and the 'order sensitivity' cause, are on those sheets. On the final sheet alone the split is 1 shared (draft 10) and 1 Mistral only (draft 5, grounding).",
+   "fix": "Lead with the final sheet: 'On the final sheet, the two judges share 1 error and Mistral has 1 of its own (draft 5, grounding).' Then give the pooled split with the caveat next to it: 'Pooled, llama3.1 has 0 errors of its own and Mistral 4, but 3 of those 4 are on sheets 1 and 2, where the rubric was revised against llama3.1's disagreements.'"
+  },
+  {
+   "requirement": "6 (every number traceable to the JSON)",
+   "quote": "(its blind figure under v7 was 82 percent)",
+   "problem": "The report says 'Every number comes from reports/post-hoc-second-judge.json', but 82 percent here and 80 percent on sheet 2 ('its blind figure under v10 was 80 percent') are not in the JSON. Neither has a count or an interval, and they switch from '%' to 'percent'.",
+   "fix": "Add the earlier blind figures to the JSON (for example under each sheet's home_advantage) with k of n and interval, and print them that way ('under v7, 32 of 39, 82% [..]'). If they are not added, cite their source file and remove the claim that every number comes from the JSON."
+  },
+  {
+   "requirement": "6 (plain, grammatical sentences)",
+   "quote": "Mistral's own errors come from: judging: the judge's own yes or no answers differ from the owner's reading (2); grounding: the judge's YES matched the owner but the copied words failed the check (1); order sensitivity: one answer order matched the owner, the stricter order was kept (1).",
+   "problem": "Colons are stacked inside colons and the cause labels are pasted in raw, so the sentence does not parse.",
+   "fix": "Write: 'Of Mistral's 4 own errors, 2 are its own yes or no answers disagreeing with the owner's reading (sheet 2, drafts 2 and 4), 1 is a YES that matched the owner but whose copied words failed the check (final, draft 5), and 1 is order sensitivity, where the stricter of two orders was kept (sheet 1, draft 8).'"
+  },
+  {
+   "requirement": "6 (plain, grammatical sentences)",
+   "quote": "Every draft llama3.1 grades differently from the owner, Mistral also grades differently (3 of 3)",
+   "problem": "Comma splice; the sentence is ungrammatical.",
+   "fix": "Write: 'Mistral also misgrades every draft that llama3.1 misgrades (3 of 3).'"
+  },
+  {
+   "requirement": "6 (plain sentences)",
+   "quote": "Both judges took the same route (rules, exact, judge) on every draft: True.",
+   "problem": "A Python boolean has been pasted into prose. This appears on all three sheets.",
+   "fix": "Write: 'Both judges took the same route (code rules, exact match or judge) on every draft.'"
+  },
+  {
+   "requirement": "6 (plain sentences)",
+   "quote": "The two judges agree with each other on 19 of 20 (95%) of all 20 drafts, and on 8 of 9 (89%) of the 9 drafts that reach a judge (three-way 8 of 9 (89%)).",
+   "problem": "The denominators are repeated ('19 of 20 ... of all 20 drafts') and the parentheses are nested. The same wording is used on all sheets.",
+   "fix": "Write: 'The two judges give the same binary grade on 19 of the 20 drafts (95%), and on 8 of the 9 that reach a judge (89%; the same on three grades).'"
+  },
+  {
+   "requirement": "4 and 6 (say what the unreadable reply cost; no vacuous lines)",
+   "quote": "With Mistral's unreadable drafts set aside (20 labelled drafts left): llama3.1 19 of 20 (95%), Mistral 18 of 20 (90%).",
+   "problem": "The final sheet and sheet 1 have no unreadable drafts, so this line and the 'Diagnostic ... Mistral 18 of 20 (90%)' line only repeat the table and look like extra results. On sheet 2, where the one unreadable reply is, the report never says what it cost. Setting it aside drops both judges by one agreement (24 of 25 to 23 of 24, and 22 of 25 to 21 of 24), so the owner's label agreed with the WRONG-by-rule grade and the failure cost Mistral nothing.",
+   "fix": "On sheets with no unreadable drafts, replace both lines with 'No unreadable replies on this sheet.' On sheet 2 add: 'The one unreadable reply (draft 5) was graded WRONG by rule, which matches the owner's binary label, so it cost Mistral no agreement.'"
+  },
+  {
+   "requirement": "6 (accurate wording)",
+   "quote": "Secondary line, with the owner's later change to sheet 34 applied: llama3.1 39 of 39 (100%), Mistral 38 of 39 (97%).",
+   "problem": "'Sheet 34' should be draft 34 on sheet 1. The line also does not say what changed: the label went from PARTIAL to one that agrees with both judges' CORRECT.",
+   "fix": "Write: 'Secondary line, with the owner's later change to draft 34's label (PARTIAL to CORRECT) applied: ...'"
+  },
+  {
+   "requirement": "6 (plain, unambiguous terms)",
+   "quote": "| 4 | answerable | PARTIAL | WRONG | CORRECT | Mistral only |",
+   "problem": "The report never defines 'binary'. Without a definition this row looks wrong: llama3.1's WRONG differs from the owner's PARTIAL, yet only Mistral is marked wrong. The report also never explains why 85 drafts become 84 labelled (sheet 1, draft 1 was never graded).",
+   "fix": "Add near the top: 'Binary agreement counts CORRECT against PARTIAL or WRONG; three-way agreement needs the exact grade. 84 of the 85 drafts carry an owner label (sheet 1, draft 1 was never graded).'"
+  },
+  {
+   "requirement": "6 (numbers consistent within the report)",
+   "quote": "Pooled over all 84 labelled drafts, llama3.1 agrees on 81 (96% [92, 100]) and Mistral on 77 (92% [86, 96]); the paired difference, llama3.1 minus Mistral, is +5 points [+1, +10].",
+   "problem": "The rounded percentages suggest a gap of 4 points (96 minus 92), but the text says +5 (unrounded 4.8). On sheet 1, 97% and 95% suggest 2, but the text says '+3 points' (2.6). A reader checking the subtraction finds a mismatch. '[+0, +15]' is also an odd way to write zero.",
+   "fix": "Give paired differences to one decimal ('+4.8 points [+1.2, +9.5]') or in drafts ('4 drafts of 84'). Write 0 rather than +0."
+  },
+  {
+   "requirement": "6 (accurate labels)",
+   "quote": "| answer lines, with extra words, lower case | 0 | 3 |",
+   "problem": "The code labels a line 'lower case' whenever the yes or no is not all capitals (isupper()), so title-case 'No, ...' and 'Yes, in a way' are counted here. The label is wrong for those lines.",
+   "fix": "Rename the rows to 'not all capitals' (or count lower case and title case separately) and regenerate."
+  },
+  {
+   "requirement": "3 (final sheet framed accurately as the clean comparison)",
+   "quote": "Grader v13 was frozen before this sheet was drawn, so neither judge had any say in shaping the rubric against it.",
+   "problem": "True for this sheet, but the prompts, parser and copy-the-words check were all developed with llama3.1 as the judge on sheets 1 and 2. The final sheet is free of tuning on this sheet, not of tuning to one judge. Mistral's only extra error on this sheet came from the copy-the-words check.",
+   "fix": "Add: 'The prompts, parser and copy-the-words check were built with llama3.1 as the judge, so some general advantage for llama3.1 remains even here; what this sheet removes is tuning on its own drafts.'"
+  },
+  {
+   "requirement": "6 (numbers traceable, plain)",
+   "quote": "One pass, only Mistral loaded (nothing unloaded first). Wall clock 719 s for 127 judge and extraction calls (114 live). Seconds per live call: median 6.1, 90th percentile 10.49.",
+   "problem": "unloaded_before_start: [] shows only that nothing was unloaded, not that only Mistral was loaded. The 13 calls that were not live in a fresh Mistral run are not explained (the log marks them cached), and the 127 includes the 3 diagnostic calls without saying so. Precision is mixed: 6.1 against 10.49.",
+   "fix": "Write: 'One pass; no other model was unloaded first (none was listed as loaded). 719 s for 127 calls (70 judge and 54 extraction in the strict pass, 3 in the diagnostic), of which 13 were served from the cache.' Round both timings to one decimal."
+  },
+  {
+   "requirement": "6 (numbers consistent within the report)",
+   "quote": "| YES answers removed because the copied words did not check out | 2 | 5 |",
+   "problem": "The per-sheet counts of YES answers removed total 23 for llama3.1 and 26 for Mistral. The habits table shows 9 failed copies each (not found plus echo) and 11 or 8 NONE replies. The two tables count different units (YES answers per answer order against extraction replies), but the report does not say so, so they seem to contradict each other.",
+   "fix": "State the unit in both tables: 'YES answers removed (counted per question per answer order)' and 'copy-the-words replies (one per call)'."
+  },
+  {
+   "requirement": "6 (plain presentation)",
+   "quote": "where does it  |",
+   "problem": "Questions in the disagreement tables are cut at 90 characters mid-phrase with no ellipsis ('where does it', 'for configuration', 'fed the Office of').",
+   "fix": "Add an ellipsis when a question is cut, or print the full question."
+  }
+ ],
+ "met": [
+  "Requirement 1: The title and first paragraph label this a post hoc experiment run after the tagged evaluation (v1.0.2), and state that no test item was read and nothing was refit. The claim that the plan and reading rule were committed before the first Mistral call holds: commit 1514552 is at 17:35:53 UTC and the run started at 17:36:02 UTC. The cause rule was not part of that commit (see defects).",
+  "Requirement 2, in substance: every sheet gives each judge's binary agreement with the owner, with k of n, percentage and interval; agreement between the judges on all drafts and on judged drafts; which drafts each judge gets wrong; and a disagreement table. All of these figures match the JSON. The overlap line is garbled (see defects).",
+  "Requirement 3: sections run headline, final sheet, sheet 1, sheet 2. Each home sheet's heading and the paragraph directly above its table state the home advantage, and the headline's pooled paragraph names it next to the pooled gap. The headline's pooled overlap paragraph lacks the caveat (see defects).",
+  "Requirement 4, partly: the single unreadable reply is shown verbatim (it matches the JSON apart from a leading space) with sheet, draft, call, stop reason and token count. The report says no reply hit the 200-token cap and that the code classed the reply as a task failure, not format, so the mandatory 'judge swap is not free' sentence was not triggered. The report still notes the swap was not entirely free. The pre-registered independent reading is missing (see defects).",
+  "Requirement 5: the headline applies the rule from docs/decisions.md correctly (18 of 20 is within one draft of llama3.1's 19, so 'about as well'), states it that way, and does not hide the pooled gap: 'The support is qualified', with a pooled paired interval of [+1, +10] that excludes zero.",
+  "Requirement 6, partly: every figure in the three sheet tables, the paired differences, pooled counts and intervals, reply categories, timing and replay counts (85 of 85 reproduced, 0 live) matches reports/post-hoc-second-judge.json after rounding. Intervals appear wherever the JSON gives them, except in the final-sheet headline sentence."
+ ]
+}

@@ -1182,3 +1182,33 @@ that claim, and the paper says so. Sheets 1 and 2 and the pooled 84 are
 reported with the paired interval as supporting evidence under the home
 advantage caveat. Twenty items give wide intervals; the conclusion is
 directional either way.
+
+## Post hoc: the second judge's result, 2026-09-13
+
+Run as planned: one pass, only Mistral loaded, 719 s. The llama3.1 grades
+replayed from the cache reproduced all 85 committed grades exactly, with
+no live call, so both judges saw identical inputs. By the reading rule
+fixed before the run, Mistral agrees with the owner about as well as
+llama3.1 on the final sheet (18 of 20 against 19 of 20), which supports
+rubric over model. Pooled over 84 labelled drafts the paired difference is
++4.8 points [+1.2, +9.5], with three of Mistral's four extra errors on the
+home-advantage sheets. Format did not fail (69 of 70 replies parsed; the
+one unreadable reply was a hedged non-answer, a task failure by the code
+and by three blind readers). The copy-the-words check did carry
+llama3.1's conventions: Mistral echoed the instruction's phrase on 7 calls
+against llama3.1's 1, costing it one grade.
+
+Added after the run, and labelled as such in the report: a cause rule in
+the script, a blind reading of the 19 parsed answer lines with added
+words, two blind analysts assigning causes to the 7 misgraded drafts, an
+independent recount of every per-sheet number (all matched), and a critic
+review of the first rendering. The analysts agreed with each other on all
+7 drafts and with the script's rule on 5; the report follows the analysts
+where they differ, because the rule assumed that an error both judges make
+belongs to the rubric, and on one shared draft both judges simply
+misjudged. The critic found 26 defects in the first rendering. The worst
+was an echo-count pattern that required a colon and missed the shape
+'give "X" as the answer', so the first rendering said echoing was not a
+Mistral habit; the corrected count is 7 against 1, the pattern now has a
+test, and every defect was addressed before the result was written into
+docs/report.md.

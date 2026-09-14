@@ -315,6 +315,43 @@ most of the error is. And for the false-premise bucket, a larger model
 for the premise judgement or a classifier fine-tuned on
 premise-contradiction pairs; both were out of scope on a 4 GB card.
 
+## Post hoc, after the evaluation: a second judge
+
+Run after the tagged evaluation (v1.0.2), with the plan and the reading
+rule committed before the first call. It touches no test item and refits
+nothing. The full account is reports/post-hoc-second-judge.md.
+
+The question was whether judge choice or rubric quality carried the
+agreement between the grader and the owner's blind labels. The 85 drafts
+on the three blind sheets were regraded with grader v13 unchanged and
+Mistral 7B Instruct as the judge in place of llama3.1 8B. On the final
+sheet, the only one never used to develop the rubric, llama3.1 agrees
+with the owner on 19 of 20, 95 [85, 100] percent, and Mistral on
+18 of 20, 90 [75, 100] percent. By the rule fixed before the run that
+counts as about as well, which supports rubric over model. The support is
+thin. Only 9 of the 20 final-sheet drafts reach a judge at all, and on
+those llama3.1 agrees on 8 and Mistral on 7. Pooled over 84 labelled
+drafts, Mistral agrees on 77 against llama3.1's 81, a paired difference of
++4.8 points [+1.2, +9.5]. Three of Mistral's four extra errors sit on the
+two sheets where the rubric was tuned with llama3.1, so that gap mixes
+home advantage with any real difference between the judges.
+
+Mistral did not fail on format: 69 of its 70 judge replies parsed under
+llama3.1's conventions, and the one that did not was a hedged non-answer.
+The harness still carried the first judge's conventions. The
+copy-the-words check quotes the phrase it wants found, and Mistral echoed
+that phrase back instead of copying the draft on 7 calls against
+llama3.1's 1, which cost it one grade its own answers had right. A judge
+swap is not free. Two blind analysts also found that an error both judges
+make is not always the rubric's: one shared error is a judging mistake
+both judges make.
+
+The first rendering of that report was reviewed by an independent critic,
+which found a bug in the echo count that had reversed the conclusion
+about the copy check. The bug was fixed and tested before the result was
+written here, another instance of the pattern in the measurement-integrity
+section above.
+
 ## Reproduction
 
 Everything in this report comes from a script and its committed output:

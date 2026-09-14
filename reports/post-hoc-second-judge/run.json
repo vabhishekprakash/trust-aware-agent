@@ -1,0 +1,26 @@
+{
+ "judge": "mistral:latest",
+ "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+ "details": {
+  "parent_model": "",
+  "format": "gguf",
+  "family": "llama",
+  "families": [
+   "llama"
+  ],
+  "parameter_size": "7.2B",
+  "quantization_level": "Q4_K_M"
+ },
+ "ollama_version": "0.24.0",
+ "grader": "grader-v13",
+ "grader_sha256": "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485",
+ "unloaded_before_start": [],
+ "started_at": "2026-09-13T17:36:02+00:00",
+ "wall_seconds": 718.9,
+ "calls": 127,
+ "live_calls": 114,
+ "drafts": 85,
+ "adapted_drafts": 1,
+ "strict_cap": 200,
+ "adapted_cap": 600
+}

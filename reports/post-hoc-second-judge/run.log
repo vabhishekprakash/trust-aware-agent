@@ -1,0 +1,113 @@
+ 1 final   1 unanswerable   judge  llama CORRECT  mistral CORRECT   24s
+ 2 final   2 answerable     rules  llama WRONG    mistral WRONG     24s
+ 3 final   3 answerable     rules  llama WRONG    mistral WRONG     24s
+ 4 final   4 unanswerable   rules  llama CORRECT  mistral CORRECT   24s
+ 5 final   5 ambiguous      judge  llama CORRECT  mistral PARTIAL   39s
+ 6 final   6 false_premise  judge  llama WRONG    mistral WRONG     55s
+ 7 final   7 answerable     judge  llama WRONG    mistral WRONG     83s
+ 8 final   8 unanswerable   rules  llama CORRECT  mistral CORRECT   83s
+ 9 final   9 answerable     exact  llama CORRECT  mistral CORRECT   83s
+10 final  10 false_premise  judge  llama WRONG    mistral WRONG    position_disagreement 99s
+11 final  11 answerable     rules  llama WRONG    mistral WRONG     99s
+12 final  12 answerable     judge  llama CORRECT  mistral CORRECT   111s
+13 final  13 answerable     exact  llama CORRECT  mistral CORRECT   111s
+14 final  14 answerable     rules  llama WRONG    mistral WRONG     111s
+15 final  15 unanswerable   rules  llama CORRECT  mistral CORRECT   111s
+16 final  16 answerable     exact  llama CORRECT  mistral CORRECT   111s
+17 final  17 unanswerable   rules  llama CORRECT  mistral CORRECT   111s
+18 final  18 false_premise  judge  llama WRONG    mistral WRONG     130s
+19 final  19 answerable     judge  llama CORRECT  mistral CORRECT   141s
+20 final  20 false_premise  judge  llama WRONG    mistral WRONG     163s
+21 sheet1  1 unanswerable   rules  llama CORRECT  mistral CORRECT   163s
+22 sheet1  2 answerable     exact  llama CORRECT  mistral CORRECT   163s
+23 sheet1  3 unanswerable   judge  llama PARTIAL  mistral PARTIAL   174s
+24 sheet1  4 unanswerable   judge  llama WRONG    mistral WRONG     195s
+25 sheet1  5 unanswerable   judge  llama PARTIAL  mistral PARTIAL   207s
+26 sheet1  6 answerable     exact  llama CORRECT  mistral CORRECT   207s
+27 sheet1  7 answerable     rules  llama WRONG    mistral WRONG     207s
+28 sheet1  8 unanswerable   judge  llama CORRECT  mistral PARTIAL  position_disagreement 223s
+29 sheet1  9 false_premise  rules  llama PARTIAL  mistral PARTIAL   223s
+30 sheet1 10 answerable     judge  llama WRONG    mistral WRONG     241s
+31 sheet1 11 answerable     judge  llama WRONG    mistral WRONG     257s
+32 sheet1 12 answerable     judge  llama WRONG    mistral WRONG    position_disagreement 287s
+33 sheet1 13 answerable     rules  llama WRONG    mistral WRONG     287s
+34 sheet1 14 unanswerable   rules  llama CORRECT  mistral CORRECT   287s
+35 sheet1 15 answerable     exact  llama CORRECT  mistral CORRECT   287s
+36 sheet1 16 false_premise  rules  llama PARTIAL  mistral PARTIAL   287s
+37 sheet1 17 unanswerable   rules  llama CORRECT  mistral CORRECT   287s
+38 sheet1 18 unanswerable   rules  llama CORRECT  mistral CORRECT   287s
+39 sheet1 19 answerable     exact  llama CORRECT  mistral CORRECT   287s
+40 sheet1 20 false_premise  judge  llama WRONG    mistral WRONG     303s
+41 sheet1 21 answerable     rules  llama WRONG    mistral WRONG     303s
+42 sheet1 22 answerable     judge  llama WRONG    mistral WRONG     320s
+43 sheet1 23 answerable     judge  llama WRONG    mistral WRONG     345s
+44 sheet1 24 unanswerable   rules  llama CORRECT  mistral CORRECT   345s
+45 sheet1 25 answerable     rules  llama WRONG    mistral WRONG     345s
+46 sheet1 26 unanswerable   rules  llama CORRECT  mistral CORRECT   345s
+47 sheet1 27 unanswerable   rules  llama CORRECT  mistral CORRECT   345s
+48 sheet1 28 unanswerable   rules  llama CORRECT  mistral CORRECT   345s
+49 sheet1 29 answerable     judge  llama CORRECT  mistral CORRECT   356s
+50 sheet1 30 unanswerable   judge  llama WRONG    mistral WRONG     372s
+51 sheet1 31 answerable     judge  llama WRONG    mistral WRONG    position_disagreement 392s
+52 sheet1 32 answerable     judge  llama PARTIAL  mistral PARTIAL   408s
+53 sheet1 33 false_premise  rules  llama PARTIAL  mistral PARTIAL   408s
+54 sheet1 34 unanswerable   rules  llama CORRECT  mistral CORRECT   408s
+55 sheet1 35 answerable     exact  llama CORRECT  mistral CORRECT   409s
+56 sheet1 36 ambiguous      rules  llama WRONG    mistral WRONG     409s
+57 sheet1 37 answerable     exact  llama CORRECT  mistral CORRECT   409s
+58 sheet1 38 ambiguous      judge  llama WRONG    mistral WRONG     442s
+59 sheet1 39 answerable     judge  llama WRONG    mistral WRONG    position_disagreement 478s
+60 sheet1 40 ambiguous      rules  llama WRONG    mistral WRONG     478s
+61 sheet2  1 answerable     judge  llama WRONG    mistral WRONG    position_disagreement 498s
+62 sheet2  2 answerable     judge  llama WRONG    mistral CORRECT   516s
+63 sheet2  3 answerable     rules  llama WRONG    mistral WRONG     516s
+64 sheet2  4 answerable     judge  llama WRONG    mistral CORRECT   533s
+65 sheet2  5 false_premise  judge  llama WRONG    mistral WRONG    judge_unparsed 560s
+66 sheet2  6 unanswerable   rules  llama CORRECT  mistral CORRECT   560s
+67 sheet2  7 false_premise  judge  llama WRONG    mistral WRONG     585s
+68 sheet2  8 answerable     rules  llama WRONG    mistral WRONG     585s
+69 sheet2  9 ambiguous      judge  llama WRONG    mistral WRONG     605s
+70 sheet2 10 ambiguous      judge  llama WRONG    mistral PARTIAL   631s
+71 sheet2 11 unanswerable   rules  llama CORRECT  mistral CORRECT   631s
+72 sheet2 12 answerable     rules  llama WRONG    mistral WRONG     631s
+73 sheet2 13 false_premise  rules  llama PARTIAL  mistral PARTIAL   631s
+74 sheet2 14 false_premise  rules  llama PARTIAL  mistral PARTIAL   631s
+75 sheet2 15 unanswerable   rules  llama CORRECT  mistral CORRECT   631s
+76 sheet2 16 ambiguous      rules  llama WRONG    mistral WRONG     631s
+77 sheet2 17 false_premise  rules  llama PARTIAL  mistral PARTIAL   631s
+78 sheet2 18 unanswerable   judge  llama WRONG    mistral WRONG     644s
+79 sheet2 19 unanswerable   rules  llama CORRECT  mistral CORRECT   644s
+80 sheet2 20 false_premise  judge  llama WRONG    mistral WRONG    position_disagreement 673s
+81 sheet2 21 answerable     rules  llama WRONG    mistral WRONG     673s
+82 sheet2 22 ambiguous      rules  llama WRONG    mistral WRONG     673s
+83 sheet2 23 answerable     exact  llama CORRECT  mistral CORRECT   673s
+84 sheet2 24 answerable     judge  llama WRONG    mistral WRONG     693s
+85 sheet2 25 unanswerable   rules  llama CORRECT  mistral CORRECT   693s
+   adapted sheet2  5 mistral WRONG    judge_unparsed 719s
+{
+ "judge": "mistral:latest",
+ "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+ "details": {
+  "parent_model": "",
+  "format": "gguf",
+  "family": "llama",
+  "families": [
+   "llama"
+  ],
+  "parameter_size": "7.2B",
+  "quantization_level": "Q4_K_M"
+ },
+ "ollama_version": "0.24.0",
+ "grader": "grader-v13",
+ "grader_sha256": "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485",
+ "unloaded_before_start": [],
+ "started_at": "2026-09-13T17:36:02+00:00",
+ "wall_seconds": 718.9,
+ "calls": 127,
+ "live_calls": 114,
+ "drafts": 85,
+ "adapted_drafts": 1,
+ "strict_cap": 200,
+ "adapted_cap": 600
+}
+exit 0

@@ -1,0 +1,125 @@
+{
+ "method": "Two analysts, each reading only the committed records, call logs, owner sheets and grader source, assigned a cause to every draft where either judge's binary grade differs from the owner, without seeing this report, its JSON, the script or each other. Added after the run.",
+ "analysts": 2,
+ "drafts": [
+  {
+   "sheet": "final",
+   "sheet_no": 5,
+   "llama_cause": [
+    "not_wrong",
+    "not_wrong"
+   ],
+   "mistral_cause": [
+    "grounding_copy_check",
+    "grounding_copy_check"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The human gave CORRECT. Llama graded CORRECT/CORRECT; its reading2 copy \"Just prior to the Preliminary Design Review (PDR).\" verified. Mistral answered Q2 YES and Q3 YES in both orders, but its copy reply was ' \"just prior to the PDR\"', the claim's own wording, which is not in the draft (the draft says \"Preliminary Design Review (PDR)\"). So judge_ungrounded is [\"reading2\"] twice and the grade is PARTIAL.",
+    "Human CORRECT. Llama CORRECT in both orders, and its copied words \"Just prior to the Preliminary Design Review (PDR).\" verified. Mistral also answered Q1 NO, Q2 YES, Q3 YES in both orders, which maps to CORRECT, but when asked to copy it replied ' \"just prior to the PDR\"'. That is the reference wording and does not occur in the draft, so judge_ungrounded is [\"reading2\"] in both orders and the grade dropped to PARTIAL/PARTIAL."
+   ]
+  },
+  {
+   "sheet": "final",
+   "sheet_no": 10,
+   "llama_cause": [
+    "judge_judging",
+    "judge_judging"
+   ],
+   "mistral_cause": [
+    "judge_judging",
+    "judge_judging"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The human gave CORRECT, and the draft states the correction: \"the LCC ... includes the cost of the launch vehicle\". Both judges still answered Q1 (rejects) NO in both orders. Llama also said Q3 (builds) YES twice, backed by \"The handbook does not say.\", giving WRONG/WRONG. Mistral gave PARTIAL (all NO, ABSTAIN form) and then WRONG (builds YES). Both of its orders are label 0, so the order flip did not change the binary result.",
+    "Human CORRECT. The draft opens by stating the correction (\"the LCC ... includes the cost of the launch vehicle\"), yet both judges answered Q1 (rejects) NO in both orders. Llama also said Q3 (builds) YES and backed it with \"The handbook does not say.\", giving WRONG/WRONG. Mistral gave NO,NO,NO then NO,NO,YES. That is a position_disagreement (PARTIAL vs WRONG), but neither order is CORRECT, so the wrong Q1 answer is the cause, not order. annotation-guide.md also records this sheet's WRONG as \"a judge miss\"."
+   ]
+  },
+  {
+   "sheet": "sheet1",
+   "sheet_no": 8,
+   "llama_cause": [
+    "not_wrong",
+    "not_wrong"
+   ],
+   "mistral_cause": [
+    "judge_order_sensitivity",
+    "judge_order_sensitivity"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The human gave CORRECT. Llama gave CORRECT/CORRECT (answers NO, abstains YES). Mistral's reference-first reply was \"Q1: YES Q2: YES\"; the answers YES held up because its copy \"NASA Systems Engineering Handbook\" occurs in the draft, so that order gave PARTIAL. Candidate-first gave \"Q1: NO Q2: YES\", which is CORRECT. The record has flag position_disagreement and the stricter PARTIAL was kept.",
+    "Human CORRECT; Llama CORRECT/CORRECT (Q1 NO, Q2 YES). Mistral answered Q1 (answers) YES in reference_first order and backed it with \"NASA Systems Engineering Handbook\". That verified, because 'answers' has no answer-token check, so the grade was PARTIAL. In candidate_first order it answered NO, giving CORRECT. The record is flagged position_disagreement and the stricter PARTIAL was kept."
+   ]
+  },
+  {
+   "sheet": "sheet1",
+   "sheet_no": 34,
+   "llama_cause": [
+    "owner_label_later_revised",
+    "owner_label_later_revised"
+   ],
+   "mistral_cause": [
+    "owner_label_later_revised",
+    "owner_label_later_revised"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "Both records have decided_by \"rules\" and grade CORRECT (a plain abstention on an unanswerable item), so no judge was called. The blind sheet grade is PARTIAL, but data/eval/grader_check_revisions.json has {\"34\": \"CORRECT\"}. The owner later changed the label to match the rule's grade.",
+    "The blind sheet grade was PARTIAL, but data/eval/grader_check_revisions.json has {\"34\": \"CORRECT\"}. Both records are decided_by \"rules\" with grade CORRECT (\"the handbook has no answer and the draft says so\"), so no judge was involved and the code rule agrees with the revised label."
+   ]
+  },
+  {
+   "sheet": "sheet2",
+   "sheet_no": 2,
+   "llama_cause": [
+    "not_wrong",
+    "not_wrong"
+   ],
+   "mistral_cause": [
+    "judge_judging",
+    "judge_judging"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The human gave WRONG, since the draft names System Definition, System Design and System Development. Llama gave WRONG/WRONG (same NO). Mistral answered \"Q1: YES Q2: NO Q3: NO\" in both orders, with the reason \"correctly identifies the three sets\". Its copy of the whole draft sentence verified, so it graded CORRECT. The contradicts NO is the real error: a YES there would have given PARTIAL (label 0).",
+    "Human WRONG; Llama WRONG/WRONG. The draft names \"System Definition, System Design, and System Development\", only one of the three reference sets, yet Mistral answered Q1 (same) YES, Q2 NO, Q3 NO in both orders. Its copy of the whole draft verified because it shares 'system'/'design' with the reference, giving CORRECT/CORRECT."
+   ]
+  },
+  {
+   "sheet": "sheet2",
+   "sheet_no": 4,
+   "llama_cause": [
+    "not_wrong",
+    "not_wrong"
+   ],
+   "mistral_cause": [
+    "rubric_or_question_wording",
+    "rubric_or_question_wording"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The human gave PARTIAL: the right answer (impact on cost or schedule) is padded with mission success, safety and technical performance. Llama's WRONG/WRONG is also label 0. Mistral answered same YES, contradicts NO, omits NO in both orders, which is defensible because cost and schedule impact is there. None of the questions asks about added criteria, and code's unsupported check (unsupported false) only catches acronyms and capitalised outside names, so the draft came out CORRECT.",
+    "Human PARTIAL (label 0); Llama WRONG/WRONG (Q1-Q3 all NO), which is the same binary label. Mistral's Q1 YES, Q2 NO, Q3 NO is defensible because the draft does include impact on cost and schedule. The human's PARTIAL rests on the padding (mission success, safety, technical performance, basis for design decisions). No judge question asks about padding, and code_unsupported only catches capitalised names or acronyms, so unsupported=false and the grade came out CORRECT."
+   ]
+  },
+  {
+   "sheet": "sheet2",
+   "sheet_no": 10,
+   "llama_cause": [
+    "rubric_or_question_wording",
+    "rubric_or_question_wording"
+   ],
+   "mistral_cause": [
+    "rubric_or_question_wording",
+    "rubric_or_question_wording"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The draft gives only the validation reading, which the rules map to PARTIAL. The human graded CORRECT, and docs/annotation-guide.md records that the owner \"treated [q0115's validation reading] as the natural answer\". Mistral correctly gave reading2 YES and reading1 NO (its reading1 YES was ungrounded), so PARTIAL/PARTIAL. Llama gave PARTIAL, then WRONG (reading2 NO) with flag position_disagreement, but even its lenient PARTIAL is label 0.",
+    "Human CORRECT, but the draft answers only the validation reading, and the rubric maps one reading to PARTIAL (the annotation guide notes the owner treated q0115's validation reading as the natural answer). Mistral's grounded answers (reading1 NO, reading2 YES) gave PARTIAL/PARTIAL. Llama's reference_first answers gave PARTIAL, and its candidate_first answers (reading2 NO) gave WRONG, so the stricter WRONG was kept (position_disagreement). Either Llama grade is label 0, so order did not change the binary label."
+   ]
+  }
+ ]
+}

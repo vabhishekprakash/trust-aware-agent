@@ -1,0 +1,386 @@
+{
+ "method": "Three readers, each given only the entries below (the question and Mistral's text), classified them independently without seeing the code's categories, the grades or each other. Added after the run for the answer lines; planned before the run for unreadable replies.",
+ "readers": 3,
+ "entries": [
+  {
+   "id": "L1",
+   "sheet": "final",
+   "sheet_no": 7,
+   "type": "one answer line",
+   "text": "Q2: YES, the candidate provides an answer related to Design Documentation instead of the Human Rating Certification Package.",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the explanation says the candidate gives a different answer (Design Documentation), which fits YES.",
+    "It commits to YES and the explanation that the candidate gives a different answer (Design Documentation) backs that up.",
+    "YES is backed by a reason: the candidate answers about Design Documentation instead of the expected package, which is a different answer."
+   ]
+  },
+  {
+   "id": "L2",
+   "sheet": "final",
+   "sheet_no": 7,
+   "type": "one answer line",
+   "text": "Q3: YES, the candidate leaves out the specific project type (Type A) that is fully compliant for the Human Rating Certification Package.",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the explanation names what was left out (Type A), which fits YES.",
+    "It commits to YES and names the part the candidate left out (Type A), which fits the answer.",
+    "YES is backed by naming the missing detail, the Type A project type."
+   ]
+  },
+  {
+   "id": "L3",
+   "sheet": "sheet1",
+   "sheet_no": 4,
+   "type": "one answer line",
+   "text": "Q2: No, the candidate does not state that the handbook does not contain the answer or could not find one. Instead, they acknowledge that the handbook does not answer the question directly.",
+   "votes": [
+    "contradictory",
+    "contradictory",
+    "contradictory"
+   ],
+   "majority": "contradictory",
+   "unanimous": true,
+   "notes": [
+    "It says NO, then says the candidate admits the handbook does not answer the question directly, which is the YES case.",
+    "It says NO but then says the candidate admits the handbook does not answer the question directly, which is what the question asks about, so the added words point to YES.",
+    "It says NO, then adds that the candidate admits the handbook does not answer the question directly, and that admission is exactly what the question asks about."
+   ]
+  },
+  {
+   "id": "L4",
+   "sheet": "sheet1",
+   "sheet_no": 12,
+   "type": "one answer line",
+   "text": "Q3: YES (The candidate leaves out the System Definition Review (SDR) as one of the reviews that can be merged with SRR in a small project.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the explanation names the part left out (SDR), which fits YES.",
+    "It commits to YES and names the missing review (SDR), which fits the answer.",
+    "YES is backed by naming the missing item, the System Definition Review."
+   ]
+  },
+  {
+   "id": "L5",
+   "sheet": "sheet1",
+   "sheet_no": 22,
+   "type": "one answer line",
+   "text": "Q2: YES, the candidate states a different answer that contradicts the reference answer.",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the extra words just repeat that the candidate contradicts the reference.",
+    "It commits to YES and the added words just repeat that the candidate contradicts the reference.",
+    "YES is followed by words that just repeat the question's wording in agreement."
+   ]
+  },
+  {
+   "id": "L6",
+   "sheet": "sheet1",
+   "sheet_no": 30,
+   "type": "one answer line",
+   "text": "Q2: No, the candidate does not say that the handbook does not contain the answer or that it could not find one.",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "NO, and the extra words just restate the question in the negative.",
+    "It commits to NO and the added words just repeat the question in the negative.",
+    "NO is followed by words that repeat the question in the negative, which matches the NO."
+   ]
+  },
+  {
+   "id": "L7",
+   "sheet": "sheet1",
+   "sheet_no": 31,
+   "type": "one answer line",
+   "text": "Q2: YES (The candidate states a different answer)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the note in brackets just repeats that the candidate gives a different answer.",
+    "It commits to YES and the note in brackets repeats the same point.",
+    "YES comes with a short note in brackets that matches it."
+   ]
+  },
+  {
+   "id": "L8",
+   "sheet": "sheet1",
+   "sheet_no": 38,
+   "type": "one answer line",
+   "text": "Q2: NO (The candidate mentions the Flight Readiness Review, not Operational Readiness Review.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "NO, and the reason given (the candidate names the Flight Readiness Review, not the ORR) fits NO.",
+    "It commits to NO and explains that the candidate named the Flight Readiness Review instead of the ORR.",
+    "NO is explained: the candidate names the Flight Readiness Review, not the ORR."
+   ]
+  },
+  {
+   "id": "L9",
+   "sheet": "sheet1",
+   "sheet_no": 38,
+   "type": "one answer line",
+   "text": "Q3: NO (The candidate does not mention Post-Launch Assessment Review.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "NO, and the reason given (PLAR is not mentioned) fits NO.",
+    "It commits to NO and says PLAR is not mentioned, which fits the answer.",
+    "NO is explained: the candidate never mentions the PLAR."
+   ]
+  },
+  {
+   "id": "L10",
+   "sheet": "sheet1",
+   "sheet_no": 38,
+   "type": "one answer line",
+   "text": "Q2: YES (the Operational Readiness Review (ORR) is given as the answer for reading 1)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the brackets repeat that the ORR is given for reading 1.",
+    "It commits to YES and the note in brackets repeats that ORR is given for reading 1.",
+    "YES comes with a note in brackets saying the ORR is given for reading 1."
+   ]
+  },
+  {
+   "id": "L11",
+   "sheet": "sheet1",
+   "sheet_no": 38,
+   "type": "one answer line",
+   "text": "Q3: YES (the Post-Launch Assessment Review (PLAR) is given as the answer for reading 2)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the brackets repeat that the PLAR is given for reading 2.",
+    "It commits to YES and the note in brackets repeats that PLAR is given for reading 2.",
+    "YES comes with a note in brackets saying the PLAR is given for reading 2."
+   ]
+  },
+  {
+   "id": "L12",
+   "sheet": "sheet1",
+   "sheet_no": 39,
+   "type": "one answer line",
+   "text": "Q3: YES (The candidate states that the TRL falls by one or two levels, while the reference answer specifies a drop to TRL 5 initially.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the explanation says the specific TRL 5 value is missing from the candidate, which fits the omission YES.",
+    "It commits to YES and points to the missing number (TRL 5), which fits a meaningful omission even though the wording also suggests a difference.",
+    "YES is backed by the reason that the candidate leaves out the specific drop to TRL 5; the reason reads a bit like a contradiction but still fits an omission."
+   ]
+  },
+  {
+   "id": "L13",
+   "sheet": "sheet2",
+   "sheet_no": 1,
+   "type": "one answer line",
+   "text": "Q2: YES, the candidate states a different answer that contradicts the reference answer.",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the extra words just repeat that the candidate contradicts the reference.",
+    "It commits to YES and the added words repeat that the candidate contradicts the reference.",
+    "YES is followed by words that repeat the question's wording in agreement."
+   ]
+  },
+  {
+   "id": "L14",
+   "sheet": "sheet2",
+   "sheet_no": 5,
+   "type": "one answer line",
+   "text": "Q2: NO (The answer implies that the systems engineer focuses on different tasks, but does not state that the assumption is incorrect.)",
+   "votes": [
+    "clear",
+    "hedged",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": false,
+   "notes": [
+    "NO, and the explanation says the candidate only implies a different view without stating doubt, which fits NO (a borderline case, but not a reversal).",
+    "It says NO, but the reason given (the answer hints at a different view without calling the assumption wrong) comes close to describing doubt without a correction, so the NO is uncertain.",
+    "NO stands, and the explanation never says the candidate expresses doubt, so nothing contradicts it, though the reason is only loosely on topic."
+   ]
+  },
+  {
+   "id": "U15",
+   "sheet": "sheet2",
+   "sheet_no": 5,
+   "type": "whole reply that the parser could not read",
+   "text": " REASON: The candidate does not directly address the assumption but provides information that contradicts it.\nQ1: NO\nQ2: Implicitly, as they provide information that contradicts the assumption without explicitly stating it.\nQ3: Yes, in a way, as their answer suggests that the systems engineer focuses on different tasks than what was assumed in the question.",
+   "votes": [
+    "task_failure",
+    "task_failure",
+    "task_failure"
+   ],
+   "majority": "task_failure",
+   "unanimous": true,
+   "notes": [
+    "Q1 gets a firm NO, but Q2 ('Implicitly') and Q3 ('Yes, in a way') are hedged and never commit to yes or no.",
+    "Q1 gets a clear NO, but Q2 is answered only with 'Implicitly' and Q3 with 'Yes, in a way', so neither gets a committed yes or no.",
+    "Q2 gets only 'Implicitly' and Q3 gets 'Yes, in a way', so neither question gets a committed yes or no."
+   ]
+  },
+  {
+   "id": "L16",
+   "sheet": "sheet2",
+   "sheet_no": 9,
+   "type": "one answer line",
+   "text": "Q2: NO (The candidate gives \"the appropriate level of management or the project manager\" as the answer for reading 1.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "NO, and the explanation says the candidate named a different body, which fits NO.",
+    "It commits to NO and quotes the different answer the candidate gave, which fits.",
+    "NO is explained: the candidate gives a different body, not the OCE."
+   ]
+  },
+  {
+   "id": "L17",
+   "sheet": "sheet2",
+   "sheet_no": 10,
+   "type": "one answer line",
+   "text": "Q2: NO (The candidate gives \"stakeholder expectations within the intended operational environments\" as the answer for both readings.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "NO, and the explanation says the candidate gave a different phrase for reading 1, which fits NO.",
+    "It commits to NO and quotes the other answer the candidate gave for both readings, which fits.",
+    "NO is explained: the candidate gives stakeholder expectations for reading 1, not all specified requirements."
+   ]
+  },
+  {
+   "id": "L18",
+   "sheet": "sheet2",
+   "sheet_no": 10,
+   "type": "one answer line",
+   "text": "Q2: YES (The candidate gives \"all of its specified requirements\" as the answer for reading 1.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the brackets repeat that the expected phrase is given for reading 1.",
+    "It commits to YES and the note in brackets repeats the expected answer for reading 1.",
+    "YES comes with a note in brackets that repeats the expected answer."
+   ]
+  },
+  {
+   "id": "L19",
+   "sheet": "sheet2",
+   "sheet_no": 10,
+   "type": "one answer line",
+   "text": "Q3: YES (The candidate gives \"stakeholder expectations (MOEs) in the intended operational environment\" as the answer for reading 2.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the brackets repeat that the expected phrase is given for reading 2.",
+    "It commits to YES and the note in brackets repeats the expected answer for reading 2.",
+    "YES comes with a note in brackets that repeats the expected answer for reading 2."
+   ]
+  },
+  {
+   "id": "L20",
+   "sheet": "sheet2",
+   "sheet_no": 24,
+   "type": "one answer line",
+   "text": "Q2: YES, the candidate states a different answer as they mention a senior manager with engineering expertise, while the reference answer refers to someone with program/project change authority.",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "YES, and the explanation describes a mismatch (senior manager with engineering expertise vs change authority), which fits YES.",
+    "It commits to YES and explains the mismatch (a senior manager versus someone with change authority), which fits.",
+    "YES is backed by a concrete difference: a senior manager with engineering expertise versus someone with change authority."
+   ]
+  }
+ ]
+}
