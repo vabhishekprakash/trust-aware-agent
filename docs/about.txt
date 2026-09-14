@@ -1,1 +1,1 @@
-A small local QA agent over the NASA Systems Engineering Handbook that outputs a calibrated confidence and acts on it. Preregistered held-out evaluation; the result is negative and reported as such. L&T Techgium Tech2607.
+A small local QA agent over the NASA Systems Engineering Handbook that outputs a calibrated confidence and acts on it. Preregistered held-out evaluation; the result is negative and reported as such.
