@@ -1114,3 +1114,14 @@ up; the questions are two dev items whose calls are cached, so the
 recording did not wait on the model. Playwright is installed for the
 recording only and is not added to requirements.txt, since the served app
 does not need it.
+
+## Final blind grader check, 2026-09-12
+
+Before the test read, drawn from dev outputs only so the grader's
+sign-off is not entangled with the test numbers: 19 of 20 binary (95
+percent), 18 of 20 three-way, on grader v13. Above the owner's bar of 90
+percent. All three blind figures now sit together in the report: 82
+percent (sheet 1, v7), 80 percent (sheet 2, v10), 95 percent (final,
+v13, real outputs). The one disagreement is a judge miss on a
+false-premise output that states the correction and abstains; the owner
+is right; the grader is not changed.

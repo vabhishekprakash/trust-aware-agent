@@ -112,6 +112,31 @@ pattern is the same and a reader should expect more of it.
    rule since then is that every point on a risk-coverage curve must be a
    threshold someone could set.
 
+## The grader's three blind figures
+
+The correctness labels come from a language-model judge inside a staged
+grader. Its agreement with the owner was checked blind three times, each
+on drafts or outputs the owner graded without seeing the judge's key:
+
+| check | drafts | grader | binary agreement |
+|---|---|---|---|
+| sheet 1, model drafts under three passage conditions | 39 graded of 40 | v7 | 32 of 39 (82 percent) |
+| sheet 2, fresh model drafts | 25 | v10 | 20 of 25 (80 percent) |
+| final check, real agent outputs from dev | 20 | v13, the grader that graded dev and test | 19 of 20 (95 percent) |
+
+The final check is the signed-off figure: the same grader version that
+produced every label in this report, on the agent's own outputs, 10
+answerable, 1 ambiguous, 5 unanswerable, 4 false premise, three-way
+agreement 18 of 20. The one binary disagreement is a false-premise output
+that states the handbook's correction and then abstains; the owner graded
+it CORRECT and the judge WRONG while its own reason called the
+interpretation correct. On that item the owner is right and the grader
+is not, and the grader was not changed after the check. The later
+rubric-fidelity reruns of sheets 1 and 2 (38 of 39 and 24 of 25) are not
+blind figures and are reported as such in the annotation guide. Twenty
+items give a wide interval on 95 percent; it is a check, not a
+certificate.
+
 ## Limitations
 
 The standing limitations are in docs/annotation-guide.md. In short:

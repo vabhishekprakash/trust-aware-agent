@@ -487,3 +487,17 @@ and 19 of 25 three-way, unchanged from v12. On the dev run the rule changed one 
 CORRECT; the other composed question, q0126, names one reading and stays
 WRONG with the judge. The blind figures are unchanged: 82 percent (v7, sheet
 1) and 80 percent (v10, sheet 2).
+
+Addendum, 2026-09-12, the final blind check. Twenty real agent outputs
+from dev, drawn with seed 42 in proportion to the buckets, graded by the
+owner without opening the key: binary agreement 19 of 20 (95 percent),
+three-way 18 of 20, per bucket answerable 10 of 10, ambiguous 1 of 1,
+unanswerable 5 of 5, false premise 3 of 4 (reports/final-blind-result.md).
+This is the signed-off grader number for the report, on grader v13, the
+version that graded dev and test. The one binary disagreement (sheet 10)
+is an output that states the correction to a false premise and then
+abstains; the owner's CORRECT is right and the judge's WRONG is a judge
+miss, left as it stands: the grader is not changed after its check. The
+grade-only disagreement (sheet 18, owner PARTIAL, judge WRONG) is an
+output that builds on the premise after restating it; the guide's rule
+gives WRONG.

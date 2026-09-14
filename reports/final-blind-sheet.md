@@ -10,7 +10,7 @@ reference: the handbook does not answer this question
 
 output: The NASA Systems Engineering Handbook does not specify the duration of Phase B (Preliminary Design and Technology Completion) in terms of months for any type of mission. Therefore, the answer is: The handbook does not say.
 
-grade:
+grade:CORRECT
 
 ### 2
 
@@ -21,7 +21,7 @@ reference: acceptable forms: IWG; Interface Working Group; an Interface Working 
 
 output: The handbook does not say.
 
-grade:
+grade:WRONG
 
 ### 3
 
@@ -32,7 +32,7 @@ reference: acceptable forms: 7120.7; NPR 7120.7, NASA Information Technology and
 
 output: The handbook does not say.
 
-grade:
+grade:WRONG
 
 ### 4
 
@@ -42,7 +42,7 @@ reference: the handbook does not answer this question
 
 output: The handbook does not say.
 
-grade:
+grade:CORRECT
 
 ### 5
 
@@ -53,7 +53,7 @@ reference: reading 2: the final TMA that feeds the Technology Readiness Assessme
 
 output: The Technology Maturity Assessment (TMA) is performed at two key points in the life cycle: initially, as a baseline maturity of the system's required technologies at program/project outset; and secondly, just prior to the Preliminary Design Review (PDR).
 
-grade:
+grade:CORRECT
 
 ### 6
 
@@ -63,7 +63,7 @@ reference: the question's assumption is false; the handbook says: The verificati
 
 output: The product verification plan is generated as part of the "prepare to conduct product verification" activity within the five major activities in the Product Verification Process.
 
-grade:
+grade:WRONG
 
 ### 7
 
@@ -74,7 +74,7 @@ reference: acceptable forms: the Human Rating Certification Package; human ratin
 
 output: Type A projects are fully compliant for Design Documentation, while it is not applicable for all other types (B, C, D, E, F). Therefore, the answer is: Design Documentation.
 
-grade:
+grade:WRONG
 
 ### 8
 
@@ -84,7 +84,7 @@ reference: the handbook does not answer this question
 
 output: The handbook does not say.
 
-grade:
+grade:CORRECT
 
 ### 9
 
@@ -95,7 +95,7 @@ reference: acceptable forms: MRB; MRBs; Material Review Boards; a Material Revie
 
 output: Large projects typically use Material Review Boards (MRBs) to review any nonconformance to specifications and determine the disposition of the components.
 
-grade:
+grade:CORRECT
 
 ### 10
 
@@ -105,7 +105,7 @@ reference: the question's assumption is false; the handbook says: The handbook's
 
 output: The handbook says that the LCC (Life Cycle Cost) includes the cost of the launch vehicle. It does not specify an alternative location for accounting for this cost, only stating its inclusion in the LCC definition. Therefore, the answer is: The handbook does not say.
 
-grade:
+grade:CORRECT
 
 ### 11
 
@@ -116,7 +116,7 @@ reference: acceptable forms: KDPs; KDP; Key Decision Point; key decision points 
 
 output: Do you mean The readiness of a project's flight system to execute critical events during flight operation, or An event at which the decision authority determines the readiness of a program/project to progress to the next phase of the life cycle (or to the next KDP)?
 
-grade:
+grade:WRONG
 
 ### 12
 
@@ -127,7 +127,7 @@ reference: acceptable forms: NPR 7123.1, Systems Engineering Processes and Requi
 
 output: J.2 Terms Used states that terms used in the SEMP should have the same meaning as the terms used in NPR 7123.1, Systems Engineering Processes and Requirements. Therefore, the answer is: NPR 7123.1.
 
-grade:
+grade:CORRECT
 
 ### 13
 
@@ -138,7 +138,7 @@ reference: acceptable forms: acceptance testing; the acceptance program; accepta
 
 output: Acceptance is repeated on each of the flight units as they are manufactured and readied for flight/use.
 
-grade:
+grade:CORRECT
 
 ### 14
 
@@ -149,7 +149,7 @@ reference: acceptable forms: 400M; $400 million; 400 million; 400 million dollar
 
 output: The top of the Type C life-cycle cost range exceeds the top of the Type D range by $100 according to the given information, but the exact figure is not provided directly in the passages.
 
-grade:
+grade:WRONG
 
 ### 15
 
@@ -159,7 +159,7 @@ reference: the handbook does not answer this question
 
 output: The handbook does not say.
 
-grade:
+grade:CORRECT
 
 ### 16
 
@@ -170,7 +170,7 @@ reference: acceptable forms: mission success criteria; project success criteria;
 
 output: The handbook says that Measures of Effectiveness (MOEs) are treated as synonymous with mission/project success criteria.
 
-grade:
+grade:CORRECT
 
 ### 17
 
@@ -180,7 +180,7 @@ reference: the handbook does not answer this question
 
 output: The handbook does not say.
 
-grade:
+grade:CORRECT
 
 ### 18
 
@@ -190,7 +190,7 @@ reference: the question's assumption is false; the handbook says: During design 
 
 output: The handbook states that roughly 75% of a project's cost is committed by the time design is done. Therefore, it commits 75% of the total life cycle costs at this stage.
 
-grade:
+grade:PARTIAL
 
 ### 19
 
@@ -201,7 +201,7 @@ reference: acceptable forms: NPR 7150.2, NASA Software Engineering Requirements;
 
 output: The technical team should ensure that software development follows NPR 7150.2 when making or coding a product.
 
-grade:
+grade:CORRECT
 
 ### 20
 
@@ -211,5 +211,5 @@ reference: the question's assumption is false; the handbook says: A waiver is a 
 
 output: Because the handbook treats an authorized waiver as a minor engineering change to the baseline that may affect an external interface, it needs approval from all stakeholders affected. CALC: 1 + 2
 
-grade:
+grade:WRONG
 
