@@ -148,6 +148,47 @@ with everything shown, 41 [28, 55] percent at the frozen thresholds at
   ground-truth fields, the traces for item-record reads, and the cache
   for test questions answered before the read.
 
+## Amendment, committed before the read: the response in each band
+
+Decided now so the response is not chosen after seeing the number.
+
+- Consistent: report it. No further analysis, no additional variants.
+- Worse: report it as the result. The dev numbers stay in the report as
+  dev numbers. No refitting, no new features, no second read.
+- Suspiciously better: a leakage audit before any claim, specified here.
+  (1) Re-verify the feature provenance list against the test traces: every
+  feature name in the test rows is in the provenance lists and none is a
+  ground-truth field; the script asserts this and the rows carry the list
+  of item-record fields present in each trace, which the features never
+  read. (2) Check that no item-record field entered the vector, by name
+  and by value: the test feature matrix is recomputed from the traces and
+  compared with the stored rows. (3) Near-duplicate questions across the
+  dev and test splits, defined below. (4) Confirm the split script's seed
+  (42) and stratification by bucket against reports/split-summary.md and
+  data/eval/items_locked.jsonl.
+
+Near-duplicate detection runs as part of the read regardless of band,
+because both splits came from one drafting pipeline over one corpus and
+two questions about the same passage in different splits is a plausible
+leak that the seed and stratification would not catch. Definition: for
+every test question, the most similar dev question by content-word
+Jaccard (the grader's normalise, stopwords and stems) and by bge cosine
+of the question texts. A pair is flagged when Jaccard is at least 0.6 or
+cosine is at least 0.9, and also when the two items cite the same
+evidence page and cosine is at least 0.8. Flagged pairs are listed with
+both questions, and the headline metrics are also reported with the
+flagged test items removed, labelled as such, whichever band the result
+falls in.
+
+## Markers: a crashed run and a completed run are different
+
+The script appends a line to data/eval/TEST_READ_STARTED at every start
+and writes data/eval/TEST_READ_ONCE only when it completes. It refuses to
+run when TEST_READ_ONCE exists. A crashed run leaves a start line and no
+completion marker; the restart replays every model call from the cache
+and repeats no generation, and the attempt count is recorded in the
+results. Both marker files are committed with the results.
+
 ## What happens after the read
 
 Only the description of what came back. No threshold, feature set,
