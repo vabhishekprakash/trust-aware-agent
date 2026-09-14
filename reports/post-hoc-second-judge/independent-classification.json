@@ -1,5 +1,6 @@
 {
- "method": "Three readers, each given only the entries below (the question and Mistral's text), classified them independently without seeing the code's categories, the grades or each other. Added after the run for the answer lines; planned before the run for unreadable replies.",
+ "run_by": "three language-model agents, not people",
+ "method": "Three model-run readers (language-model agents, not people), each given only the entries below (the question and Mistral's text), classified them independently without seeing the code's categories, the grades or each other. Added after the run for the answer lines; planned before the run for unreadable replies.",
  "readers": 3,
  "entries": [
   {

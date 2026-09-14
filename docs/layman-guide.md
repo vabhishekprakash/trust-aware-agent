@@ -67,9 +67,10 @@ checked against a person three times without the person seeing its
 verdicts; the last check agreed 19 times in 20. The 100 test questions
 were locked away and read once, after the whole analysis had been written
 down and committed, including what would count as good, bad, or too good
-to believe. Five times during the project a number looked better than it
-was, and each time two independent checks disagreed and the error was
-found before it became a claim. All five are listed in the report.
+to believe. Seven times during the project a number was wrong or looked
+better than it was, and each time two checks disagreed and the error was
+found before a released version of the report carried it. All seven are
+listed in the report.
 
 ## What a reader should take away
 

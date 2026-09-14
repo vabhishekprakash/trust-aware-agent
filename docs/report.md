@@ -66,7 +66,7 @@ material the owner graded without seeing the judge's key:
 
 | check | drafts | grader | binary agreement |
 |---|---|---|---|
-| sheet 1, model drafts under three passage conditions | 39 graded of 40 | v7 | 32 of 39 (82 percent) |
+| sheet 1, model drafts under three passage conditions | 40, one grade line unread | v7 | 32 of 39 (82 percent) |
 | sheet 2, fresh model drafts | 25 | v10 | 20 of 25 (80 percent) |
 | final check, real agent outputs from dev, before the test read | 20 | v13, the grader that graded dev and test | 19 of 20 (95 percent) |
 
@@ -219,16 +219,19 @@ rejection is a judgement this model does not have at 3B. The step is
 off, behind a flag, and the full account is reports/premise-step.md. On
 test the bucket stayed at 0 of 20.
 
-## Measurement integrity: five errors caught by internal checks
+## Measurement integrity: seven errors caught by internal checks
 
-Five times during this project a number was wrong or flattering for a
-reason unrelated to what it claimed to measure, and each time it was
-caught by a disagreement between two independent checks before it
-reached a claim: a rerun against a fixed reference, a second grading of
-the same drafts, a diagnostic that moved one feature at a time, a
-tie-aware recomputation of a curve, a strata query against the committed
-rows. Five instances make that a pattern of the process rather than an
-anecdote, and a reader should expect more of the same kind.
+Seven times during this project a number was wrong or flattering for a
+reason unrelated to what it claimed to measure. Each time a disagreement
+between two checks caught it before any tagged version of this report
+carried it. The first three checks were a rerun against a fixed
+reference, a second grading of the same drafts and a diagnostic that
+moved one feature at a time. The fourth and fifth were a tie-aware
+recomputation of a curve and a strata query against the committed rows.
+The last two were model-run
+reviews, by language-model agents and not people, checked against the
+raw call logs. Seven instances make that a pattern of the process rather
+than an anecdote, and a reader should expect more of the same kind.
 
 1. The v9 judge question. A fourth yes-or-no question added to the judge
    produced YES on true statements and flipped three binary labels on
@@ -266,6 +269,28 @@ anecdote, and a reader should expect more of the same kind.
    the rows were corrected to the merged 134 items throughout. The rule
    since then is that every number in the report is traced to a committed
    file by the script that reads it, and none is typed from memory.
+6. The echo count undercounted, post hoc. The second-judge report counts
+   how often a judge, asked to copy words that back a YES, gives back the
+   phrase the instruction quotes instead. Its first rendering used a
+   pattern that required a colon and missed the shape give "X" as the
+   answer. It said the two judges echoed equally often and that echoing
+   was not a Mistral habit. A model-run critic, a language-model agent
+   and not a person, called that sentence false against the call logs,
+   though its own count was the same undercount. Fixing its objection
+   found the colon. Like lp_tokens, it was a number that read as a finding
+   and came from how it was measured. The pattern has a test for the
+   shape it missed.
+7. The echo count overcounted, post hoc. The recount after entry 6,
+   7 calls against 1, was committed with the second-judge report, and it
+   was too high. After the owner read that report and asked for
+   corrections, model-run reviewers recounted from the raw logs with their
+   own code. They found that 4 of the 7 were NONE replies that quote the
+   phrase in an explanation, and that llama3.1's 1 was a leaves-out call
+   that copied the draft. A second round found that the recount's
+   denominators counted instructions quoting an answer to go against, not
+   a phrase to find. Counted by distinct request, Mistral gave the phrase
+   back on 2 of the 7 instructions that quote one, and llama3.1 on 0 of 2.
+   The classifier has a test for each shape it had wrong.
 
 The test read adds an entry of a different kind: the preregistered
 audit ran regardless of band. Provenance held on every row and the
@@ -324,33 +349,72 @@ nothing. The full account is reports/post-hoc-second-judge.md.
 The question was whether judge choice or rubric quality carried the
 agreement between the grader and the owner's blind labels. The 85 drafts
 on the three blind sheets were regraded with grader v13 unchanged and
-Mistral 7B Instruct as the judge in place of llama3.1 8B. On the final
-sheet, the only one never used to develop the rubric, llama3.1 agrees
-with the owner on 19 of 20, 95 [85, 100] percent, and Mistral on
-18 of 20, 90 [75, 100] percent. By the rule fixed before the run that
-counts as about as well, which supports rubric over model. The support is
-thin. Only 9 of the 20 final-sheet drafts reach a judge at all, and on
-those llama3.1 agrees on 8 and Mistral on 7. Pooled over 84 labelled
-drafts, Mistral agrees on 77 against llama3.1's 81, a paired difference of
-+4.8 points [+1.2, +9.5]. Three of Mistral's four extra errors sit on the
-two sheets where the rubric was tuned with llama3.1, so that gap mixes
-home advantage with any real difference between the judges.
+Mistral 7B Instruct as the judge in place of llama3.1 8B.
+
+At this size the experiment cannot separate a real difference between
+the judges from the advantage the harness gives llama3.1. Judge choice
+measurably mattered: pooled over 84 labelled drafts, llama3.1 agrees with
+the owner on 81 and Mistral on 77, a paired difference of +4.8 points
+[+1.2, +9.5] that excludes zero. But three of Mistral's four extra errors
+fall on the two sheets where the rubric was tuned with llama3.1 as the
+judge, and the fourth was taken by the copy-the-words check described
+below. On the final sheet, the only one never used to develop the rubric,
+llama3.1 agrees on 19 of 20, 95 [85, 100] percent, and Mistral on
+18 of 20, 90 [75, 100] percent. The rule fixed before the run reads that
+as about as well, and was written to count it as support for rubric over
+model. The report does not draw that conclusion, a choice the owner
+made after seeing the result: only 9 of those 20 drafts reach a judge,
+and the pooled interval excludes zero.
+
+The overlap supports a weaker claim, and no more. Mistral misgrades all
+three drafts llama3.1 misgrades, but a code rule decided one of them
+before any judge saw it, so that one is shared by construction. The other
+two reached a judge and recur under Mistral, so llama3.1's judged errors
+are not peculiar to llama3.1. That does not show the rubric is sound, and
+it does not show the shared errors are the rubric's.
 
 Mistral did not fail on format: 69 of its 70 judge replies parsed under
-llama3.1's conventions, and the one that did not was a hedged non-answer.
-The harness still carried the first judge's conventions. The
-copy-the-words check quotes the phrase it wants found, and Mistral echoed
-that phrase back instead of copying the draft on 7 calls against
-llama3.1's 1, which cost it one grade its own answers had right. A judge
-swap is not free. Two blind analysts also found that an error both judges
-make is not always the rubric's: one shared error is a judging mistake
-both judges make.
+llama3.1's conventions. The one that did not gave no yes or no to one
+of its three questions.
 
-The first rendering of that report was reviewed by an independent critic,
-which found a bug in the echo count that had reversed the conclusion
-about the copy check. The bug was fixed and tested before the result was
-written here, another instance of the pattern in the measurement-integrity
-section above.
+### Harness lock-in
+
+The copy-the-words check asks the judge to back each YES with words
+copied from the text. Two kinds of instruction quote the phrase they
+want found. Counted by distinct request, Mistral met 7 of them and gave
+the phrase back as its copy on 2; llama3.1 met 2 and did so on neither. On final-sheet draft 5 the instruction asked for the words that
+give "just prior to the PDR" as the answer. llama3.1 copied the draft's
+own "Just prior to the Preliminary Design Review (PDR)". Mistral returned
+the instruction's phrase, which the draft does not contain. The check
+struck its YES, and a draft the owner marked CORRECT was graded PARTIAL.
+Mistral's other echo did no harm: that draft never states the
+correction, so there was nothing to copy. On 4 more calls Mistral
+replied NONE and quoted the phrase in its explanation, which the grader's
+parser reads as a copy; there it changed nothing.
+
+The check and its parser were built and tuned with llama3.1 as the only
+judge. A grader tuned around one judge carries that judge's habits as if
+they were the task, and the parse rate does not show it. Of everything in
+this experiment, this is the finding most likely to hold for other
+graders that use a language model as the judge. It rests on little: one
+request and one grade. Whether an instruction that does not quote its
+target removes the effect was not tested.
+
+### Who ran the checks
+
+The owner's labels are the only human judgement in this experiment. The
+replay and the single-model guard were code. Every other check was
+model-run, by language-model agents and not people. Three readers
+classified Mistral's unreadable reply. Two analysts assigned causes to
+the misgraded drafts. A verifier recomputed each sheet's counts, both
+judges' binary agreement with the owner and the misgraded drafts. A
+critic reviewed the first rendering. After the owner's corrections, two
+rounds of reviewers checked the corrected text, each reviewer followed by
+an agent told to refute its findings. None of them is one of the human
+blind checks described earlier in this report. The analysts found that
+one error both judges share is a judging mistake, not the rubric's. The
+echo count, wrong once in each direction, is entries 6 and 7 of the
+measurement-integrity section.
 
 ## Reproduction
 

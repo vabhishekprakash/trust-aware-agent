@@ -34,7 +34,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from agent.provider import OllamaProvider  # noqa: E402
 from calibration import grader  # noqa: E402
 from calibration.grader import GRADER_VERSION, SYSTEM_PROMPT, ProviderJudge, grade, questions_for  # noqa: E402
-from calibration.judge_compare import (agreement, binary, bootstrap_share, categorise_reply, classify_copy, lenient_parser,  # noqa: E402
+from calibration.judge_compare import (agreement, binary, bootstrap_share, categorise_reply, classify_copy, copy_target, lenient_parser,  # noqa: E402
                                        order_rule_effect, overlap, paired_difference, split_extraction_message)
 from compare_grader_check import read_sheet  # noqa: E402
 
@@ -319,6 +319,7 @@ def cmd_report():
     replay = json.loads((OUT / "llama-replay.json").read_text(encoding="utf-8"))
     load = lambda name: json.loads((OUT / name).read_text(encoding="utf-8")) if (OUT / name).exists() else None
     classification, attribution, verification = load("independent-classification.json"), load("independent-attribution.json"), load("verification.json")
+    corrections_check = load("corrections-verification.json")
     items = load_items()
     owner = {s["name"]: read_sheet(ROOT / s["sheet"]) for s in SHEETS}
     revisions = {int(k): v for k, v in json.loads((ROOT / "data" / "eval" / "grader_check_revisions.json").read_text(encoding="utf-8")).items()}
@@ -420,7 +421,12 @@ def cmd_report():
                   "cached": sum(c["cached"] for c in calls), "live": len(live)},
         "timing": {"wall_seconds": run["wall_seconds"], "median_seconds": q(secs, 0.5), "p90_seconds": q(secs, 0.9), "median_output_tokens": q(toks, 0.5), "p90_output_tokens": q(toks, 0.9)},
         "single_model_guard": "cmd_run read Ollama's loaded models after every draft and would have stopped if any model other than mistral:latest was loaded; the run log ends with exit 0",
+        "harness_lock_in": harness_facts(calls, llama_calls, strict, llama, results),
+        "who_ran_the_checks": "The owner's labels are the only human judgement. The readers, analysts, verifier and critic were language-model agents, not people.",
         "run": run, "replay": replay, "independent_classification": classification, "independent_attribution": attribution, "verification": verification,
+        "corrections_verification": ({**{k: v for k, v in corrections_check.items() if k not in ("reviewers", "later_rounds")},
+                                      "later_rounds": [{k: v for k, v in r.items() if k != "reviewers"} for r in corrections_check.get("later_rounds", [])],
+                                      "later_confirmed": sum(r["confirmed"] for r in corrections_check.get("later_rounds", []))} if corrections_check else None),
     }
     if verification:
         mismatches = []
@@ -440,89 +446,140 @@ def cmd_report():
     return 0
 
 
+MODEL_RUN = "language-model agents, not people"
+
+
+def harness_facts(s_calls, l_calls, strict, llama, results):
+    """What each judge's copy-the-words replies did on requests that quote a phrase to find, and the echo that cost a grade, from the call logs."""
+    def facts(calls):
+        extraction = [c for c in calls if c["kind"] == "extraction"]
+        echoes, none_quoting, targeted = [], [], {}
+        for c in extraction:
+            source, instruction = split_extraction_message(c["user_message"])
+            kind, target = classify_copy(c["reply"], source, instruction), copy_target(instruction)
+            if target:
+                targeted.setdefault(c["user_message"], set()).add(kind)
+            row = {"sheet": c["sheet"], "sheet_no": c["sheet_no"], "cached": c["cached"], "phrase": target, "reply": c["reply"].strip(), "user_message": c["user_message"]}
+            if kind == "echoed":
+                echoes.append(row)
+            elif kind == "none quoting a phrase":
+                none_quoting.append(row)
+        return {"calls": len(extraction), "requests": len({c["user_message"] for c in extraction}), "requests_quoting_a_phrase_to_find": len(targeted),
+                "echo_calls": len(echoes), "echo_requests": len({e["user_message"] for e in echoes}), "echoes": echoes, "none_quoting_a_phrase": none_quoting,
+                "_targeted": targeted}
+    m, l = facts([c for c in s_calls if c["pass"] == "strict"]), facts(l_calls)
+    where_of = {c["user_message"]: (c["sheet"], c["sheet_no"]) for c in l_calls if c["kind"] == "extraction"}
+    both_met = [{"sheet": where_of[u][0], "sheet_no": where_of[u][1], "llama3.1": sorted(l["_targeted"][u]), "mistral": sorted(m["_targeted"][u])}
+                for u in sorted(set(m["_targeted"]) & set(l["_targeted"]), key=lambda u: where_of[u])]
+    del m["_targeted"], l["_targeted"]
+    mistral_only = {(k, d["sheet_no"]): d for k, x in results.items() for d in x["disagreements"] if d["wrong"] == "Mistral only"}
+    costly, harmless = [], []
+    for e in {e["user_message"]: e for e in m["echoes"]}.values():
+        d = mistral_only.get((e["sheet"], e["sheet_no"]))
+        if d and d["cause_analysts"] and "grounding_copy_check" in d["cause_analysts"]:
+            same_request = [c for c in l_calls if c["kind"] == "extraction" and c["user_message"] == e["user_message"]]
+            costly.append({"sheet": e["sheet"], "sheet_no": e["sheet_no"], "phrase": e["phrase"], "mistral_copied": e["reply"],
+                           "llama_copied": same_request[0]["reply"].strip() if same_request else None, "owner": d["owner"],
+                           "llama_grade": d["llama"], "mistral_grade": d["mistral"], "draft": d["draft"]})
+        else:
+            harmless.append({"sheet": e["sheet"], "sheet_no": e["sheet_no"], "source": split_extraction_message(e["user_message"])[0]})
+    strip = lambda f: {k: ([{kk: vv for kk, vv in e.items() if kk != "user_message"} for e in v] if isinstance(v, list) else v) for k, v in f.items()}
+    return {"mistral": strip(m), "llama3.1": strip(l), "requests_both_judges_met": both_met, "costly": costly, "echoes_that_cost_nothing": harmless,
+            "note": "echo: the reply gives back the phrase the instruction quotes as the thing to find (give \"X\" as the answer, or state this correction: \"X\"), "
+                    "and that phrase is not in the text checked. "
+                    "A reply opening with NONE that quotes a phrase in its explanation is counted apart; an earlier version of the classifier counted it as an echo."}
+
+
 def headline(s):
-    r, p = s["results"], s["pooled"]
+    r, p, h = s["results"], s["pooled"], s["harness_lock_in"]
     f = r["final"]
-    gaps = [r[k]["llama_owner"][0] - r[k]["mistral_owner"][0] for k in ("final", "sheet1", "sheet2")]
     diff = p["paired_difference_llama_minus_mistral"]
-    mistral_only = [(k, d) for k in r for d in r[k]["disagreements"] if d["wrong"] == "Mistral only"]
-    home = sum(1 for k, _ in mistral_only if k != "final")
+    mistral_only = [(k, d) for k in ("final", "sheet1", "sheet2") for d in r[k]["disagreements"] if d["wrong"] == "Mistral only"]
+    on_tuned = [(k, d) for k, d in mistral_only if k != "final"]
+    by_copy = [(k, d) for k, d in mistral_only if k == "final" and d["cause_analysts"] and "grounding_copy_check" in d["cause_analysts"]]
+    first = sum(len(r[k]["overlap"]["first"]) for k in r)
+    shared = [(k, d) for k in ("final", "sheet1", "sheet2") for d in r[k]["disagreements"] if d["wrong"] == "both"]
+    shared_by_code = [(k, d) for k, d in shared if d.get("decided_by") != "judge"]
+    shared_judged = [(k, d) for k, d in shared if d.get("decided_by") == "judge"]
+    judging_shared = [(k, d) for k, d in shared_judged if d["cause_analysts"] and "judge_judging" in d["cause_analysts"]]
+    name = lambda k, d: f"{k}, draft {d['sheet_no']}"
     out = [
-        f"On the final sheet, the only one never used to develop the rubric, llama3.1 agrees with the owner on {k_of(f['llama_owner'])}, {share(f['llama_interval'])}, "
-        f"and Mistral on {k_of(f['mistral_owner'])}, {share(f['mistral_interval'])}. By the rule fixed before the run, a result within one draft of llama3.1 counts as "
-        f"agreeing about as well, so Mistral agrees **{s['verdict_final_sheet']}**. "
-        + ("That supports the claim that the rubric carried the agreement more than the choice of judge." if s["verdict_final_sheet"] == "about as well"
-           else "That weakens the claim that the rubric carried the agreement more than the choice of judge, and the paper says so."),
+        f"At this size the experiment cannot separate a real difference between the judges from the advantage the harness gives llama3.1. Judge choice measurably "
+        f"mattered: across the {p['labelled']} labelled drafts llama3.1 agrees with the owner on {p['llama']}, {share(p['llama_interval'])}, and Mistral on {p['mistral']}, "
+        f"{share(p['mistral_interval'])}, a paired difference of {points(diff)}" + (" that excludes zero." if diff[1] > 0 else ".") +
+        " What the experiment cannot say is how much of that gap belongs to Mistral and how much to llama3.1's home advantage. "
+        f"{word(len(on_tuned)).capitalize()} of Mistral's {word(len(mistral_only))} extra errors fall on sheets 1 and 2, where the rubric was tuned with llama3.1 as the judge."
+        + (f" The {'fourth' if len(mistral_only) == 4 else 'remaining one'}, on the final sheet, was taken by the copy-the-words check, a harness step built and tuned "
+           "with llama3.1 as the only judge (see Harness lock-in)." if by_copy and len(by_copy) + len(on_tuned) == len(mistral_only) else ""),
         "",
-        f"That support is thin in two ways. Only {f['judged']} of the {f['drafts']} final-sheet drafts reach a judge; the other {f['drafts'] - f['judged']} get the same grade "
-        f"under either judge by construction, and on the {f['judged_labelled']} that do, llama3.1 agrees with the owner on {f['llama_owner_judged'][0]} and Mistral on "
-        f"{f['mistral_owner_judged'][0]}. And the prompts, the answer parser and the copy-the-words check were all built with llama3.1 as the judge, so even this sheet "
-        "carries some general advantage for llama3.1.",
+        f"The overlap supports a weaker claim, and no more. Mistral also misgrades every draft llama3.1 misgrades against the owner ({len(shared)} of {first}). "
+        + (f"But {word(len(shared_by_code))} of the {word(len(shared))} ({'; '.join(name(k, d) for k, d in shared_by_code)}) was decided by a code rule before any judge "
+           "saw it, so the two share it by construction" + (", and the owner later changed that label" if all(d.get("revised_label") for _, d in shared_by_code) else "")
+           + ". " if shared_by_code else "")
+        + f"The other {word(len(shared_judged))} reached a judge, and both recur under Mistral. So llama3.1's judged errors are not peculiar to llama3.1: they recur "
+        "under an independently trained judge on the same rubric and harness. That does not show the rubric is sound, since Mistral makes errors llama3.1 does not. "
+        "Nor does it show that the shared errors are the rubric's"
+        + (f"; by the model-run analysts' reading, {word(len(judging_shared))} of the {word(len(shared_judged))} is a judging mistake both judges make." if judging_shared else "."),
+        "",
+        f"The reading rule fixed before the run was applied as written. On the final sheet, the only one never used to develop the rubric, llama3.1 agrees on "
+        f"{k_of(f['llama_owner'])}, {share(f['llama_interval'])}, and Mistral on {k_of(f['mistral_owner'])}, {share(f['mistral_interval'])}; within one draft, so the rule "
+        f"reads **{s['verdict_final_sheet']}**. The rule was written to take that as support for rubric over model. This report departs from that reading, a choice "
+        "the owner made after seeing the results. The rule looks at twenty drafts while the pooled interval above excludes zero. And only "
+        f"{f['judged']} of those {f['drafts']} drafts reach a judge at all (llama3.1 {f['llama_owner_judged'][0]} of {f['judged_labelled']}, Mistral "
+        f"{f['mistral_owner_judged'][0]} of {f['judged_labelled']}). The other {f['drafts'] - f['judged']} get the same grade under either judge by construction.",
+        "",
+        f"Of the 85 drafts, {85 - sum(r[k]['judged'] for k in r)} are decided by code rules or exact match and get the same grade under either judge. Only "
+        f"{sum(r[k]['judged'] for k in r)} reach a judge, so a judge swap can move at most that many grades. On those {p['judged_labelled']} labelled drafts llama3.1 "
+        f"agrees on {p['llama_judged']} and Mistral on {p['mistral_judged']}.",
         "",
     ]
-    pooled_line = (f"Across all {p['labelled']} labelled drafts llama3.1 agrees on {p['llama']}, {share(p['llama_interval'])}, and Mistral on {p['mistral']}, "
-                   f"{share(p['mistral_interval'])}: {count(p['llama'] - p['mistral'], 'draft')} apart, a paired difference of {points(diff)}")
-    pooled_line += ", an interval that excludes zero." if diff[1] > 0 else "."
-    if all(g > 0 for g in gaps):
-        pooled_line += f" Mistral agreed less on every sheet, by {gaps[0]}, {gaps[1]} and {gaps[2]} {'draft' if gaps[2] == 1 else 'drafts'}."
-    pooled_line += (f" {word(home).capitalize()} of Mistral's {word(len(mistral_only))} extra errors are on sheets 1 and 2, where the rubric was tuned with llama3.1 in the loop, "
-                    "so the pooled gap mixes that home advantage with any real difference between the judges, and these drafts cannot separate the two. "
-                    f"On the {p['judged_labelled']} judged drafts alone, llama3.1 agrees on {p['llama_judged']} and Mistral on {p['mistral_judged']}.")
-    out += [pooled_line, "",
-            f"Of the 85 drafts, {85 - sum(r[k]['judged'] for k in r)} are decided by code rules or exact match and get the same grade under either judge. "
-            f"Only {sum(r[k]['judged'] for k in r)} reach a judge, so a judge swap can move at most that many grades.", ""]
     return out
 
 
 def errors_section(s):
     r = s["results"]
     f = r["final"]
-    both_final = f["overlap"]["both"]
-    own_final = f["overlap"]["second_only"]
+    both_final, own_final = f["overlap"]["both"], f["overlap"]["second_only"]
     first = sum(len(r[k]["overlap"]["first"]) for k in r)
     both = sum(len(r[k]["overlap"]["both"]) for k in r)
     first_only = sum(len(r[k]["overlap"]["first_only"]) for k in r)
     second_only = sum(len(r[k]["overlap"]["second_only"]) for k in r)
     out = ["## Where the errors fall", "",
            f"On the final sheet the two judges share {count(len(both_final), 'error')} ({drafts_list(both_final)}), and Mistral has {count(len(own_final), 'error')} of its own "
-           f"({drafts_list(own_final)}). Over all three sheets Mistral also misgrades every draft llama3.1 misgrades ({both} of {first}) and adds "
-           f"{count(second_only, 'error')} of its own, while llama3.1 has {count(first_only, 'error')} of its own. That llama3.1 has none is expected on sheets 1 and 2, "
+           f"({drafts_list(own_final)}). Over all three sheets Mistral also misgrades every draft llama3.1 misgrades ({both} of {first}), and one of those was decided "
+           f"by a code rule before any judge saw it. Mistral adds {count(second_only, 'error')} of its own, while llama3.1 has {count(first_only, 'error')} of its own. That llama3.1 has none is expected on sheets 1 and 2, "
            "where the rubric was revised until its disagreements there were fixed.", ""]
     att = s.get("independent_attribution")
     rows = [(k, d) for k in ("final", "sheet1", "sheet2") for d in r[k]["disagreements"]]
     if att:
         agree_each_other = all(d["analysts_agree"] for d in att["drafts"])
         rule_agrees = sum(1 for _, d in rows if d["rule_agrees_with_analysts"])
-        out += [f"Two analysts assigned a cause to each of these {len(rows)} drafts, blind to this report, the script's rule and each other. They agreed with each other on "
+        out += [f"Two model-run analysts ({MODEL_RUN}) assigned a cause to each of these {len(rows)} drafts. Each read only the committed records, call logs, owner sheets "
+                "and grader source, without seeing this report, the script's rule or the other analyst. They agreed with each other on "
                 f"{'every' if agree_each_other else 'not every'} draft. A cause rule written into the script after the run agrees with them on {rule_agrees} of the {len(rows)}, "
                 "counting sheet 1, draft 34 as agreement: the rule names the code rule that decided it, the analysts name the label the owner later changed, and both are true. "
                 "Where the two differ, this report goes with the analysts. They read the drafts and the replies; the rule reads only flags and answers, assumes that an error "
-                "both judges make belongs to the rubric, and cannot tell a defensible answer from a wrong one.", "",
-                "| sheet | draft | misgraded by | cause, two blind analysts | cause, rule written after the run |", "|---|---|---|---|---|"]
+                "both judges make belongs to the rubric, and cannot tell a defensible answer from a wrong one. Their causes are a model's reading of the records, not a "
+                "person's.", "",
+                "| sheet | draft | misgraded by | cause, two model-run analysts (not people) | cause, rule written after the run |", "|---|---|---|---|---|"]
         for k, d in rows:
-            analyst = "; ".join(ANALYST_PHRASE[c] for c in (d["cause_analysts"] or []))
-            out.append(f"| {k} | {d['sheet_no']} | {d['wrong']} | {analyst} | {RULE_PHRASE[d['cause_rule']]} |")
+            out.append(f"| {k} | {d['sheet_no']} | {d['wrong']} | {'; '.join(ANALYST_PHRASE[c] for c in (d['cause_analysts'] or []))} | {RULE_PHRASE[d['cause_rule']]} |")
         out.append("")
         shared = [(k, d) for k, d in rows if d["wrong"] == "both"]
         judging_shared = [(k, d) for k, d in shared if d["cause_analysts"] and "judge_judging" in d["cause_analysts"]]
+        notes = []
         if judging_shared:
-            out += [f"So an error both judges make is not always the rubric's. {count(len(judging_shared), 'shared error').capitalize()} "
-                    f"({', '.join(f'{k}, draft {d["sheet_no"]}' for k, d in judging_shared)}) "
-                    "is a judging mistake the two judges happen to share, which may be a limit of judges this size rather than of either one."]
-        rubric_own = [(k, d) for k, d in rows if d["wrong"] == "Mistral only" and d["cause_analysts"] and "rubric_or_question_wording" in d["cause_analysts"]]
+            notes.append(f"By the model-run analysts' reading, an error both judges make is not always the rubric's. {count(len(judging_shared), 'shared error').capitalize()} "
+                         f"({', '.join(f'{k}, draft {d["sheet_no"]}' for k, d in judging_shared)}) is a judging mistake the two judges happen to share, which may be a limit "
+                         "of judges this size rather than of either one.")
         evidence = {(e["sheet"], e["sheet_no"]): " ".join(e["evidence"]).lower() for e in att["drafts"]}
-        for k, d in rubric_own:
+        for k, d in [(k, d) for k, d in rows if d["wrong"] == "Mistral only" and d["cause_analysts"] and "rubric_or_question_wording" in d["cause_analysts"]]:
             reason = ("padding the draft adds to a right answer, which no judge question asks about and the code's unsupported-claim check, looking only for outside "
                       "names and acronyms, does not catch" if "padding" in evidence.get((k, d["sheet_no"]), "") else "something the judge's questions do not ask about")
-            out[-1] += (f" And one of Mistral's own errors ({k}, draft {d['sheet_no']}) is the rubric's. Both analysts found Mistral's answers defensible and traced the "
-                        f"owner's {d['owner']} to {reason}; llama3.1 matched the owner's binary label only by grading the draft {d['llama']}.")
-        if judging_shared or rubric_own:
-            out.append("")
-    else:
-        out += ["| sheet | draft | misgraded by | cause, rule written after the run |", "|---|---|---|---|"]
-        for k, d in rows:
-            out.append(f"| {k} | {d['sheet_no']} | {d['wrong']} | {RULE_PHRASE[d['cause_rule']]} |")
-        out.append("")
+            notes.append(f"And one of Mistral's own errors ({k}, draft {d['sheet_no']}) is the rubric's. Both analysts found Mistral's answers defensible and traced the "
+                         f"owner's {d['owner']} to {reason}; llama3.1 matched the owner's binary label only by grading the draft {d['llama']}.")
+        if notes:
+            out += [" ".join(notes), ""]
     return out
 
 
@@ -561,19 +618,21 @@ def sheet_block(s, name, heading, caveat):
 def format_section(s):
     cats = s["reply_categories_strict"]
     hab = s["habits"]
+    cls = s.get("independent_classification")
+    whole = [e for e in (cls or {}).get("entries", []) if e["type"].startswith("whole")]
+    lines = [e for e in (cls or {}).get("entries", []) if not e["type"].startswith("whole")]
+    unreadable = sum(v for k, v in cats.items() if k != "parsed")
     out = ["## Unreadable replies: task or format", "",
            f"Mistral's strict pass made {sum(cats.values())} judge calls; the parser read {cats.get('parsed', 0)}. None stopped at the 200-token cap. "
            f"Every reply is kept verbatim in reports/post-hoc-second-judge/mistral-calls.jsonl. There was only {count(len(s['unreadable_replies']), 'unreadable reply', 'unreadable replies')}, "
            "so the handful asked for is this one:", ""]
     for u in s["unreadable_replies"]:
         out += [f"{u['sheet']}, draft {u['sheet_no']}, second answer order, {u['eval_count']} tokens, stopped normally:", "", "```", u["reply"].strip(), "```", ""]
-    cls = s.get("independent_classification")
-    whole = [e for e in (cls or {}).get("entries", []) if e["type"].startswith("whole")]
-    lines = [e for e in (cls or {}).get("entries", []) if not e["type"].startswith("whole")]
     out.append("It commits to NO on Q1, qualifies Q3 as \"Yes, in a way\", and gives Q2 no yes or no at all, only \"Implicitly\". The grader needs an answer to every "
                "question, so the draft was graded WRONG. The code's category is a task failure, not a format failure: a lenient reading that strips formatting still "
                "finds no answer to Q2, and the diagnostic regrade at 600 tokens got the same reply."
-               + (f" Three readers who saw only the questions and the reply, blind to the code, all called it a task failure." if whole and all(e["votes"].count("task_failure") == 3 for e in whole) else ""))
+               + (f" Three model-run readers ({MODEL_RUN}), each shown only the questions and the reply and blind to the code, all called it a task failure."
+                  if whole and all(e["votes"].count("task_failure") == 3 for e in whole) else ""))
     out += ["", "How each judge wrote its answer lines over the same drafts, one row per kind of line:", "", "| answer line | llama3.1 | Mistral |", "|---|---|---|"]
     for key in sorted(set(hab["llama3.1"]["answer_lines"]) | set(hab["mistral"]["answer_lines"])):
         out.append(f"| {key} | {hab['llama3.1']['answer_lines'].get(key, 0)} | {hab['mistral']['answer_lines'].get(key, 0)} |")
@@ -582,70 +641,123 @@ def format_section(s):
         maj = Counter(e["majority"] for e in lines)
         contradictory = [e for e in lines if e["majority"] == "contradictory"]
         split = [e for e in lines if not e["unanimous"]]
-        sentence = (f"Three blind readers also read the {len(lines)} parsed Mistral answer lines that carry added words, a check added after the run. By majority {maj.get('clear', 0)} "
-                    f"are clear, the added words backing the YES or NO given")
+        sentence = (f"The same three model-run readers also read the {len(lines)} parsed Mistral answer lines that carry added words, a check added after the run. "
+                    f"By majority {maj.get('clear', 0)} are clear, the added words backing the YES or NO given")
         if contradictory:
-            sentence += (f", and {count(len(contradictory), 'is', 'are')} contradictory: " + "; ".join(f"{e['sheet']}, draft {e['sheet_no']}, \"{e['text'].rstrip('.')}.\"" for e in contradictory)
+            sentence += (f", and {count(len(contradictory), 'is', 'are')} contradictory: "
+                         + "; ".join(f"{e['sheet']}, draft {e['sheet_no']}, \"{e['text'].rstrip('.')}.\"" for e in contradictory)
                          + " The parser read the stated answer there, and the owner and both judges graded that draft the same")
         sentence += "."
         if split:
             sentence += f" The readers split on {count(len(split), 'line')}: " + "; ".join(f"{e['sheet']}, draft {e['sheet_no']} ({', '.join(e['votes'])})" for e in split) + "."
         out += [sentence, ""]
-    out += ["What each judge's copy-the-words replies did, one row per kind of reply, counted per call:", "", "| copy reply | llama3.1 | Mistral |", "|---|---|---|"]
-    names = {"copied": "copied words found in the draft", "echoed": "echoed the instruction's own phrase", "not found": "copied words not found in the draft", "none": "NONE, or nothing usable"}
-    for key in ("copied", "echoed", "not found", "none"):
-        out.append(f"| {names[key]} | {hab['llama3.1']['copy_replies'].get(key, 0)} | {hab['mistral']['copy_replies'].get(key, 0)} |")
-    out += ["", conclusion(s), ""]
+    out += [f"Mistral did not fail on format. Its replies parsed under llama3.1's conventions {cats.get('parsed', 0)} times in {sum(cats.values())}"
+            + (f", and the {'one reply that did not' if unreadable == 1 else str(unreadable) + ' that did not'} failed the task, not the format." if unreadable else ".")
+            + " The parser was not where llama3.1's conventions cost Mistral; the copy check was (see Harness lock-in).", ""]
     return out
 
 
-def conclusion(s):
-    r = s["results"]
-    cats = s["reply_categories_strict"]
-    unreadable = sum(v for k, v in cats.items() if k != "parsed")
-    fmt = cats.get("format", 0) + cats.get("truncated", 0)
+def harness_section(s):
+    h, r = s["harness_lock_in"], s["results"]
     hab = s["habits"]
-    m_echo, l_echo = hab["mistral"]["copy_replies"].get("echoed", 0), hab["llama3.1"]["copy_replies"].get("echoed", 0)
-    grounding = [(k, d) for k in r for d in r[k]["disagreements"] if d["wrong"] == "Mistral only" and d["cause_analysts"] and "grounding_copy_check" in d["cause_analysts"]]
+    m, l = h["mistral"], h["llama3.1"]
+    names = {"copied": "copied words found in the text checked", "echoed": "gave back the phrase the instruction quotes, not in the text",
+             "none quoting a phrase": "NONE, quoting a phrase in its explanation", "not found": "other copied words not found in the text", "none": "NONE, or nothing usable"}
+    where = lambda es: "; ".join(f"{sheet} draft {no}" + (f", {'twice' if n == 2 else str(n) + ' times'}" if n > 1 else "")
+                                  for (sheet, no), n in Counter((e["sheet"], e["sheet_no"]) for e in es).items())
+    bare = lambda q: '"' + (q or "").strip().strip('"').rstrip(".") + '"'
     flips = {k: (r[k]["order_flips"]["mistral"], r[k]["order_flips"]["llama"]) for k in ("final", "sheet1", "sheet2")}
     m_cost = sum(r[k]["stricter_order_rule"]["mistral"]["cost"] for k in r)
     m_saved = sum(r[k]["stricter_order_rule"]["mistral"]["saved"] for k in r)
-    if unreadable and fmt == unreadable:
-        head = (f"All {unreadable} unreadable replies were format failures, not task failures. A judge swap is not free, because the harness carries the first judge's "
-                "conventions: the parser was built around llama3.1's output.")
-        return head
-    head = (f"Mistral did not fail on format. Its replies parsed under llama3.1's conventions {cats.get('parsed', 0)} times in {sum(cats.values())}, and the "
-            f"{'one reply that did not' if unreadable == 1 else str(unreadable) + ' that did not'} failed the task, not the format.")
-    body = ""
-    if m_echo > l_echo:
-        body += (f" The harness still carried llama3.1's conventions, and they cost Mistral, through the copy check rather than the parser. That instruction quotes the "
-                 f"phrase it wants found, and Mistral echoed the phrase back instead of copying the draft's words on {count(m_echo, 'call')}, against llama3.1's {word(l_echo)}.")
-        if grounding:
-            body += (f" On {count(len(grounding), 'draft')} ({', '.join(f'{k}, draft {d["sheet_no"]}' for k, d in grounding)}) "
-                     "that echo removed a YES Mistral had right and cost the grade.")
-        body += " A judge swap is not free: a harness built around the first judge's habits turns a second judge's different habits into errors the first judge never makes."
-    body += (f" Mistral's grade also changed with the answer order more often, on {flips['final'][0]}, {flips['sheet1'][0]} and {flips['sheet2'][0]} drafts across the final "
-             f"sheet and sheets 1 and 2, against llama3.1's {flips['final'][1]}, {flips['sheet1'][1]} and {flips['sheet2'][1]}; the gap sits mostly on sheet 1, where the rubric was "
-             f"tuned with llama3.1. Keeping the stricter order cost Mistral {count(m_cost, 'binary agreement')} and saved it {word(m_saved)}, so on these drafts the order "
-             "sensitivity did not change its agreement with the owner.")
-    return head + body
+    repeats = m["echo_calls"] - m["echo_requests"]
+    out = ["## Harness lock-in: the copy check carries the first judge's habits", "",
+           "The grader does not take a judge's YES on trust. It asks the judge to copy the words that back the YES and checks that they are there. For every question "
+           "but the one about leaving something out, they must be in the draft; for that one, in the reference. A YES whose copied words cannot be found is turned "
+           "into NO. For some questions the instruction quotes the phrase it wants found, for example: Copy the exact words in the text that give \"just prior to the "
+           "PDR\" as the answer, in any wording. The check, its instructions and the parser that reads the reply were built and tuned with llama3.1 as the only judge.", "",
+           "| copy reply, counted per call | llama3.1 | Mistral |", "|---|---|---|"]
+    for key in ("copied", "echoed", "none quoting a phrase", "not found", "none"):
+        out.append(f"| {names[key]} | {hab['llama3.1']['copy_replies'].get(key, 0)} | {hab['mistral']['copy_replies'].get(key, 0)} |")
+    shared = h["requests_both_judges_met"]
+    verb = {"copied": "copied", "echoed": "gave the phrase back", "none quoting a phrase": "replied NONE quoting the phrase", "not found": "copied words not in the text",
+            "none": "replied NONE"}
+    out += ["",
+            "The text checked is the draft, or the reference for the leaves-out question. Only two kinds of instruction quote a phrase to find: give \"X\" as the "
+            "answer, and state this correction: \"X\". The other copy calls quote nothing, the question, the draft, or an answer the copied words must go against. Counted by "
+            f"distinct request, Mistral met {word(m['requests_quoting_a_phrase_to_find'])} instructions that quote a phrase to find, and llama3.1 met "
+            f"{word(l['requests_quoting_a_phrase_to_find'])}. Mistral gave the quoted phrase back as its copy on {word(m['echo_requests'])} of its "
+            f"{word(m['requests_quoting_a_phrase_to_find'])} ({where(m['echoes'])}"
+            + f")." + (" The repeat is the identical request from the other answer order, served from the cache." if repeats else "")
+            + f" llama3.1 did so on {'neither' if l['requests_quoting_a_phrase_to_find'] == 2 and not l['echo_requests'] else word(l['echo_requests'])} of its "
+            f"{word(l['requests_quoting_a_phrase_to_find'])}. The two judges met the same such request {'twice' if len(shared) == 2 else count(len(shared), 'time')}"
+            + (": " + "; ".join(f"on {x['sheet']} draft {x['sheet_no']} " + (f"both {verb[x['mistral'][0]]}" if x["mistral"] == x["llama3.1"] else
+                                          f"llama3.1 {' and '.join(verb[k] for k in x['llama3.1'])} and Mistral {' and '.join(verb[k] for k in x['mistral'])}")
+                                 for x in shared) + "." if shared else ".")]
+    out += ["",
+            "An echo is not in the draft whenever the draft words the answer differently, so the check strikes the YES even when the judge was right."]
+    for c in h["costly"]:
+        out[-1] += (f" On {c['sheet']} draft {c['sheet_no']} that is what happened. The instruction asked for the words that give \"{c['phrase']}\" as the answer. "
+                    f"llama3.1 copied the draft's own words, {bare(c['llama_copied'])}. Mistral replied {bare(c['mistral_copied'])}, the instruction's phrase, which the "
+                    f"draft does not contain. The check struck Mistral's YES, and its grade fell to {c['mistral_grade']}, where llama3.1 and the owner have {c['owner']}.")
+    for c in h["echoes_that_cost_nothing"]:
+        out[-1] += (f" The echo on {c['sheet']} draft {c['sheet_no']} did no harm. The draft reads: \"{c['source'].strip()}\" It accepts the question's premise and never "
+                    "states the correction, so there were no words to copy. The check was right to strike the YES, and Mistral's grade there agrees with the owner's.")
+    nq = m["none_quoting_a_phrase"]
+    if nq:
+        out += ["",
+                f"On {count(len(nq), 'more call')} ({where(nq)}) Mistral replied NONE and quoted the phrase in its explanation. One of them reads: {nq[0]['reply']} The "
+                "grader's parser looks for a quoted phrase before it looks for NONE, so it reads such a reply as a copy of that phrase. None of these phrases was in "
+                "the text, so the result was the same as a plain NONE. "
+                + ("llama3.1 wrote no reply of this kind." if not l["none_quoting_a_phrase"] else f"llama3.1 wrote {count(len(l['none_quoting_a_phrase']), 'reply', 'replies')} of this kind.")]
+    cats = s["reply_categories_strict"]
+    out += ["",
+            f"This is the most transferable finding in the experiment, and it rests on little: {count(len(h['costly']), 'request')} and "
+            f"{count(len(h['costly']), 'grade')}, with the habit behind it seen on {word(m['echo_requests'])}. A verification step that quotes its target inside the prompt passes a judge that copies from the text and fails a "
+            "judge that gives the prompt's phrase back, whenever the text words the target differently. A harness built with one judge encodes that judge's habits as "
+            "if they were the task, and a second judge's different habits then show up as errors the first judge never makes. Swapping the judge in a grader like "
+            f"this one is not free, and the parse rate does not show the cost: Mistral's judge replies parsed {cats.get('parsed', 0)} times in {sum(cats.values())}. "
+            "Whether an instruction that does not quote the target would remove the effect was not tested.", "",
+            f"A second harness rule, keeping the stricter of two answer orders, met a second difference between the judges. Mistral's grade changed with the answer order "
+            f"on {flips['final'][0]}, {flips['sheet1'][0]} and {flips['sheet2'][0]} drafts across the final sheet and sheets 1 and 2, against llama3.1's {flips['final'][1]}, "
+            f"{flips['sheet1'][1]} and {flips['sheet2'][1]}; the gap sits mostly on sheet 1, where the rubric was tuned with llama3.1. Here the rule cost Mistral "
+            f"{count(m_cost, 'binary agreement')} and saved it {word(m_saved)}, so on these drafts it did not change Mistral's agreement with the owner.", ""]
+    return out
 
 
 def checks_section(s):
-    out = ["## Independent checks", ""]
+    out = ["## Independent checks, and who ran them", "",
+           f"Every check below was run by code or by {MODEL_RUN}. The only person who graded anything in this experiment is the owner, whose labels are the ones on "
+           "the three blind sheets. The readers, analysts and verifier were kept blind in the sense stated for each. The critic and the check of the owner's "
+           "corrections were not blind, since reading this report was their job. A reader should weigh all of them as a model's work, not as the human blind checks "
+           "reported in the main report.", ""]
     if s.get("verification"):
         mm = s.get("verification_mismatches", [])
-        out.append("- A verifier, blind to this report and the script, recomputed each sheet's draft, label and judged counts, both judges' binary agreement with the owner, "
-                   "the judges' agreement with each other, the misgraded draft numbers and the unreadable count from the raw files with its own code. "
-                   + ("Every number matched." if not mm else f"Mismatches: {', '.join(mm)}."))
+        out.append("- A model-run verifier (a language-model agent, not a person) worked from the raw files with its own code, blind to this report and the script. "
+                   "It recomputed each sheet's draft, label and judged counts, both judges' binary agreement with the owner, the judges' agreement with each other, the "
+                   "misgraded draft numbers and the unreadable count. " + ("Every number matched." if not mm else f"Mismatches: {', '.join(mm)}.")
+                   + " It did not recompute the intervals, three-way agreement, order flips or copy-check counts. Added after the run.")
     if s.get("independent_classification"):
-        out.append("- Three readers classified the unreadable reply (planned before the run) and the answer lines with added words (added after the run), blind to the code.")
+        out.append("- Three model-run readers (language-model agents, not people) classified the unreadable reply, a check planned before the run. After the run they "
+                   "also read the answer lines with added words. Each was blind to the code and to the other readers.")
     if s.get("independent_attribution"):
-        out.append("- Two analysts assigned causes to every misgraded draft, blind to the report, the rule and each other (added after the run).")
-    out.append("- A critic reviewed the first rendering of this report against the owner's requirements and found 26 defects (reports/post-hoc-second-judge/critic-review.json). "
-               "The most serious was a bug in the echo count: a pattern that required a colon missed the instruction shape \"give \\\"X\\\" as the answer\", so the first rendering "
-               "said Mistral and llama3.1 echoed equally often and that echoing was not a Mistral habit. The corrected count is the one above, the pattern has a test, and every "
-               "other defect is addressed in this version.")
+        out.append("- Two model-run analysts (language-model agents, not people) assigned causes to every misgraded draft, blind to the report, the rule and each other, "
+                   "added after the run.")
+    out.append("- A model-run critic (a language-model agent, not a person) reviewed the first rendering of this report against the owner's requirements and found 26 "
+               "defects (reports/post-hoc-second-judge/critic-review.json). The first rendering said the two judges echoed equally often and that echoing was not a "
+               "Mistral habit. The critic's first defect called that sentence false against the call logs, though its own echo count was the same undercount. The cause "
+               "turned up while that defect was being fixed: a pattern that required a colon missed the instruction shape give \"X\" as the answer. The recount that "
+               "followed, 7 calls against 1, was committed and was itself too high. Added after the run; the undercount is the sixth entry in the main report's "
+               "measurement-integrity section.")
+    cv = s.get("corrections_verification")
+    if cv:
+        out.append(f"- The owner read the committed report and asked for four corrections. Three more model-run reviewers ({MODEL_RUN}) then checked the corrected "
+                   "text, each followed by a model-run agent told to refute its findings (reports/post-hoc-second-judge/corrections-verification.json). "
+                   f"{cv['confirmed']} findings survived, several of them found by more than one reviewer, and all are addressed in this version. The recount from the "
+                   "raw logs found that 4 of Mistral's 7 counted echoes were NONE replies quoting a phrase, and that llama3.1's 1 was a leaves-out call that copied the "
+                   "draft. It also found that the overlap counted a draft no judge saw, and that the critic had been credited with finding the colon bug. A second round of "
+                   "the same kind, on the fixed text, found that the recount's denominators included instructions that quote an answer to go against, not a phrase to "
+                   f"find. A third round found only wording and test gaps; all {cv['later_confirmed']} later findings are fixed and recorded in the same file. The overcount is the seventh entry in the main report's measurement-integrity section, and the classifier has a test for each shape it missed.")
+    out.append("- The llama3.1 replay and the Mistral pass are code: the replay refused any live model call, and the pass refused to run with any other model loaded.")
     return out + [""]
 
 
@@ -655,13 +767,18 @@ def render(s):
              "A post hoc experiment, run after the tagged evaluation (v1.0.2). The 85 drafts on the three blind sheets were regraded with grader v13 unchanged and "
              "Mistral 7B Instruct (mistral:latest) as the judge in place of llama3.1 8B, and both judges were compared with the owner's hand labels. No test item "
              "was read and nothing was refit. The plan and the reading rule were committed before the first Mistral call (commit 1514552; docs/decisions.md, "
-             "\"Post hoc: a second judge\"). The cause rule, the reading of answer lines with added words, and the two analysts were added after the run and are "
-             "labelled where they appear. Every number comes from reports/post-hoc-second-judge.json.", "",
-             "Terms. Binary agreement counts CORRECT against PARTIAL or WRONG; three-way agreement needs the exact grade. 84 of the 85 drafts carry an owner label "
-             "(sheet 1, draft 1 was never graded). A draft reaches a judge only when no code rule or exact match decides it first; both judges take the same route "
+             "\"Post hoc: a second judge\"). Every number comes from reports/post-hoc-second-judge.json.", "",
+             f"Who did what. The owner's hand labels are the only human judgement in this experiment. The two judges are language models. The readers, analysts, "
+             f"verifier, critic and reviewers named below are also {MODEL_RUN}, and are called model-run wherever they appear; they are not the human blind checks reported in the "
+             "main report. Of these checks only one was planned before the run, the readers' classification of the unreadable reply. The cause rule, the readers' "
+             "reading of answer lines with added words, the analysts, the verifier, the critic and the check of the owner's corrections were all added after it.", "",
+             "Terms. Binary agreement counts CORRECT against PARTIAL or WRONG; three-way agreement needs the exact grade. 84 of the 85 drafts carry an owner label. "
+             "The owner did grade sheet 1, draft 1, CORRECT like both judges. Its grade line is indented and the sheet reader skips it, so it counts as unlabelled "
+             "here, as in every earlier figure for that sheet. A draft reaches a judge only when no code rule or exact match decides it first; both judges take the same route "
              "on every draft.", "",
              "## Headline", ""]
     lines += headline(s)
+    lines += harness_section(s)
     lines += errors_section(s)
     lines += sheet_block(s, "final", "Final sheet: the clean comparison",
                          "Twenty real agent outputs from dev, drawn for the final blind check after grader v13 was frozen, and graded by the owner without seeing either judge. "

@@ -115,21 +115,41 @@ def overlap(first_wrong: set, second_wrong: set) -> dict:
             "first_only": sorted(first_wrong - second_wrong), "second_only": sorted(second_wrong - first_wrong)}
 
 
-# The copy-the-words instruction names the phrase it wants found in three shapes:
-#   give "X" as the answer, in any wording / contradict this answer: "X" / state this correction: "X"
-# The first shape has no colon; an earlier pattern that required one missed it and undercounted echoes.
-_TARGET = re.compile(r'(?:\bgive\s+|this answer:\s*|this correction:\s*)"([^"]+)"')
+# The copy-the-words instruction quotes a phrase it wants found in two shapes:
+#   give "X" as the answer, in any wording / state this correction: "X"
+# The first has no colon; an earlier pattern that required one missed it and undercounted echoes.
+# Three other shapes quote something that is not a target to find, and are excluded: the same
+# shape, give the answer to the question "<question>", quotes the question; the leaves-out shape,
+# are missing from this answer: "<draft>", quotes the draft under check (an earlier pattern matched
+# it through "this answer:" and counted a copy of the draft as an echo); and the contradict shape,
+# contradict this answer: "<gold>", quotes the answer the copied words must go against.
+_TARGET = re.compile(r'(?:\bgive\s+|\bthis correction:\s*)"([^"]+)"')
+
+
+def copy_target(instruction: str) -> Optional[str]:
+    """The phrase a copy-the-words instruction quotes as the thing to find, or None when it quotes none."""
+    match = _TARGET.search(instruction)
+    return match.group(1) if match else None
 
 
 def classify_copy(reply: str, source: str, instruction: str) -> str:
-    """What a copy-the-words reply did: copied words found in the source, echoed the instruction's phrase, not found, or none."""
+    """What a copy-the-words reply did.
+
+    none quoting a phrase: the reply opens with NONE but quotes a phrase in its
+    explanation; the grader's parser looks for a quote first and reads it as the
+    copy. Checked before anything else, because an earlier version counted these
+    as echoes. Then: none, copied (found in the text checked), echoed (gave back
+    the instruction's quoted target, not found), or not found.
+    """
     copied = grader.parse_extraction(reply)
+    if reply.translate(grader._QUOTES).strip().upper().startswith("NONE"):
+        return "none" if copied is None else "none quoting a phrase"
     if copied is None:
         return "none"
     if grader.quote_in(source, copied):
         return "copied"
-    target = _TARGET.search(instruction)
-    if target and grader.normalise(copied) == grader.normalise(target.group(1)):
+    target = copy_target(instruction)
+    if target and grader.normalise(copied) == grader.normalise(target):
         return "echoed"
     return "not found"
 

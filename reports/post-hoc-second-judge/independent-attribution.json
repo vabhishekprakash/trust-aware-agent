@@ -1,5 +1,6 @@
 {
- "method": "Two analysts, each reading only the committed records, call logs, owner sheets and grader source, assigned a cause to every draft where either judge's binary grade differs from the owner, without seeing this report, its JSON, the script or each other. Added after the run.",
+ "run_by": "two language-model agents, not people",
+ "method": "Two model-run analysts (language-model agents, not people), each reading only the committed records, call logs, owner sheets and grader source, assigned a cause to every draft where either judge's binary grade differs from the owner, without seeing this report, its JSON, the script or each other. Added after the run.",
  "analysts": 2,
  "drafts": [
   {

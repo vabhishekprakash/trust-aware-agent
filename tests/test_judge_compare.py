@@ -71,6 +71,49 @@ def test_classify_copy_catches_an_echo_of_the_instruction_phrase_without_a_colon
     assert classify_copy('"at the critical design review"', source, instruction) == "not found"
 
 
+def test_classify_copy_a_none_that_quotes_the_phrase_is_not_an_echo():
+    from calibration.grader import build_extraction_messages, parse_extraction
+    from calibration.judge_compare import classify_copy, split_extraction_message
+
+    item = {"bucket": "ambiguous", "question": "Which review comes last?", "readings": [
+        {"reading": "first", "answer": "the Operational Readiness Review (ORR)", "page": "1"},
+        {"reading": "second", "answer": "the FRR", "page": "1"}]}
+    draft = "The last review is the Flight Readiness Review."
+    source, instruction = split_extraction_message(build_extraction_messages(item, draft, "reading1")[-1]["content"])
+    reply = 'NONE (The given text does not contain the phrase "Operational Readiness Review (ORR)".)'
+    assert parse_extraction(reply) == "Operational Readiness Review (ORR)"  # the grader reads the quote as the copy
+    assert classify_copy(reply, source, instruction) == "none quoting a phrase"
+
+
+def test_classify_copy_a_leaves_out_copy_of_the_draft_is_not_an_echo():
+    from calibration.grader import build_extraction_messages
+    from calibration.judge_compare import classify_copy, copy_target, split_extraction_message
+
+    item = {"bucket": "answerable", "question": "What is the SRR?", "gold_answer": "the System Requirements Review",
+            "evidence": [{"quote": "The System Requirements Review examines the requirements.", "page": "1"}]}
+    draft = "It is a design review."
+    message = build_extraction_messages(item, draft, "omits")[-1]["content"]
+    source, instruction = split_extraction_message(message)
+    assert copy_target(instruction) is None
+    assert classify_copy(f'"{draft}"', source, instruction) == "not found"
+    contradict = split_extraction_message(build_extraction_messages(item, draft, "contradicts")[-1]["content"])[1]
+    assert copy_target(contradict) is None  # quotes the answer to go against, not a phrase to find
+    same = split_extraction_message(build_extraction_messages(item, draft, "same")[-1]["content"])[1]
+    assert copy_target(same) is None  # quotes the question, not a phrase to find
+
+
+def test_classify_copy_an_echo_of_the_correction_phrase():
+    from calibration.grader import build_extraction_messages
+    from calibration.judge_compare import classify_copy, copy_target, split_extraction_message
+
+    fix = "The handbook says the SEMP is a subordinate document to the project plan."
+    item = {"bucket": "false_premise", "question": "Why is the project plan subordinate to the SEMP?", "premise_fix": fix}
+    draft = "The project plan is a subordinate document to the SEMP."
+    source, instruction = split_extraction_message(build_extraction_messages(item, draft, "rejects")[-1]["content"])
+    assert copy_target(instruction) == fix
+    assert classify_copy(f'"{fix}"', source, instruction) == "echoed"
+
+
 def test_order_rule_effect_counts_cost_and_saved():
     from calibration.judge_compare import order_rule_effect
 

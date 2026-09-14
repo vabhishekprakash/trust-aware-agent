@@ -1134,7 +1134,9 @@ blind labels. This entry is written and committed before any call to the
 second judge. It touches no test item and refits nothing.
 
 Design. The 85 drafts on the three blind sheets (84 carry a hand label;
-sheet 1, draft 1 was never graded) are regraded with grader v13 unchanged
+sheet 1, draft 1 was never graded [note added after the run: the owner
+did grade it; its grade line is indented and the sheet reader skips it])
+are regraded with grader v13 unchanged
 (src/calibration/grader.py SHA-256 a2eb938e...), same prompts, same
 parser, same 200-token cap, seed 42, temperature 0, num_ctx 4096, with
 mistral:latest (Mistral 7B Instruct, Q4_K_M) as the judge. Inputs are
@@ -1167,7 +1169,10 @@ reading recovers a yes or no for every question: markdown stripped,
 or the line after it), truncated (the reply stopped at the 200-token cap
 before answering), or task (a complete reply that answers no recoverable
 question). Independent readers then classify the same replies without
-seeing the code's category, and disagreements are reported. A diagnostic
+seeing the code's category, and disagreements are reported. (Note added
+after the run: these readers were model-run, language-model agents and
+not people, as were the analysts, verifier and critic named in the
+result entry below.) A diagnostic
 regrade, labelled as such and never the headline, reruns only the
 unreadable drafts with the lenient reading and a 600-token cap, in the same
 pass. If the unreadable replies are format or truncation and the
@@ -1190,25 +1195,110 @@ replayed from the cache reproduced all 85 committed grades exactly, with
 no live call, so both judges saw identical inputs. By the reading rule
 fixed before the run, Mistral agrees with the owner about as well as
 llama3.1 on the final sheet (18 of 20 against 19 of 20), which supports
-rubric over model. Pooled over 84 labelled drafts the paired difference is
-+4.8 points [+1.2, +9.5], with three of Mistral's four extra errors on the
+rubric over model. [That reading is withdrawn in the next entry.] Pooled
+over 84 labelled drafts the paired difference is +4.8 points
+[+1.2, +9.5], with three of Mistral's four extra errors on the
 home-advantage sheets. Format did not fail (69 of 70 replies parsed; the
 one unreadable reply was a hedged non-answer, a task failure by the code
-and by three blind readers). The copy-the-words check did carry
-llama3.1's conventions: Mistral echoed the instruction's phrase on 7 calls
-against llama3.1's 1, costing it one grade.
+and by three model-run readers, language-model agents and not people).
+[The critic called "hedged non-answer" an overstatement; the reply gives
+no yes or no to one of three questions. Fixed in both reports.]
+The copy-the-words check did carry llama3.1's conventions: Mistral echoed
+the instruction's phrase on 7 calls against llama3.1's 1, costing it one
+grade. [Recounted in the next entry: 2 distinct requests against 0.]
 
-Added after the run, and labelled as such in the report: a cause rule in
-the script, a blind reading of the 19 parsed answer lines with added
-words, two blind analysts assigning causes to the 7 misgraded drafts, an
-independent recount of every per-sheet number (all matched), and a critic
-review of the first rendering. The analysts agreed with each other on all
-7 drafts and with the script's rule on 5; the report follows the analysts
-where they differ, because the rule assumed that an error both judges make
-belongs to the rubric, and on one shared draft both judges simply
-misjudged. The critic found 26 defects in the first rendering. The worst
-was an echo-count pattern that required a colon and missed the shape
-'give "X" as the answer', so the first rendering said echoing was not a
-Mistral habit; the corrected count is 7 against 1, the pattern now has a
-test, and every defect was addressed before the result was written into
-docs/report.md.
+Added after the run, and labelled as such in the report, were a cause
+rule in the script and a model-run reading of the 19 parsed answer lines
+with added words. Also added were two model-run analysts assigning causes
+to the 7 misgraded drafts, and a model-run verifier's recount of the
+per-sheet counts, binary agreement and misgraded drafts (all matched).
+Last came a model-run critic's review of the first rendering. Every one
+of these readers, analysts, the verifier and the critic was a
+language-model agent, not a person. The
+analysts agreed with each other on all 7 drafts and with the script's
+rule on 5; the report follows the analysts where they differ, because the
+rule assumed that an error both judges make belongs to the rubric, and on
+one shared draft both judges simply misjudged. The critic found 26
+defects in the first rendering. The worst was an echo-count pattern that
+required a colon and missed the shape 'give "X" as the answer', so the
+first rendering said echoing was not a Mistral habit; the corrected count
+is 7 against 1, the pattern now has a test, and every defect was
+addressed before the result was written into docs/report.md. [Corrected
+in the next entry: the critic flagged the sentence but repeated the
+undercount, the colon turned up while its objection was being fixed, and
+7 against 1 was itself too high.]
+
+## Post hoc: how the second judge's result is described, 2026-09-13
+
+The owner read the post hoc report and made four corrections to how it is
+described. Two rounds of model-run checks on those corrections then found
+that several committed statements were wrong, so this entry records both.
+The agreement figures and intervals did not change.
+
+1. The headline no longer says the result supports rubric over model. The
+   pooled paired difference, +4.8 points [+1.2, +9.5], excludes zero, so
+   judge choice measurably mattered. The report now leads with what the
+   experiment cannot do at this size. It cannot separate a real judge
+   difference from llama3.1's harness advantage: three of Mistral's four
+   extra errors fall on the tuned sheets, and the fourth was taken by the
+   copy check. The pre-registered rule is still applied and its reading,
+   about as well, is still reported. The report states that it departs
+   from the rule's interpretation, and why. The claim kept from the overlap
+   is weaker than first written. Mistral misgrades all three drafts
+   llama3.1 misgrades, but a code rule decided one of them (sheet 1,
+   draft 34) before any judge saw it. Only the other two are judge errors
+   that recur under Mistral, so llama3.1's judged errors are not peculiar
+   to llama3.1. That does not show the rubric is sound or that the shared
+   errors are the rubric's.
+2. The readers, analysts, verifier and critic were language-model agents
+   run in a workflow, not people. Every place they appear now says so,
+   in the post hoc report, its JSON check files (a run_by field), the main
+   report and this log. A reader coming from the three human blind checks
+   would otherwise assume these were human too.
+3. The echo count joins the main report's measurement-integrity section.
+   The owner asked for a sixth entry: the colon bug had already put a
+   false claim into a draft, the same class as lp_tokens. The checks in
+   item 5 then showed the committed recount was an overcount, a second
+   false claim of the same class that did reach a commit. That became a
+   seventh entry, so the section and the layman guide say seven. This
+   departs from the owner's "six", which was set before the overcount was
+   known; folding entry 7 into entry 6 would restore six.
+4. Harness lock-in has its own named subsection in the post hoc report and
+   the main report. Two kinds of copy instruction quote the phrase they
+   want found. The owner's correction quoted the committed count, 7 calls
+   against 1. Counted by distinct request, Mistral gave the phrase back on
+   2 of the 7 such instructions it met, and llama3.1 on 0 of 2. On
+   final-sheet draft 5 that turned a CORRECT into a PARTIAL. Mistral's
+   other echo, on sheet 2 draft 20, did no harm, because that draft never
+   states the correction. The finding is still the most transferable of
+   the experiment, and the report now says it rests on one request and one
+   grade.
+5. Two rounds of model-run reviewers checked these corrections, each
+   reviewer followed by a model-run agent told to refute its findings, all
+   language-model agents and not people. The first round's 15 surviving
+   findings are in reports/post-hoc-second-judge/corrections-verification.json,
+   and the later rounds' are in the same file under later_rounds. A third
+   round found only wording and test gaps. Substance, first
+   round: 4 of Mistral's 7 counted echoes were NONE replies that quote the
+   phrase, which the grader's parser reads as a copy, and llama3.1's 1 was
+   a leaves-out call that copied the draft. The overlap counted a draft no
+   judge saw. The critic had been credited with finding the colon bug,
+   which its committed review does not show. Substance, second round: the
+   recount's denominators, 13 and 10, included instructions that quote an
+   answer to go against, and the sheet 2 draft 20 echo had been described
+   as a missed copy. The classifier now checks for NONE first and counts
+   only the two find-shaped instructions. There is a test for each of the
+   five instruction shapes that quote something, and for a NONE that
+   quotes a phrase.
+6. The rest, all fixed, were these. The verifier's scope was overstated,
+   and the critic was implied to be blind. Table labels said draft where
+   the text checked is the reference. The committed text said sheet 1
+   draft 1 was never graded, though the owner graded it on an indented
+   line the sheet reader skips. The integrity intro said errors were
+   caught before a committed result, which entry 4 contradicts. The main
+   report still said "hedged non-answer", and checks added after the run
+   were not all labelled so. A later sentence, "those reviews corrected
+   twice", gave the critic credit again. This entry first said three
+   committed statements were wrong, and called the refuting agents only
+   "an agent". The list of shapes left out the question-quoting one, and
+   several sentences ran too long.

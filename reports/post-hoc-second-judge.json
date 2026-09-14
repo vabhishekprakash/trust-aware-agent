@@ -541,16 +541,10 @@
    },
    "copy_replies": {
     "copied": 30,
-    "not found": 8,
-    "none": 11,
-    "echoed": 1
+    "not found": 9,
+    "none": 11
    },
-   "echo_drafts": [
-    {
-     "sheet": "sheet1",
-     "sheet_no": 31
-    }
-   ]
+   "echo_drafts": []
   },
   "mistral": {
    "answer_lines": {
@@ -560,10 +554,11 @@
     "YES or NO with added words, not all capitals": 3
    },
    "copy_replies": {
-    "echoed": 7,
+    "echoed": 3,
     "copied": 37,
     "none": 8,
-    "not found": 2
+    "not found": 2,
+    "none quoting a phrase": 4
    },
    "echo_drafts": [
     {
@@ -573,22 +568,6 @@
     {
      "sheet": "final",
      "sheet_no": 5
-    },
-    {
-     "sheet": "sheet1",
-     "sheet_no": 38
-    },
-    {
-     "sheet": "sheet1",
-     "sheet_no": 38
-    },
-    {
-     "sheet": "sheet2",
-     "sheet_no": 9
-    },
-    {
-     "sheet": "sheet2",
-     "sheet_no": 10
     },
     {
      "sheet": "sheet2",
@@ -614,6 +593,121 @@
   "p90_output_tokens": 59
  },
  "single_model_guard": "cmd_run read Ollama's loaded models after every draft and would have stopped if any model other than mistral:latest was loaded; the run log ends with exit 0",
+ "harness_lock_in": {
+  "mistral": {
+   "calls": 54,
+   "requests": 41,
+   "requests_quoting_a_phrase_to_find": 7,
+   "echo_calls": 3,
+   "echo_requests": 2,
+   "echoes": [
+    {
+     "sheet": "final",
+     "sheet_no": 5,
+     "cached": false,
+     "phrase": "just prior to the PDR",
+     "reply": "\"just prior to the PDR\""
+    },
+    {
+     "sheet": "final",
+     "sheet_no": 5,
+     "cached": true,
+     "phrase": "just prior to the PDR",
+     "reply": "\"just prior to the PDR\""
+    },
+    {
+     "sheet": "sheet2",
+     "sheet_no": 20,
+     "cached": false,
+     "phrase": "The handbook says the SEMP is a subordinate document to the project plan, not the other way round.",
+     "reply": "\"The handbook says the SEMP is a subordinate document to the project plan, not the other way round.\""
+    }
+   ],
+   "none_quoting_a_phrase": [
+    {
+     "sheet": "sheet1",
+     "sheet_no": 38,
+     "cached": false,
+     "phrase": "the Operational Readiness Review (ORR)",
+     "reply": "NONE (The given text does not contain the phrase \"Operational Readiness Review (ORR)\".)"
+    },
+    {
+     "sheet": "sheet1",
+     "sheet_no": 38,
+     "cached": false,
+     "phrase": "the Post-Launch Assessment Review (PLAR)",
+     "reply": "NONE (The given text does not contain the phrase \"Post-Launch Assessment Review (PLAR)\".)"
+    },
+    {
+     "sheet": "sheet2",
+     "sheet_no": 9,
+     "cached": false,
+     "phrase": "the Center Director or designee",
+     "reply": "NONE (The given text does not contain the specific phrase \"the Center Director or designee\".)"
+    },
+    {
+     "sheet": "sheet2",
+     "sheet_no": 10,
+     "cached": false,
+     "phrase": "all of its specified requirements",
+     "reply": "NONE (There are no exact words in the given text that specify \"all of its specified requirements.\")"
+    }
+   ]
+  },
+  "llama3.1": {
+   "calls": 50,
+   "requests": 33,
+   "requests_quoting_a_phrase_to_find": 2,
+   "echo_calls": 0,
+   "echo_requests": 0,
+   "echoes": [],
+   "none_quoting_a_phrase": []
+  },
+  "requests_both_judges_met": [
+   {
+    "sheet": "final",
+    "sheet_no": 5,
+    "llama3.1": [
+     "copied"
+    ],
+    "mistral": [
+     "echoed"
+    ]
+   },
+   {
+    "sheet": "sheet2",
+    "sheet_no": 10,
+    "llama3.1": [
+     "copied"
+    ],
+    "mistral": [
+     "copied"
+    ]
+   }
+  ],
+  "costly": [
+   {
+    "sheet": "final",
+    "sheet_no": 5,
+    "phrase": "just prior to the PDR",
+    "mistral_copied": "\"just prior to the PDR\"",
+    "llama_copied": "\"Just prior to the Preliminary Design Review (PDR).\"",
+    "owner": "CORRECT",
+    "llama_grade": "CORRECT",
+    "mistral_grade": "PARTIAL",
+    "draft": "The Technology Maturity Assessment (TMA) is performed at two key points in the life cycle: initially, as a baseline maturity of the system's required technologies at program/project outset; and secondly, just prior to the Preliminary Design Review (PDR)."
+   }
+  ],
+  "echoes_that_cost_nothing": [
+   {
+    "sheet": "sheet2",
+    "sheet_no": 20,
+    "source": "The NASA Systems Engineering Handbook states that while the project plan is a subordinate document to the System Engineering Management Plan (SEMP), it can define specific project-specific tasks and activities not covered by the broader SEMP."
+   }
+  ],
+  "note": "echo: the reply gives back the phrase the instruction quotes as the thing to find (give \"X\" as the answer, or state this correction: \"X\"), and that phrase is not in the text checked. A reply opening with NONE that quotes a phrase in its explanation is counted apart; an earlier version of the classifier counted it as an echo."
+ },
+ "who_ran_the_checks": "The owner's labels are the only human judgement. The readers, analysts, verifier and critic were language-model agents, not people.",
  "run": {
   "judge": "mistral:latest",
   "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
@@ -657,7 +751,8 @@
   "live_calls": 0
  },
  "independent_classification": {
-  "method": "Three readers, each given only the entries below (the question and Mistral's text), classified them independently without seeing the code's categories, the grades or each other. Added after the run for the answer lines; planned before the run for unreadable replies.",
+  "run_by": "three language-model agents, not people",
+  "method": "Three model-run readers (language-model agents, not people), each given only the entries below (the question and Mistral's text), classified them independently without seeing the code's categories, the grades or each other. Added after the run for the answer lines; planned before the run for unreadable replies.",
   "readers": 3,
   "entries": [
    {
@@ -1043,7 +1138,8 @@
   ]
  },
  "independent_attribution": {
-  "method": "Two analysts, each reading only the committed records, call logs, owner sheets and grader source, assigned a cause to every draft where either judge's binary grade differs from the owner, without seeing this report, its JSON, the script or each other. Added after the run.",
+  "run_by": "two language-model agents, not people",
+  "method": "Two model-run analysts (language-model agents, not people), each reading only the committed records, call logs, owner sheets and grader source, assigned a cause to every draft where either judge's binary grade differs from the owner, without seeing this report, its JSON, the script or each other. Added after the run.",
   "analysts": 2,
   "drafts": [
    {
@@ -1168,6 +1264,7 @@
   ]
  },
  "verification": {
+  "run_by": "a language-model agent, not a person",
   "method": "I wrote a standalone Python script in the session scratchpad, outside the repo, and ran it with the repo's .venv Python. It uses only json, re and collections, and imports nothing from src/ or scripts/. For each sheet file it scans lines in order: a line matching \"### <n>\" sets the current draft, and the next line that starts with \"grade:\" gives that draft's grade, taken as the first whitespace-separated token after \"grade:\", or empty if there is none. Only CORRECT, PARTIAL and WRONG count as labelled. No draft had two grades and there were no odd values. First-judge and second-judge records are keyed by sheet_no (the second judge is filtered by its sheet field). I checked that each file has unique sheet_nos, that both judges cover the same sheet_nos, and that item_ids match between the two judges for every draft. Binary label is 1 if the grade is CORRECT, else 0. drafts is the number of first-judge records. judged counts decided_by == \"judge\". Agreement and the wrong lists compare each judge's binary label with the human's on labelled drafts only. judges_agree_all_drafts compares the two judges on every draft. mistral_unparsed counts second-judge records on that sheet with flag == \"judge_unparsed\". One caveat on sheet1: draft 1's grade line is indented four spaces (\"    grade:CORRECT\"), as are its question, reference and draft lines. Read literally, that line does not start with \"grade:\", so draft 1 is unlabelled and sheet1 has 39 labelled drafts. The figures reported use that reading. If the indentation is stripped, draft 1 is human CORRECT, and both judges also gave CORRECT. Sheet1 would then read labelled 40, llama_agree 39, mistral_agree 37 -> 38, and the wrong lists would not change. The other two sheets have exactly one \"grade:\" line per draft header.",
   "sheets": [
    {
@@ -1223,6 +1320,32 @@
     "mistral_unparsed": 1
    }
   ]
+ },
+ "corrections_verification": {
+  "run_by": "language-model agents, not people",
+  "reviewed": "the owner's four corrections to reports/post-hoc-second-judge.md, docs/report.md, docs/decisions.md and docs/layman-guide.md, before commit",
+  "method": "Three model-run reviewers (language-model agents, not people), read only, each followed by a model-run agent told to refute its findings: a disclosure sweep of every mention of the model-run checks, a check of the corrections against the owner's words, and a recount of every number in the changed prose from the raw call logs with the reviewer's own code. Not blind to the report: reading it was the job.",
+  "confirmed": 15,
+  "refuted": 5,
+  "later_rounds": [
+   {
+    "round": 2,
+    "run_by": "language-model agents, not people",
+    "reviewed": "the text after the first round's fixes, before commit",
+    "method": "Two model-run reviewers, a recount from the raw logs with the reviewer's own code and a claims and disclosure check, each followed by a model-run agent told to refute its findings.",
+    "confirmed": 12,
+    "refuted": 10
+   },
+   {
+    "round": 3,
+    "run_by": "language-model agents, not people",
+    "reviewed": "the text after the second round's fixes, before commit",
+    "method": "Two model-run reviewers, a recount from the raw logs with the reviewer's own code and a claims and disclosure check, each followed by a model-run agent told to refute its findings.",
+    "confirmed": 7,
+    "refuted": 4
+   }
+  ],
+  "later_confirmed": 19
  },
  "verification_mismatches": []
 }
