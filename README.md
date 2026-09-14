@@ -6,7 +6,6 @@ showing it. When that probability is low it verifies, asks a clarifying
 question, or hands the case to a person, and every score comes with a
 plain-language breakdown of the signals behind it.
 
-Built for L&T Technology Services problem statement Tech2607 (Techgium).
 
 ![Demo: a confident answer with its capped confidence, an escalated one, and the explanation panel](docs/assets/demo.gif)
 
