@@ -648,6 +648,27 @@ show the counts alongside the rates, and the text must say the ambiguous
 numbers are indicative only. q0125 stays in the bucket: two versions of a
 plan is a real split.
 
+## Retriever built; top-k measured on dev, 2026-09-10
+
+The index is bge-small-en-v1.5 vectors in a flat FAISS index over the 773
+chunks (docs/explanations/02-retriever.md, src/agent/retriever.py,
+scripts/build_index.py). Embedding the corpus took 127 s on the CPU. The
+vectors live in data/index/, which is gitignored and rebuilt by script; the
+loader refuses a saved index whose chunk ids differ from chunks.jsonl.
+
+scripts/retrieval_recall.py measured, on the 100 dev items only, how often a
+chunk holding the evidence quote sits in the top k. Every evidence quote
+was found in some chunk. Recall at k without neighbours: 1 gives 49
+percent, 3 gives 63, 5 gives 70, 8 gives 77, 10 gives 79. With one
+neighbouring chunk on each side: 3 gives 71, 5 gives 77, 8 gives 80, 10
+gives 82. Per bucket at k of 8 without neighbours: answerable 38 of 46,
+ambiguous 8 of 9, false premise 17 of 20, unanswerable 14 of 25 (for
+unanswerable items the target is the closest passage, which the agent does
+not need in order to abstain). Average context per question: about 190
+words per chunk, so 1,500 words at k of 8 and 2,350 words at k of 5 with
+neighbours; tokens run about 1.3 times words. The choice of k is the
+owner's; the numbers are recorded here so it is made from measurement.
+
 ## M2 must implement CLARIFY and ABSTAIN as real actions
 
 On the grader check the model under test scored 0 of 4 on ambiguous items

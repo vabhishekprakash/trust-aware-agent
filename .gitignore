@@ -38,3 +38,4 @@ data/corpus/*.pdf
 scripts/demo/videos/
 test-results/
 *.webm
+data/index/
