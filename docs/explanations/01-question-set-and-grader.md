@@ -9,17 +9,17 @@ states the answer, recorded with its page. Ambiguous: two readings that the
 handbook answers differently, so the right move is to ask which is meant.
 Unanswerable: it sounds like a handbook question, but the handbook never
 says. False premise: it assumes something the handbook contradicts, and the
-right move is to say so. The last two exist because an agent never asked the
-impossible never has to admit uncertainty, and that admission is the point.
+right move is to say so. The last two exist because an agent that is never
+asked the impossible never has to admit uncertainty, which is the point.
 
 The grader is the rule that decides whether an answer was right. Free text
 cannot be compared letter by letter: "the Program Manager" and "the manager
-of the program" are the same answer. So the grader works in stages: a cheap
-exact check, then a check for a refusal or a clarifying question, then a
-language model reading the answer against the gold answer with a fixed
-rubric. Its verdicts feed the calibrator as ones and zeros. A lenient grader
-makes the agent look better calibrated than it is, a harsh one worse, which
-is why the owner signs off on twenty graded examples before any large run.
+of the program" are the same answer. So the grader has stages: a check for
+a refusal or a clarifying question, a cheap exact match, and only then a
+language model that answers fixed yes-or-no questions about the draft. A
+rule turns those answers into a grade, and the grades feed the calibrator
+as ones and zeros. A lenient grader makes the agent look better calibrated
+than it is, a harsh one worse, so the owner signs off on the examples first.
 
 A common misconception: a bigger question set fixes a bad grader. It does
 not. It produces more wrong labels, faster.

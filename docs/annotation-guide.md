@@ -2,7 +2,7 @@
 
 How the labeled question set is written, and how an answer is marked right or
 wrong. Nothing in data/eval is labeled until the grader described here has
-been signed off by the owner on twenty worked examples.
+been signed off by the owner on the worked examples.
 
 The corpus is the NASA Systems Engineering Handbook (NASA/SP-2016-6105 Rev 2).
 Every label below means "according to the handbook", never "according to the
@@ -95,28 +95,83 @@ binary label, 1 or 0, which is what the calibrator trains on.
 
 The grader runs in stages, and the first stage that reaches a decision wins.
 
-Stage 1, normalise. Lowercase, strip punctuation and articles, collapse
-whitespace, and write numbers in one canonical form so that "1,000", "1000"
-and "one thousand" compare equal.
+Stage 1, normalise. Lowercase, strip punctuation, collapse whitespace, and
+drop the thousands separators in numbers so that "1,000" and "1000" compare
+equal. The articles "the" and "an" are stripped anywhere, and "a" only at the
+start of the text. Elsewhere the letter A is kept, because "Phase A", "KDP A"
+and "Appendix A" are labels in this handbook and stripping it would turn
+"Phase A" into "phase".
 
-Stage 2, classify the form of the draft. A draft is an ABSTAIN if it says the
-handbook does not contain the answer, a CLARIFY if it asks the user a question
-instead of answering, and an ANSWER otherwise. A short list of patterns
-handles the clear cases; the judge in stage 4 decides the unclear ones.
+Stage 2, classify the form of the draft. A draft is a CLARIFY if it ends with
+a question mark and contains a clarifying cue such as "do you mean" or "which
+of these". Otherwise it is an ABSTAIN if it says the handbook does not contain
+the answer, and a CLARIFY again if the whole draft is one short question.
+Anything else is an ANSWER. The patterns handle the clear cases; the judge in
+stage 4 reads the unclear ones. On the unanswerable and false-premise buckets
+the rules accept an ABSTAIN only when it is the whole draft, one sentence. A
+longer draft may abstain and then speculate, or build on the premise anyway,
+so it goes to the judge.
 
 Stage 3, exact check. For an ANSWER draft with a gold answer, if the
-normalised draft equals the gold answer or an alias, or contains it and is
-under 30 words, the grade is CORRECT and no model is called. Longer drafts go
-to the judge, because a long draft can contain the right answer and a
-contradicting one.
+normalised draft equals the gold answer or an alias, the grade is CORRECT and
+no model is called. The same holds if the draft is under 30 words and contains
+the gold answer or an alias. A negation or a choice next to it ("12, not 17";
+"17 or 12") cancels that, and the judge reads the draft. Longer drafts go to
+the judge, because a long draft can contain the right answer and a
+contradicting one. An ABSTAIN draft on an answerable item that still names
+the gold answer also goes to the judge.
 
-Stage 4, judge. A language model reads the question, the gold answer and its
-aliases (or the readings, or the premise fix), the evidence quote, and the
-draft. It returns exactly one of CORRECT, PARTIAL, WRONG and a one-sentence
-reason. The prompt is fixed and versioned, temperature is zero, the seed is
-fixed, and every call is cached, so grading is repeatable. The judge sees the
-evidence quote so that it grades against the handbook and not against its own
-memory.
+Stage 4, judge. A language model reads the question, the evidence quote, the
+draft, and the reference material for the bucket. That material is the gold
+answer and its aliases, the two readings and their answers, or the premise
+correction. It does not choose a grade. It answers a fixed list of yes-or-no questions about
+what the draft does, and code maps the answers to a grade.
+
+    bucket          questions the judge answers about the draft
+    answerable      gives the same answer? states a different or contradicting one?
+                    leaves out a part that carries meaning?
+    ambiguous       asks which reading is meant? gives the answer for reading 1?
+                    for reading 2?
+    unanswerable    gives a specific answer, figure, name or date? says the
+                    handbook does not contain the answer?
+    false_premise   says the assumption is wrong or states the correction?
+                    doubts it without correcting it? answers as if it were true?
+
+    bucket          mapping from answers to grade
+    answerable      a different answer: PARTIAL if the right one is there too,
+                    else WRONG. A part left out: PARTIAL. The same answer and
+                    nothing against it: CORRECT. Otherwise WRONG.
+    ambiguous       asks which reading, or answers both: CORRECT. Answers one:
+                    PARTIAL. Neither: WRONG.
+    unanswerable    says there is no answer and gives none: CORRECT. Gives one
+                    while saying so: PARTIAL. Gives one: WRONG. Neither: WRONG.
+    false_premise   rejects or doubts the assumption and does not answer on it:
+                    CORRECT. Rejects or doubts it but still answers on it:
+                    PARTIAL. Answers on it: WRONG. Neither: WRONG.
+
+Where a question is about a specific piece of text, the answer for a reading
+or the premise correction, that text is quoted in the question. For the
+answerable bucket the gold answer is not quoted, because quoting it made the
+judge match strings instead of meaning. The prompt is fixed and versioned,
+temperature is zero, the seed is fixed, and every call is cached, so grading
+is repeatable. The judge sees the evidence quote so that it reads against the
+handbook and not against its own memory.
+
+Why questions rather than a grade: the first two versions of the grader asked
+the local judge for CORRECT, PARTIAL or WRONG directly. On the unanswerable and
+false-premise buckets it graded the question instead of the draft. Adding
+three words to the prompt flipped a correct clarifying question from CORRECT
+to PARTIAL in both orders. Narrow reading questions were answered steadily.
+The worked examples were run under all three versions and the report shows
+them side by side.
+
+The judge runs twice for every draft it sees: once with the reference before
+the candidate, and once with the candidate before the reference. Language
+model judges are sensitive to position, and running both orders measures
+that. If the two grades differ, the stricter one is used, the record is
+flagged for the owner's review, and the flip rate is reported. A reply the
+parser cannot read is flagged, graded WRONG, and counts as label 0 until a
+person reads it.
 
 Stage 5, the partial rule. PARTIAL becomes label 0. An answer that is half
 right is one a user would act on and be misled by, so it counts as a failure
@@ -137,10 +192,13 @@ the grader, the owner's verdict replaces it and the record says so.
     ambiguous       ANSWER          CORRECT if it covers both readings, PARTIAL if one
     ambiguous       ABSTAIN         WRONG
     unanswerable    ABSTAIN         CORRECT
-    unanswerable    ANSWER          WRONG, even if the claim happens to be true elsewhere
+    unanswerable    ANSWER          WRONG, even if the claim happens to be true elsewhere;
+                                    PARTIAL if it also says the handbook has no answer
     unanswerable    CLARIFY         WRONG
     false_premise   ABSTAIN         CORRECT; better still if it states the correction
-    false_premise   ANSWER          CORRECT if it rejects the premise, WRONG if it builds on it
+    false_premise   ANSWER          CORRECT if it rejects the premise, PARTIAL if it
+                                    rejects or doubts it but still answers on it,
+                                    WRONG if it builds on it
     false_premise   CLARIFY         WRONG unless the question exposes the false premise
 
 An abstention on an answerable question is a miss for correctness. Coverage,
@@ -151,20 +209,33 @@ caution twice.
 ### What every grade record stores
 
     grader_version   version string of the rules and the judge prompt
+    form             ANSWER | ABSTAIN | CLARIFY
     decided_by       exact | rules | judge | human
     grade            CORRECT | PARTIAL | WRONG
     label            1 | 0
     judge_model      model name, when the judge ran
-    judge_output     the raw judge reply, when the judge ran
+    judge_grades     the two grades, reference first then candidate first
+    judge_answers    the two sets of yes-or-no answers, keyed by question
+    judge_outputs    the two raw judge replies
+    flag             null | position_disagreement | judge_unparsed
+    machine_grade    the grade before a human override, when one was applied
     reason           one sentence
 
 ## Review procedure
 
-Before mass labelling, twenty worked examples are graded and shown to the
-owner: real questions from the handbook with hand-written drafts that are
-plainly correct, plainly wrong, partial, and borderline, spread across the
-four buckets. The owner signs off on the rules or changes them. The sign-off
-and any changes are recorded at the end of this file with the date.
+Before mass labelling, twenty-one worked examples are graded and shown to the
+owner. They are real questions from the handbook with hand-written drafts
+that are plainly correct, plainly wrong, partial, and borderline, spread
+across the four buckets. They live in data/eval/grader_examples.jsonl, and
+scripts/grade_examples.py writes the report to reports/. The owner signs off
+on the rules or changes them. The sign-off and any changes are recorded at
+the end of this file with the date.
+
+Before the agent's drafts on the dev set are graded in bulk, the owner
+hand-labels 40 of them without seeing the judge's verdicts. Agreement between
+the owner and the judge on those 40 goes into the final report as a
+limitation, whatever the number is. If agreement is below about 90 percent,
+the grader is fixed and re-checked before the remaining drafts are graded.
 
 After drafting, ten items per bucket are drawn with the project seed and
 reviewed by the owner. Each is marked keep, fix, or drop. Fixes are applied
