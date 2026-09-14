@@ -109,6 +109,13 @@ the 100 test items land in a single bin.
 
 ![Reliability, dev and test, pooled and decisive](assets/reliability.png)
 
+The pooled reliability diagram is not informative as a curve. The
+probability distribution is too concentrated for a ten-bin diagram at
+this size, so most bins hold a handful of items or none, and the bin
+counts are printed on the figure for that reason. It is kept because a
+reader should see the concentration, not because the curve says anything
+about calibration.
+
 The preregistered band. Pooled and decisive AUROC point estimates fell
 inside the dev intervals. The policy risk at the frozen thresholds was
 above the base risk, and the preregistration defined that alone as
@@ -156,7 +163,7 @@ population above is the policy's real work.
 The usual expectation is that sampling-based uncertainty leads and that
 a richer vector beats a poorer one. Neither held here.
 
-| system (features) | dev pooled | test pooled | dev decisive | test decisive |
+| system (features) | dev pooled (post hoc, out of fold) | test pooled (preregistered) | dev decisive (post hoc, out of fold) | test decisive (preregistered) |
 |---|---|---|---|---|
 | verbalized confidence alone (3) | 0.58 [0.47, 0.66] | 0.67 [0.57, 0.75] | 0.37 [0.22, 0.55] | 0.48 [0.44, 0.50] |
 | sampling agreement alone (7) | 0.66 [0.57, 0.76] | 0.71 [0.60, 0.80] | 0.57 [0.37, 0.77] | 0.62 [0.42, 0.80] |
@@ -168,7 +175,9 @@ a richer vector beats a poorer one. Neither held here.
 On test the two smaller systems scored above the confirmed vector, with
 overlapping intervals. The free signals, computed from the trace at no
 cost, matched agreement, which costs 23 seconds of sampling per question.
-On dev the widest gap by label in the decisive stratum was lexical
+The dev columns for the three baselines were computed after the test
+read, out of fold with the same folds, for this side-by-side table only;
+the test columns are the preregistered numbers. On dev the widest gap by label in the decisive stratum was lexical
 support, the share of the answer's words found in the best retrieved
 chunk: 0.73 for correct answers against 0.49 for wrong ones.
 Verbalized confidence clustered at round numbers and inverted inside the
@@ -210,12 +219,16 @@ rejection is a judgement this model does not have at 3B. The step is
 off, behind a flag, and the full account is reports/premise-step.md. On
 test the bucket stayed at 0 of 20.
 
-## Measurement integrity: four numbers that looked better than they were
+## Measurement integrity: five errors caught by internal checks
 
-The grader, the item pool, the feature vector and a curve each produced
-one episode where a number improved for a reason unrelated to what it
-claimed to measure. They are reported together because the
-pattern is the same and a reader should expect more of it.
+Five times during this project a number was wrong or flattering for a
+reason unrelated to what it claimed to measure, and each time it was
+caught by a disagreement between two independent checks before it
+reached a claim: a rerun against a fixed reference, a second grading of
+the same drafts, a diagnostic that moved one feature at a time, a
+tie-aware recomputation of a curve, a strata query against the committed
+rows. Five instances make that a pattern of the process rather than an
+anecdote, and a reader should expect more of the same kind.
 
 1. The v9 judge question. A fourth yes-or-no question added to the judge
    produced YES on true statements and flipped three binary labels on
@@ -246,8 +259,15 @@ pattern is the same and a reader should expect more of it.
    no real threshold can reach. The tie-aware curve gave 49 [37, 60] to
    about 40 [26, 57] percent. The earlier figure was wrong and is
    recorded rather than deleted; the authors found it themselves.
+5. The confounder table. The first draft of this report's confounder
+   table used the pre-reserve dev figures for the unanswerable and
+   false-premise rows next to merged-dev figures for the answerable row.
+   A query of the committed feature rows disagreed with the table and
+   the rows were corrected to the merged 134 items throughout. The rule
+   since then is that every number in the report is traced to a committed
+   file by the script that reads it, and none is typed from memory.
 
-The test read adds a fifth entry of a different kind: the preregistered
+The test read adds an entry of a different kind: the preregistered
 audit ran regardless of band. Provenance held on every row and the
 split's seed and counts matched. Fifteen test items were flagged as
 near-duplicates of dev items, 14 by the same-evidence-page rule that
