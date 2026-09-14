@@ -639,6 +639,15 @@ item check and ambiguous calls stood in for it, and the owner locked on
 that basis. The test half is now read by exactly one script, once, at the
 end of M8, and nothing is tuned on it.
 
+## For the report: the ambiguous bucket is indicative only
+
+The owner's note on confirming the counts, kept here so it is not lost by
+M8: the ambiguous bucket has 9 dev and 9 test items. Any claim about
+clarification behaviour rests on that, so per-bucket tables at M8 must
+show the counts alongside the rates, and the text must say the ambiguous
+numbers are indicative only. q0125 stays in the bucket: two versions of a
+plan is a real split.
+
 ## M2 must implement CLARIFY and ABSTAIN as real actions
 
 On the grader check the model under test scored 0 of 4 on ambiguous items

@@ -308,8 +308,11 @@ final report says so.
 
 Genuinely ambiguous questions proved rare. The bucket ended at 18 items
 against a planned 40, after a dominant-reading pass and the owner's rulings
-removed items where one reading was what any reader would mean. Conclusions
-about clarification behaviour therefore rest on a small sample.
+removed items where one reading was what any reader would mean. That is 9
+dev items and 9 test items. Any claim about clarification behaviour rests
+on those, so every per-bucket table in the final report shows the counts
+next to the rates, and the text says the ambiguous numbers are indicative
+only.
 
 The grader's signed-off number is not any of the checks above. They gate
 mass grading. The figure the final report stands on is a last blind check
