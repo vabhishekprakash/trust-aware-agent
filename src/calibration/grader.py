@@ -10,16 +10,26 @@ and is recorded as such.
 
 The judge never chooses a grade. For each bucket it answers a short list of
 yes-or-no questions about what the candidate says, and code maps the answers
-to a grade. Where the question is about a specific piece of text (the answer
-for each reading, the premise correction) that text is quoted in the
-question; for the answerable bucket the gold answer is not quoted, because
-quoting it made the judge match strings instead of meaning. Earlier versions
-asked the judge for a grade directly. With llama3.1 8B that was unstable: it
-graded the question instead of the candidate on the unanswerable and
-false-premise buckets, and adding three words to the prompt flipped a correct
-clarifying question from CORRECT to PARTIAL in both orders. An abstract
-question ("does it reject the assumption?") was also answered against the
-judge's own written reason; the same question quoting the correction was not.
+to a grade. Judging and grounding are separate steps. Every YES must be
+backed by words from the candidate. When the candidate contains the claimed
+answer, an alias, or its acronym, code grounds the YES itself; otherwise the
+YES goes back to the judge as a copying task, "copy the exact words in this
+text that ...", and code checks that the copied words occur in the candidate
+(for the "leaves out" question, in the reference and not in the candidate)
+and, for the questions that claim the candidate gives an answer, that they
+name that answer. A YES that cannot be grounded becomes NO. Asking for the
+copy in the same breath as the question made the judge answer NO to plain
+paraphrases; asking afterwards keeps the judgement and adds the check. The
+check is what holds the two orders together: without it the judge said YES
+in candidate-first order to answers the draft never gave.
+
+Where a question is about a specific piece of text (the answer for each
+reading, the premise correction) that text is quoted in the question; for
+the answerable bucket the gold answer is not quoted, because quoting it made
+the judge match strings instead of meaning. The first versions asked the
+judge for a grade directly and were unstable: it graded the question instead
+of the candidate on two buckets, and adding three words to the prompt
+flipped a correct clarifying question from CORRECT to PARTIAL in both orders.
 """
 
 from __future__ import annotations
@@ -28,11 +38,13 @@ import copy
 import re
 from typing import Callable, Optional
 
-GRADER_VERSION = "grader-v3"
+GRADER_VERSION = "grader-v7"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
 EXACT_MAX_WORDS = 30
+QUOTE_WINDOW = 5
+QUOTE_COVERAGE = 0.8
 _STRICTNESS = {"CORRECT": 0, "PARTIAL": 1, "WRONG": 2}
 
 Judge = Callable[[list[dict]], str]
@@ -42,7 +54,7 @@ Judge = Callable[[list[dict]], str]
 _ARTICLES = re.compile(r"\b(the|an)\b|^a\b")
 _PUNCT = re.compile(r"[^\w\s]")
 _THOUSANDS = re.compile(r"(?<=\d),(?=\d{3}\b)")
-_QUOTES = str.maketrans({"\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"'})
+_QUOTES = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"'})
 _SENTENCE_BREAK = re.compile(r"(?<=[.!?])\s+")
 
 _ABSTAIN = re.compile(
@@ -51,7 +63,8 @@ _ABSTAIN = re.compile(
         (say|state|specify|mention|contain|provide|address|cover|give)\b
   | \bnot\s+(found|stated|specified|mentioned|covered|contained|provided|available|addressed|given)\b
   | \b(cannot|can't|could\s+not|couldn't|unable\s+to|not\s+able\s+to)\s+(find|locate|determine)\b
-  | \bno\s+(information|mention|reference|details?)\b
+  | \bno\s+(information|mention|reference|details?|statistics|figures?|numbers?|data|estimates?|costs?|dates?|guidance)\b
+  | \b(gives?|provides?|offers?|contains?|reports?|lists?|includes?)\s+no\b
   | \bnot\s+in\s+the\s+(handbook|document|text|corpus)\b
   | \bnot\s+answerable\b
   | \b(outside|beyond)\s+the\s+scope\b
@@ -71,9 +84,29 @@ _HEDGE = re.compile(
     r"\b(not|no|never|neither|nor|rather\s+than|instead\s+of|except|or|either|versus|vs)\b|n't\b",
     re.IGNORECASE,
 )
+# An abstention that goes on to name a figure, a date, or a thing (a proper
+# noun after the refusal phrase) may be a refusal carrying an invented answer,
+# so it goes to the judge instead of being ruled CORRECT.
+_FIGURE = re.compile(
+    r"\d"
+    r"|\b(?:million|billion|trillion|thousand|hundred|dozen|percent|half|twice|double|triple)s?\b"
+    r"|\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b",
+    re.IGNORECASE,
+)
+_PROPER = re.compile(r"[A-Z][A-Za-z0-9./&-]*")
+_TOKEN_TRIM = ".,;:!?()[]\"'"
+_STOPWORDS = {"the", "a", "an", "of", "in", "to", "and", "or", "for", "on", "by", "at", "is", "are", "with", "that", "it", "as", "from", "this"}
 
-_ANSWER_LINE = re.compile(r"\bQ(\d)\s*[:.)-]\s*(YES|NO)\b", re.IGNORECASE)
+# After YES or NO, skip ahead (without crossing a newline, a quote mark, or the
+# next "Qn") to an optional double-quoted copy; the copy is only used by tests
+# and by callers that ground answers themselves.
+_ANSWER_LINE = re.compile(
+    r"\bQ(\d)\s*[:.)-]\s*(YES|NO)\b(?:(?!\bQ\d\s*[:.)-])[^\n\"])*(?:\"([^\"\n]*)\")?",
+    re.IGNORECASE,
+)
 _REASON = re.compile(r"reason\s*:\s*(.+)", re.IGNORECASE | re.DOTALL)
+_QUOTED = re.compile(r'"([^"\n]+)"')
+_PARENTHESISED = re.compile(r"\(([^()]{2,24})\)")
 
 SYSTEM_PROMPT = (
     "You read a candidate answer to a question about the NASA Systems Engineering Handbook "
@@ -81,6 +114,11 @@ SYSTEM_PROMPT = (
     "are given. Do not use outside knowledge. Judge meaning, not wording. "
     "Reply in exactly the format requested."
 )
+EXTRACT_SYSTEM_PROMPT = (
+    "You copy words from a text. Reply only with the exact words, copied from the text, "
+    "in double quotes. If the text has no such words, reply NONE."
+)
+EXTRACT_MARK = "Copy the exact words in the text that"
 
 
 def normalise(text: str) -> str:
@@ -110,6 +148,27 @@ def classify_form(draft: str, hint: Optional[str] = None) -> str:
     return "ANSWER"
 
 
+def mentions_specifics(text: str) -> bool:
+    """True when the text names a figure, a date, or a capitalised thing mid-sentence."""
+    if _FIGURE.search(text):
+        return True
+    for index, sentence in enumerate(sentences(text)):
+        tokens = [t.strip(_TOKEN_TRIM) for t in sentence.split()]
+        tokens = [t for t in tokens if t]
+        # The first fragment continues the refusal sentence, so its first word is
+        # mid-sentence; every later fragment starts a sentence.
+        for token in tokens if index == 0 else tokens[1:]:
+            if token != "I" and _PROPER.fullmatch(token):
+                return True
+    return False
+
+
+def abstain_tail(draft: str) -> str:
+    """The text after the refusal phrase, or the whole draft if none is found."""
+    match = _ABSTAIN.search(draft.translate(_QUOTES))
+    return draft[match.end():] if match else draft
+
+
 def _targets(gold: Optional[str], aliases: list[str]) -> list[str]:
     if not gold:
         return []
@@ -137,6 +196,30 @@ def exact_match(draft: str, gold: Optional[str], aliases: list[str]) -> bool:
     return _contains_target(candidate, targets)
 
 
+def quote_in(text: str, quote: Optional[str]) -> bool:
+    """True when the quote's words occur in the text, after normalisation.
+
+    Short quotes must occur whole. Longer quotes count when at least
+    QUOTE_COVERAGE of their words sit inside runs of QUOTE_WINDOW consecutive
+    words that occur in the text, so a slip at the end of a long copied span
+    is tolerated but a quote that merely shares a phrase with the text is not.
+    """
+    if not quote:
+        return False
+    words = normalise(quote).split()
+    haystack = f" {normalise(text)} "
+    if not words:
+        return False
+    if len(words) <= QUOTE_WINDOW:
+        return f" {' '.join(words)} " in haystack
+    covered = [False] * len(words)
+    for i in range(len(words) - QUOTE_WINDOW + 1):
+        if f" {' '.join(words[i:i + QUOTE_WINDOW])} " in haystack:
+            for j in range(i, i + QUOTE_WINDOW):
+                covered[j] = True
+    return sum(covered) / len(words) >= QUOTE_COVERAGE
+
+
 def questions_for(item: dict) -> list[tuple[str, str]]:
     """The yes-or-no questions the judge answers for this item, as (key, text)."""
     bucket = item["bucket"]
@@ -161,7 +244,8 @@ def questions_for(item: dict) -> list[tuple[str, str]]:
         return questions
     if bucket == "unanswerable":
         return [
-            ("answers", "Does the candidate give a specific answer, figure, name, or date to the question?"),
+            ("answers", "Does the candidate offer any answer, figure, estimate, name, or date to the question, "
+                        "even a hedged or approximate one?"),
             ("abstains", "Does the candidate say that the handbook does not contain the answer, or that it could not find one?"),
         ]
     if bucket == "false_premise":
@@ -197,6 +281,36 @@ def grade_from_answers(bucket: str, answers: dict) -> str:
             return "PARTIAL" if a["builds"] else "CORRECT"
         return "WRONG"
     raise ValueError(f"unknown bucket {bucket!r}")
+
+
+def _tokens(text: str) -> set:
+    return set(normalise(text).split()) - _STOPWORDS
+
+
+def _reference_text(item: dict) -> str:
+    """The reference material a 'leaves out' quote must come from."""
+    bucket = item["bucket"]
+    if bucket == "answerable":
+        return " ".join([item.get("gold_answer") or ""] + list(item.get("gold_aliases") or []))
+    if bucket == "ambiguous":
+        return " ".join(r.get("answer", "") for r in item.get("readings", []))
+    return item.get("premise_fix", "") or ""
+
+
+def answer_tokens(item: dict, key: str) -> Optional[set]:
+    """Words a YES to an answer-bearing question must mention, or None when the question is not one."""
+    if key == "same":
+        return _tokens(_reference_text(item))
+    if key.startswith("reading"):
+        readings = item.get("readings") or []
+        index = int(key[len("reading"):]) - 1
+        mine = _tokens(readings[index]["answer"])
+        others = set()
+        for j, r in enumerate(readings):
+            if j != index:
+                others |= _tokens(r["answer"])
+        return (mine - others) or mine
+    return None
 
 
 def _evidence_block(item: dict) -> str:
@@ -249,21 +363,120 @@ def build_judge_messages(item: dict, draft: str, order: str) -> list[dict]:
     ]
 
 
+def _claim(item: dict, draft: str, key: str) -> str:
+    """What the copied words must do, for the grounding call, per question key."""
+    if key == "same":
+        return f'give the answer to the question "{item["question"]}"'
+    if key == "contradicts":
+        return f'state a different answer or contradict this answer: "{item.get("gold_answer", "")}"'
+    if key == "omits":
+        return f'are missing from this answer: "{draft}"'
+    if key == "flags":
+        return "ask which reading of the question is meant"
+    if key.startswith("reading"):
+        index = int(key[len("reading"):]) - 1
+        return f'give "{item["readings"][index]["answer"]}" as the answer, in any wording'
+    if key == "answers":
+        return "offer an answer, figure, estimate, name, or date to the question"
+    if key == "abstains":
+        return "say that the handbook does not contain the answer, or that it could not be found"
+    if key == "rejects":
+        return f'say that the question\'s assumption is wrong, or state this correction: "{item.get("premise_fix", "")}"'
+    if key == "doubts":
+        return "express doubt about the question's assumption"
+    if key == "builds":
+        return "answer the question as if its assumption were true"
+    raise ValueError(f"unknown question key {key!r}")
+
+
+def build_extraction_messages(item: dict, draft: str, key: str) -> list[dict]:
+    """The grounding call: copy from the candidate (or, for 'leaves out', from the reference)."""
+    source = _reference_text(item) if key == "omits" else draft
+    return [
+        {"role": "system", "content": EXTRACT_SYSTEM_PROMPT},
+        {"role": "user", "content": f"Text:\n{source}\n\n{EXTRACT_MARK} {_claim(item, draft, key)}. If there are none, reply NONE."},
+    ]
+
+
+def code_quote(item: dict, draft: str, key: str) -> Optional[str]:
+    """Words the draft itself supplies for an answer-bearing YES, or None when the judge must copy.
+
+    For "same" the candidates are the gold answer and its aliases; for a
+    reading, its answer and any parenthesised acronym in it. The first one
+    found in the draft settles the YES without a copying call.
+    """
+    if key == "same":
+        candidates = [item.get("gold_answer") or ""] + list(item.get("gold_aliases") or [])
+    elif key.startswith("reading"):
+        answer = item["readings"][int(key[len("reading"):]) - 1]["answer"]
+        candidates = [answer] + _PARENTHESISED.findall(answer)
+    else:
+        return None
+    for text in candidates:
+        text = text.strip()
+        if text and quote_in(draft, text):
+            return text
+    return None
+
+
+def parse_extraction(text: str) -> Optional[str]:
+    """The copied words from a grounding reply, or None for NONE or an unusable reply."""
+    text = text.translate(_QUOTES).strip()
+    match = _QUOTED.search(text)
+    if match:
+        return match.group(1).strip()
+    if not text or text.upper().startswith("NONE"):
+        return None
+    first = text.splitlines()[0].strip().strip("'")
+    return first if 0 < len(first.split()) <= 60 else None
+
+
 def _reason_of(text: str) -> str:
     match = _REASON.search(text)
     return match.group(1).strip().splitlines()[0].strip() if match else ""
 
 
-def parse_answers(keys: list[str], text: str) -> Optional[tuple[dict, str]]:
-    """Return ({key: bool}, reason), or None when any question went unanswered."""
-    found = {}
-    for number, answer in _ANSWER_LINE.findall(text):
+def parse_answers(keys: list[str], text: str) -> Optional[tuple[dict, str, dict]]:
+    """Return ({key: bool}, reason, {key: copied words}), or None when a question went unanswered."""
+    text = text.translate(_QUOTES)
+    found, quotes = {}, {}
+    for number, answer, quote in _ANSWER_LINE.findall(text):
         index = int(number) - 1
         if 0 <= index < len(keys) and keys[index] not in found:
             found[keys[index]] = answer.upper() == "YES"
+            if quote:
+                quotes[keys[index]] = quote.strip()
     if len(found) != len(keys):
         return None
-    return found, _reason_of(text)
+    return found, _reason_of(text), quotes
+
+
+def ground_answers(item: dict, draft: str, answers: dict, quotes: dict) -> tuple[dict, list[str]]:
+    """Turn every YES whose copied words cannot be verified into NO; return the keys that were turned.
+
+    The copied words must occur in the candidate (for "leaves out", in the
+    reference and not in the candidate). For the questions that claim the
+    candidate gives an answer ("same" and each reading) the copied words must
+    also mention that answer: a judge once backed "gives the SRR" with a copy
+    of the candidate's "Critical Design Review", which was in the draft but
+    was not the answer claimed.
+    """
+    grounded, ungrounded = dict(answers), []
+    for key, value in answers.items():
+        if not value:
+            continue
+        quote = quotes.get(key)
+        if key == "omits":
+            ok = quote_in(_reference_text(item), quote) and not quote_in(draft, quote)
+        else:
+            ok = quote_in(draft, quote)
+            must_mention = answer_tokens(item, key)
+            if ok and must_mention and not (_tokens(quote) & must_mention):
+                ok = False
+        if not ok:
+            grounded[key] = False
+            ungrounded.append(key)
+    return grounded, ungrounded
 
 
 def _label(grade: str) -> int:
@@ -278,15 +491,31 @@ def _decide(record: dict, decided_by: str, grade: str, reason: str) -> dict:
 def _run_judge(record: dict, item: dict, draft: str, judge: Judge) -> dict:
     bucket = item["bucket"]
     keys = [key for key, _ in questions_for(item)]
-    outputs, parsed = [], []
+    outputs, graded = [], []
     for order in ("reference_first", "candidate_first"):
         reply = judge(build_judge_messages(item, draft, order))
         outputs.append(reply)
-        parsed.append(parse_answers(keys, reply))
+        parsed = parse_answers(keys, reply)
+        if parsed is None:
+            record["judge_answers"].append(None)
+            record["judge_quotes"].append(None)
+            record["judge_ungrounded"].append(None)
+            record["judge_grades"].append(None)
+            continue
+        answers, reason, _ = parsed
+        quotes = {}
+        for key, value in answers.items():
+            if value:
+                known = code_quote(item, draft, key)
+                quotes[key] = known if known is not None else parse_extraction(judge(build_extraction_messages(item, draft, key)))
+        answers, ungrounded = ground_answers(item, draft, answers, quotes)
+        grade_ = grade_from_answers(bucket, answers)
+        record["judge_answers"].append(answers)
+        record["judge_quotes"].append(quotes)
+        record["judge_ungrounded"].append(ungrounded)
+        record["judge_grades"].append(grade_)
+        graded.append((grade_, reason))
     record["judge_outputs"] = outputs
-    record["judge_answers"] = [p[0] if p else None for p in parsed]
-    record["judge_grades"] = [grade_from_answers(bucket, p[0]) if p else None for p in parsed]
-    graded = [(g, p[1]) for g, p in zip(record["judge_grades"], parsed) if p]
 
     if len(graded) < 2:
         record["flag"] = "judge_unparsed"
@@ -317,6 +546,8 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
         "judge_model": getattr(judge, "model", None),
         "judge_grades": [],
         "judge_answers": [],
+        "judge_quotes": [],
+        "judge_ungrounded": [],
         "judge_outputs": [],
         "flag": None,
         "reason": "",
@@ -338,10 +569,10 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
             return _decide(record, "rules", "WRONG", "the handbook answers both readings; abstaining is a miss")
         return _run_judge(record, item, draft, judge)
 
-    # For the last two buckets the rules accept an abstention only when it is
-    # the whole draft (one sentence). A longer draft may abstain and then
-    # speculate or build on the premise anyway, so the judge reads it.
-    plain_abstain = form == "ABSTAIN" and len(sentences(draft)) == 1
+    # For the last two buckets the rules accept an abstention only when nothing
+    # specific follows the refusal phrase. A refusal that goes on to name a
+    # figure, a date, or a thing may carry an invented answer, so the judge reads it.
+    plain_abstain = form == "ABSTAIN" and not mentions_specifics(abstain_tail(draft))
 
     if bucket == "unanswerable":
         if plain_abstain:

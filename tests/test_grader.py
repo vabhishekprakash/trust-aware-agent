@@ -3,17 +3,24 @@
 import pytest
 
 from calibration.grader import (
+    EXTRACT_MARK,
     GRADER_VERSION,
     ProviderJudge,
+    abstain_tail,
     apply_human,
+    build_extraction_messages,
     build_judge_messages,
     classify_form,
     exact_match,
     grade,
     grade_from_answers,
+    ground_answers,
+    mentions_specifics,
     normalise,
     parse_answers,
+    parse_extraction,
     questions_for,
+    quote_in,
 )
 
 ANSWERABLE = {
@@ -61,16 +68,35 @@ AMBIGUOUS = {
 LONG_HEDGE = "Someone senior, possibly the manager of the program, signs it off after the review board meets."
 
 
+def source_of(content: str) -> str:
+    """The text a grounding call asks the judge to copy from."""
+    return content.split("Text:\n", 1)[1].split(f"\n\n{EXTRACT_MARK}", 1)[0]
+
+
 class StubJudge:
+    """Scripted judge. Yes-or-no calls pop from `replies`; grounding calls copy the whole source unless `extract` says otherwise."""
+
     model = "stub-judge"
 
-    def __init__(self, replies):
+    def __init__(self, replies, extract=None):
         self.replies = list(replies)
         self.calls = []
+        self.extract = extract
 
     def __call__(self, messages):
         self.calls.append(messages)
+        content = messages[-1]["content"]
+        if EXTRACT_MARK in content:
+            if self.extract is not None:
+                return self.extract(content)
+            return f'"{source_of(content)}"'
         return self.replies.pop(0)
+
+    def question_calls(self):
+        return [c for c in self.calls if EXTRACT_MARK not in c[-1]["content"]]
+
+    def grounding_calls(self):
+        return [c for c in self.calls if EXTRACT_MARK in c[-1]["content"]]
 
 
 def never_called(messages):
@@ -82,8 +108,8 @@ def reply(*answers):
     return "\n".join(lines)
 
 
-def both(*answers):
-    return StubJudge([reply(*answers), reply(*answers)])
+def both(*answers, extract=None):
+    return StubJudge([reply(*answers), reply(*answers)], extract=extract)
 
 
 # stage 1 and 2: normalise and classify the form
@@ -115,6 +141,7 @@ def test_an_answer_followed_by_a_short_question_is_not_a_clarification():
 def test_classify_form_detects_abstain():
     assert classify_form("The handbook does not specify the cost of a review.") == "ABSTAIN"
     assert classify_form("I could not find this in the handbook.") == "ABSTAIN"
+    assert classify_form("The handbook defines the term but gives no statistics on how many projects exceed it.") == "ABSTAIN"
 
 
 def test_classify_form_detects_clarify():
@@ -141,6 +168,21 @@ def test_classify_form_hint_overrides_patterns():
         classify_form("x", hint="MAYBE")
 
 
+def test_mentions_specifics_finds_figures_dates_and_proper_nouns_mid_sentence():
+    assert mentions_specifics(" for a CDR; it describes only the review's purpose.")
+    assert mentions_specifics(" a figure. It would be about two million dollars.")
+    assert mentions_specifics(" a figure, but roughly 2 million dollars.")
+    assert mentions_specifics(" the date. It was issued in December.")
+    assert not mentions_specifics(" the cost of a review.")
+    assert not mentions_specifics(" the cost. It focuses on process. I checked.")
+    assert mentions_specifics(" the cost. It focuses on NASA process.")
+
+
+def test_abstain_tail_is_the_text_after_the_refusal_phrase():
+    assert abstain_tail("The handbook does not give a cost for a CDR.") == " a cost for a CDR."
+    assert abstain_tail("No refusal here.") == "No refusal here."
+
+
 # stage 3: the exact check
 
 
@@ -164,7 +206,7 @@ def test_exact_match_ignores_empty_gold_and_empty_aliases():
     assert exact_match("the PM", "the Program Manager", ["", "PM"])
 
 
-# the judge's questions and the mapping from answers to grades
+# the judge's questions, the grounding check, and the mapping from answers to grades
 
 
 def test_questions_are_anchored_on_the_reference_text():
@@ -244,12 +286,67 @@ def test_false_premise_mapping(answers, expected):
     assert grade_from_answers("false_premise", answers) == expected
 
 
-def test_parse_answers_accepts_format_variants_and_rejects_missing_lines():
+def test_parse_answers_reads_answers_reason_and_any_copied_words():
     keys = ["a", "b"]
-    assert parse_answers(keys, "REASON: fine\nQ1: yes\nQ2) NO") == ({"a": True, "b": False}, "fine")
-    assert parse_answers(keys, "Sure. Q1 - YES, Q2: YES. Reason: ok") == ({"a": True, "b": True}, "ok")
+    assert parse_answers(keys, 'REASON: fine\nQ1: yes "some words"\nQ2) NO') == ({"a": True, "b": False}, "fine", {"a": "some words"})
+    assert parse_answers(keys, "Sure. Q1 - YES, Q2: YES. Reason: ok") == ({"a": True, "b": True}, "ok", {})
     assert parse_answers(keys, "Q1: YES") is None
     assert parse_answers(keys, "GRADE: CORRECT\nREASON: x") is None
+
+
+def test_parse_extraction_reads_quoted_words_none_and_bare_replies():
+    assert parse_extraction('"the Program Manager"') == "the Program Manager"
+    assert parse_extraction("The words are “the Program Manager”.") == "the Program Manager"
+    assert parse_extraction("NONE") is None
+    assert parse_extraction("None. The text has no such words.") is None
+    assert parse_extraction("the manager of the program") == "the manager of the program"
+    assert parse_extraction("") is None
+
+
+def test_quote_in_matches_short_quotes_whole_and_long_quotes_by_coverage():
+    text = "Someone senior, possibly the manager of the program, signs it off after the review board meets."
+    assert quote_in(text, "the manager of the program")
+    assert quote_in(text, "Manager of the Program!")
+    assert not quote_in(text, "the Center Director")
+    assert not quote_in(text, "")
+    assert not quote_in(text, None)
+    assert quote_in(text, "possibly the manager of the program signs it off after the board")
+    assert not quote_in(text, "one two three four five six seven")
+    # sharing one five-word run with the text is not enough for a long quote
+    assert not quote_in(text, "the review board meets every other week to argue about a great many unrelated things")
+
+
+def test_ground_answers_turns_unverifiable_yes_into_no():
+    answers = {"same": True, "contradicts": True, "omits": False}
+    grounded, turned = ground_answers(ANSWERABLE, LONG_HEDGE, answers, {"same": "manager of the program"})
+    assert grounded == {"same": True, "contradicts": False, "omits": False}
+    assert turned == ["contradicts"]
+    grounded, turned = ground_answers(ANSWERABLE, LONG_HEDGE, answers, {"same": "the Center Director", "contradicts": "review board"})
+    assert grounded == {"same": False, "contradicts": True, "omits": False}
+    assert turned == ["same"]
+
+
+def test_omits_quote_must_come_from_the_reference_and_be_missing_from_the_candidate():
+    answers = {"same": False, "contradicts": False, "omits": True}
+    ok, turned = ground_answers(ANSWERABLE, LONG_HEDGE, answers, {"omits": "Program Manager"})
+    assert ok["omits"] is True and turned == []
+    present, turned = ground_answers(ANSWERABLE, "The Program Manager, I think.", answers, {"omits": "Program Manager"})
+    assert present["omits"] is False and turned == ["omits"]
+    foreign, turned = ground_answers(ANSWERABLE, LONG_HEDGE, answers, {"omits": "Center Director"})
+    assert foreign["omits"] is False and turned == ["omits"]
+
+
+def test_extraction_prompt_copies_from_the_candidate_except_for_omits():
+    content = build_extraction_messages(ANSWERABLE, LONG_HEDGE, "same")[-1]["content"]
+    assert source_of(content) == LONG_HEDGE
+    assert "give the answer to the question" in content
+    content = build_extraction_messages(ANSWERABLE, LONG_HEDGE, "omits")[-1]["content"]
+    assert "Program Manager" in source_of(content)
+    assert LONG_HEDGE in content
+    content = build_extraction_messages(AMBIGUOUS, "x", "reading2")[-1]["content"]
+    assert "the System Requirements Review" in content
+    with pytest.raises(ValueError):
+        build_extraction_messages(ANSWERABLE, "x", "nonsense")
 
 
 # rule-decided cases: the judge is never called
@@ -278,29 +375,33 @@ def test_answerable_clarify_is_wrong_without_judge():
     assert (r["grade"], r["decided_by"]) == ("WRONG", "rules")
 
 
-def test_unanswerable_abstain_is_correct_and_clarify_is_wrong_without_judge():
+def test_unanswerable_plain_abstain_is_correct_and_clarify_is_wrong_without_judge():
     r = grade(UNANSWERABLE, "The handbook does not give the cost of a review.", judge=never_called)
     assert (r["grade"], r["label"], r["decided_by"]) == ("CORRECT", 1, "rules")
+    r = grade(UNANSWERABLE, "The handbook does not say. It focuses on process.", judge=never_called)
+    assert (r["grade"], r["decided_by"]) == ("CORRECT", "rules")
+    r = grade(UNANSWERABLE, "The handbook defines the Agency Baseline Commitment but gives no statistics on how many projects exceed it.", judge=never_called)
+    assert (r["grade"], r["decided_by"]) == ("CORRECT", "rules")
     r = grade(UNANSWERABLE, "Do you mean a CDR or a PDR?", judge=never_called)
     assert (r["grade"], r["decided_by"]) == ("WRONG", "rules")
 
 
-def test_false_premise_abstain_is_correct_without_judge():
+def test_false_premise_plain_abstain_is_correct_without_judge():
     r = grade(FALSE_PREMISE, "I could not find any requirement for two decision points per phase.", judge=never_called)
     assert (r["grade"], r["label"]) == ("CORRECT", 1)
 
 
-def test_multi_sentence_abstentions_go_to_the_judge():
+def test_abstentions_that_go_on_to_name_specifics_go_to_the_judge():
     draft = "The handbook does not say which comes first. Of the two per phase, the entry KDP comes first."
     r = grade(FALSE_PREMISE, draft, judge=both(False, False, True))
     assert r["form"] == "ABSTAIN"
     assert (r["decided_by"], r["grade"]) == ("judge", "WRONG")
-    draft = "The handbook does not give a figure. It would be about two million dollars."
+    draft = "The handbook does not state a figure, but a CDR would typically run into the millions of dollars."
     r = grade(UNANSWERABLE, draft, judge=both(True, True))
     assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
-    draft = "The handbook does not give a cost for a CDR; it describes only the review's purpose, timing, and criteria."
-    r = grade(UNANSWERABLE, draft, judge=never_called)
-    assert (r["decided_by"], r["grade"]) == ("rules", "CORRECT")
+    draft = "The handbook does not give a cost for a CDR; it describes only the review's purpose."
+    r = grade(UNANSWERABLE, draft, judge=both(False, True))
+    assert (r["decided_by"], r["grade"]) == ("judge", "CORRECT")
 
 
 def test_ambiguous_abstain_is_wrong_without_judge():
@@ -322,8 +423,7 @@ def test_long_draft_containing_gold_goes_to_judge_in_both_orders():
     r = grade(ANSWERABLE, draft, judge=judge)
     assert r["decided_by"] == "judge"
     assert r["grade"] == "PARTIAL"
-    assert len(judge.calls) == 2
-    first, second = judge.calls[0][-1]["content"], judge.calls[1][-1]["content"]
+    first, second = [c[-1]["content"] for c in judge.question_calls()]
     assert first.index("Reference answer") < first.index("Candidate answer")
     assert second.index("Candidate answer") < second.index("Reference answer")
 
@@ -331,9 +431,82 @@ def test_long_draft_containing_gold_goes_to_judge_in_both_orders():
 def test_judge_sees_evidence_quote_and_the_questions():
     judge = both(True, False, False)
     grade(ANSWERABLE, LONG_HEDGE, judge=judge)
-    prompt = judge.calls[0][-1]["content"]
+    prompt = judge.question_calls()[0][-1]["content"]
     assert "approved by the Program Manager" in prompt
     assert "Q1:" in prompt and "Q3:" in prompt and "Q4:" not in prompt
+    assert EXTRACT_MARK not in prompt
+
+
+def test_every_yes_is_grounded_by_a_copying_call():
+    judge = both(True, False, False)
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=judge)
+    assert r["grade"] == "CORRECT"
+    assert len(judge.question_calls()) == 2
+    assert len(judge.grounding_calls()) == 2
+    assert LONG_HEDGE in judge.grounding_calls()[0][-1]["content"]
+    assert r["judge_quotes"] == [{"same": LONG_HEDGE}] * 2
+    assert r["judge_ungrounded"] == [[], []]
+
+
+def no_extraction(content):
+    raise AssertionError("code should have grounded this YES without a copying call")
+
+
+def test_reading_yes_is_grounded_by_code_when_the_draft_names_the_answer():
+    judge = both(False, True, False, extract=no_extraction)
+    r = grade(AMBIGUOUS, "It is the Critical Design Review, held before Phase C.", judge=judge)
+    assert r["grade"] == "PARTIAL"
+    assert r["judge_quotes"][0]["reading1"] == "the Critical Design Review"
+    assert judge.grounding_calls() == []
+
+
+def test_reading_yes_is_grounded_by_code_from_a_parenthesised_acronym():
+    item = {**AMBIGUOUS, "readings": [
+        {"reading": "before Phase C", "answer": "the Critical Design Review (CDR)", "page": "22"},
+        {"reading": "before Phase B", "answer": "the System Requirements Review (SRR)", "page": "21"},
+    ]}
+    judge = both(False, True, True, extract=no_extraction)
+    r = grade(item, "Both the CDR and the SRR come before implementation, depending on the phase.", judge=judge)
+    assert r["grade"] == "CORRECT"
+    assert r["judge_quotes"][0] == {"reading1": "CDR", "reading2": "SRR"}
+
+
+def test_same_yes_is_grounded_by_code_when_the_draft_contains_an_alias():
+    draft = "The PM signs it off, although " + "some people say " * 12 + "others do too."
+    judge = both(True, False, False, extract=no_extraction)
+    r = grade(ANSWERABLE, draft, judge=judge)
+    assert r["grade"] == "CORRECT"
+    assert r["judge_quotes"][0] == {"same": "PM"}
+
+
+def test_a_yes_the_copying_call_cannot_back_becomes_no():
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, extract=lambda c: "NONE"))
+    assert (r["grade"], r["label"]) == ("WRONG", 0)
+    assert r["judge_answers"] == [{"same": False, "contradicts": False, "omits": False}] * 2
+    assert r["judge_ungrounded"] == [["same"], ["same"]]
+    assert r["judge_quotes"] == [{"same": None}] * 2
+
+
+def test_copied_words_not_in_the_candidate_count_as_no():
+    # The draft names neither answer, so code cannot ground the YES answers, and the
+    # judge's copy is words the draft does not contain.
+    judge = both(False, True, True, extract=lambda c: '"the System Requirements Review"')
+    r = grade(AMBIGUOUS, "The big design review, the one before you start building.", judge=judge)
+    assert r["grade"] == "WRONG"
+    assert r["judge_answers"][0] == {"flags": False, "reading1": False, "reading2": False}
+    assert r["judge_ungrounded"] == [["reading1", "reading2"], ["reading1", "reading2"]]
+
+
+def test_answer_bearing_yes_must_mention_the_answer_it_claims():
+    # The copied words are in the draft but name the CDR, not the SRR that reading 2 claims.
+    r = grade(AMBIGUOUS, "The Critical Design Review (CDR).", judge=both(False, False, True))
+    assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["reading2"], ["reading2"]])
+    # The same words do back reading 1, whose answer is the CDR.
+    r = grade(AMBIGUOUS, "The Critical Design Review (CDR).", judge=both(False, True, False))
+    assert (r["grade"], r["judge_ungrounded"]) == ("PARTIAL", [[], []])
+    # Words from the draft that share nothing with the gold answer do not back "same".
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, extract=lambda c: '"signs it off after the review board meets"'))
+    assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["same"], ["same"]])
 
 
 def test_unanswerable_answer_goes_to_judge_and_a_figure_is_wrong():
@@ -357,7 +530,7 @@ def test_ambiguous_clarify_that_names_both_readings_is_correct():
     judge = both(True, False, False)
     r = grade(AMBIGUOUS, "Do you mean the review before Phase B or before Phase C?", judge=judge)
     assert r["grade"] == "CORRECT"
-    prompt = judge.calls[0][-1]["content"]
+    prompt = judge.question_calls()[0][-1]["content"]
     assert "before Phase C" in prompt and "before Phase B" in prompt
 
 
@@ -386,6 +559,7 @@ def test_one_unreadable_reply_is_flagged_wrong_and_keeps_the_readable_grade():
     r = grade(ANSWERABLE, LONG_HEDGE, judge=judge)
     assert (r["grade"], r["label"], r["flag"]) == ("WRONG", 0, "judge_unparsed")
     assert r["judge_grades"] == [None, "CORRECT"]
+    assert r["judge_answers"][0] is None
     assert r["judge_outputs"][0] == "I think it is fine."
 
 
@@ -437,4 +611,4 @@ def test_record_carries_identity_version_form_and_reason():
     assert (r["item_id"], r["bucket"], r["form"]) == ("q1", "answerable", "ANSWER")
     assert r["grader_version"] == GRADER_VERSION
     assert r["reason"]
-    assert set(r) >= {"judge_grades", "judge_answers", "judge_outputs", "flag", "judge_model", "decided_by", "label"}
+    assert set(r) >= {"judge_grades", "judge_answers", "judge_quotes", "judge_ungrounded", "judge_outputs", "flag", "judge_model", "decided_by", "label"}

@@ -64,10 +64,11 @@ def comparison_lines(records: list[dict]) -> list[str]:
         grades = sum(1 for x, e in rows if x["grade"] == e)
         labels = sum(1 for x, e in rows if x["label"] == label_of(e))
         judged = [x for x, _ in rows if x["decided_by"] == "judge"]
-        flips = sum(1 for x in judged if x["flag"] == "position_disagreement")
+        flips = [x for x in judged if x["flag"] == "position_disagreement"]
+        binary = sum(1 for x in flips if len({g == "CORRECT" for g in x["judge_grades"] if g}) > 1)
         lines.append(
             f"- {tag}: grade matches {grades} of {len(rows)}, label matches {labels} of {len(rows)}, "
-            f"order flips {flips} of {len(judged)} judged"
+            f"order flips {len(flips)} of {len(judged)} judged, of which {binary} changed the binary label"
         )
     return lines
 
@@ -121,6 +122,11 @@ def main() -> int:
         "Drafts were written by hand to cover correct, wrong, partial, and borderline cases.",
         "The expected column is the grade the example writer intended; a mismatch is not",
         "automatically a grader error, it is a case for the owner to rule on.",
+        "",
+        "Limitation, stated plainly: the examples, their drafts and the expected grades were",
+        "written by a language model, and the grades below come from a language model judge.",
+        "The human check of the judge is the owner's blind grading of about 40 model drafts",
+        "(reports/grader-check-sheet.md), reported separately.",
         "",
         "## Summary",
         "",
