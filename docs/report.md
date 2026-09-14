@@ -109,6 +109,29 @@ The standing limitations are in docs/annotation-guide.md. In short:
   CORRECT readings of a bare false-premise abstention, and the lenient
   three-way grade.
 
+## Decision policy (M5, in progress)
+
+VERIFY is a flag, not a verification loop. The problem statement's
+tool-based verification is not implemented. Two reasons: retrieval recall
+on dev is 77 percent at k=8 and the same at k=10, so re-retrieving buys
+little and a second draft from the same model mostly repeats the first;
+and the premise step is the precedent, a second model pass built to fix a
+measured gap that made every bucket worse (reports/premise-step.md). The
+agent's own CLARIFY and ABSTAIN stand; the policy gates only answered
+items.
+
+What the calibrated probability can buy, before any target is chosen
+(reports/m5-risk-coverage.md, thresholds tie-aware, intervals bootstrap):
+among the 70 answered dev items, 36 correct, the error rate is 49 [37,
+60] percent when everything is answered, about 40 [26, 57] percent at
+half coverage, and reaches 17 [0, 55] percent only at 9 [3, 16] percent
+coverage. No risk target of 10, 15, 20 or 25 percent is reachable with
+meaningful coverage on dev. The unanswerable bucket contributes 32
+correct pass-through abstentions at every threshold, so the deployed
+error rate (about 45 percent, with 11 false-premise abstentions graded
+PARTIAL counted as errors) says little about the policy; the answered
+population is its real work.
+
 ## Still to come
 
 M5 policy thresholds on dev; M6 explanations; M7 API and dashboard; M8 the

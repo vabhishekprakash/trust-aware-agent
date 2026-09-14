@@ -1001,3 +1001,34 @@ features beat all three paid signals, which roughly triple the cost per
 question; that runs against the usual expectation that sampling-based
 uncertainty leads. docs/report.md is the standing draft that carries all
 of this.
+
+## M5 policy, decided by the owner on 2026-09-12
+
+VERIFY is a display state: the answer is shown with a flag that it needs
+checking, no extra model calls. The problem statement's tool-based
+verification loop is therefore not implemented, and the report says so
+plainly. Two reasons it was not expected to pay. Retrieval recall on dev
+is 77 percent at k=8 and the same at k=10, so re-retrieving at a larger k
+buys little, and a second draft on the same model mostly reproduces the
+first. And the premise step is the precedent: a second model pass built
+to fix a measured gap made every bucket worse (reports/premise-step.md).
+A verification loop would need the same measurement before it earned a
+place, and there was no budget for another negative result.
+
+ESCALATE withholds the answer and hands the question to a human with the
+trace attached. The agent's own CLARIFY and ABSTAIN stand; the policy
+decides among ANSWER, VERIFY and ESCALATE only for items the agent
+answered, and a confident abstention passes through as the answer "the
+handbook does not say". Thresholds are tuned to a target risk, the error
+rate among answered items, on the out-of-fold probabilities of the
+confirmed calibrator over all 134 dev items, pooled, reported per bucket
+and in the decisive stratum. The target is the owner's, chosen from the
+risk-coverage curve with its bootstrap band and a table of candidates (10,
+15, 20, 25 percent) with the coverage each buys, intervals on both, and
+the base rate on the same table. The report states what the policy does
+to the unanswerable bucket, 32 of the 70 positives: a policy that keeps
+coverage high by passing easy abstentions while escalating everything
+hard would score well and be useless, and if that is what happens the
+report says so. M5 adds the risk-coverage curve with its band and a
+per-bucket table of the policy's actions with counts next to rates.
+Nothing is tuned until the owner picks the target. Test is not touched.

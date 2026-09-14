@@ -1,0 +1,596 @@
+{
+ "variant": "minus_logprobs",
+ "fit": "logistic+isotonic",
+ "curves": {
+  "answered": [
+   {
+    "threshold": 1.0,
+    "coverage": 0.014,
+    "risk": 0.0,
+    "cov_lo": 0.0,
+    "cov_hi": 0.043,
+    "risk_lo": 0.0,
+    "risk_hi": 0.0
+   },
+   {
+    "threshold": 0.8824,
+    "coverage": 0.043,
+    "risk": 0.333,
+    "cov_lo": 0.0,
+    "cov_hi": 0.1,
+    "risk_lo": 0.0,
+    "risk_hi": 1.0
+   },
+   {
+    "threshold": 0.8462,
+    "coverage": 0.086,
+    "risk": 0.167,
+    "cov_lo": 0.029,
+    "cov_hi": 0.157,
+    "risk_lo": 0.0,
+    "risk_hi": 0.55
+   },
+   {
+    "threshold": 0.6857,
+    "coverage": 0.129,
+    "risk": 0.333,
+    "cov_lo": 0.057,
+    "cov_hi": 0.2,
+    "risk_lo": 0.0,
+    "risk_hi": 0.667
+   },
+   {
+    "threshold": 0.68,
+    "coverage": 0.2,
+    "risk": 0.357,
+    "cov_lo": 0.114,
+    "cov_hi": 0.3,
+    "risk_lo": 0.111,
+    "risk_hi": 0.643
+   },
+   {
+    "threshold": 0.6517,
+    "coverage": 0.214,
+    "risk": 0.4,
+    "cov_lo": 0.128,
+    "cov_hi": 0.314,
+    "risk_lo": 0.154,
+    "risk_hi": 0.667
+   },
+   {
+    "threshold": 0.649,
+    "coverage": 0.229,
+    "risk": 0.375,
+    "cov_lo": 0.129,
+    "cov_hi": 0.329,
+    "risk_lo": 0.15,
+    "risk_hi": 0.632
+   },
+   {
+    "threshold": 0.625,
+    "coverage": 0.243,
+    "risk": 0.353,
+    "cov_lo": 0.143,
+    "cov_hi": 0.343,
+    "risk_lo": 0.133,
+    "risk_hi": 0.588
+   },
+   {
+    "threshold": 0.6,
+    "coverage": 0.314,
+    "risk": 0.455,
+    "cov_lo": 0.214,
+    "cov_hi": 0.414,
+    "risk_lo": 0.25,
+    "risk_hi": 0.667
+   },
+   {
+    "threshold": 0.5769,
+    "coverage": 0.414,
+    "risk": 0.414,
+    "cov_lo": 0.3,
+    "cov_hi": 0.529,
+    "risk_lo": 0.238,
+    "risk_hi": 0.613
+   },
+   {
+    "threshold": 0.5765,
+    "coverage": 0.429,
+    "risk": 0.433,
+    "cov_lo": 0.314,
+    "cov_hi": 0.543,
+    "risk_lo": 0.261,
+    "risk_hi": 0.625
+   },
+   {
+    "threshold": 0.5714,
+    "coverage": 0.471,
+    "risk": 0.394,
+    "cov_lo": 0.357,
+    "cov_hi": 0.586,
+    "risk_lo": 0.233,
+    "risk_hi": 0.585
+   },
+   {
+    "threshold": 0.5318,
+    "coverage": 0.486,
+    "risk": 0.412,
+    "cov_lo": 0.371,
+    "cov_hi": 0.6,
+    "risk_lo": 0.256,
+    "risk_hi": 0.595
+   },
+   {
+    "threshold": 0.5172,
+    "coverage": 0.529,
+    "risk": 0.405,
+    "cov_lo": 0.414,
+    "cov_hi": 0.643,
+    "risk_lo": 0.256,
+    "risk_hi": 0.572
+   },
+   {
+    "threshold": 0.5,
+    "coverage": 0.586,
+    "risk": 0.39,
+    "cov_lo": 0.471,
+    "cov_hi": 0.7,
+    "risk_lo": 0.25,
+    "risk_hi": 0.55
+   },
+   {
+    "threshold": 0.4286,
+    "coverage": 0.643,
+    "risk": 0.4,
+    "cov_lo": 0.529,
+    "cov_hi": 0.743,
+    "risk_lo": 0.262,
+    "risk_hi": 0.556
+   },
+   {
+    "threshold": 0.4178,
+    "coverage": 0.657,
+    "risk": 0.413,
+    "cov_lo": 0.543,
+    "cov_hi": 0.771,
+    "risk_lo": 0.275,
+    "risk_hi": 0.569
+   },
+   {
+    "threshold": 0.4,
+    "coverage": 0.671,
+    "risk": 0.404,
+    "cov_lo": 0.557,
+    "cov_hi": 0.786,
+    "risk_lo": 0.268,
+    "risk_hi": 0.559
+   },
+   {
+    "threshold": 0.3894,
+    "coverage": 0.686,
+    "risk": 0.396,
+    "cov_lo": 0.571,
+    "cov_hi": 0.786,
+    "risk_lo": 0.26,
+    "risk_hi": 0.547
+   },
+   {
+    "threshold": 0.375,
+    "coverage": 0.7,
+    "risk": 0.408,
+    "cov_lo": 0.6,
+    "cov_hi": 0.8,
+    "risk_lo": 0.264,
+    "risk_hi": 0.553
+   },
+   {
+    "threshold": 0.3636,
+    "coverage": 0.729,
+    "risk": 0.412,
+    "cov_lo": 0.614,
+    "cov_hi": 0.829,
+    "risk_lo": 0.276,
+    "risk_hi": 0.553
+   },
+   {
+    "threshold": 0.3482,
+    "coverage": 0.743,
+    "risk": 0.423,
+    "cov_lo": 0.629,
+    "cov_hi": 0.843,
+    "risk_lo": 0.28,
+    "risk_hi": 0.569
+   },
+   {
+    "threshold": 0.3478,
+    "coverage": 0.786,
+    "risk": 0.4,
+    "cov_lo": 0.686,
+    "cov_hi": 0.871,
+    "risk_lo": 0.26,
+    "risk_hi": 0.54
+   },
+   {
+    "threshold": 0.3408,
+    "coverage": 0.8,
+    "risk": 0.411,
+    "cov_lo": 0.686,
+    "cov_hi": 0.886,
+    "risk_lo": 0.278,
+    "risk_hi": 0.548
+   },
+   {
+    "threshold": 0.3333,
+    "coverage": 0.857,
+    "risk": 0.433,
+    "cov_lo": 0.771,
+    "cov_hi": 0.929,
+    "risk_lo": 0.306,
+    "risk_hi": 0.567
+   },
+   {
+    "threshold": 0.2941,
+    "coverage": 0.886,
+    "risk": 0.452,
+    "cov_lo": 0.8,
+    "cov_hi": 0.957,
+    "risk_lo": 0.323,
+    "risk_hi": 0.581
+   },
+   {
+    "threshold": 0.2727,
+    "coverage": 0.9,
+    "risk": 0.46,
+    "cov_lo": 0.829,
+    "cov_hi": 0.971,
+    "risk_lo": 0.333,
+    "risk_hi": 0.587
+   },
+   {
+    "threshold": 0.25,
+    "coverage": 0.914,
+    "risk": 0.469,
+    "cov_lo": 0.843,
+    "cov_hi": 0.971,
+    "risk_lo": 0.344,
+    "risk_hi": 0.594
+   },
+   {
+    "threshold": 0.1765,
+    "coverage": 0.971,
+    "risk": 0.485,
+    "cov_lo": 0.929,
+    "cov_hi": 1.0,
+    "risk_lo": 0.368,
+    "risk_hi": 0.606
+   },
+   {
+    "threshold": 0.0,
+    "coverage": 1.0,
+    "risk": 0.486,
+    "cov_lo": 1.0,
+    "cov_hi": 1.0,
+    "risk_lo": 0.371,
+    "risk_hi": 0.6
+   }
+  ],
+  "deployed": [
+   {
+    "threshold": 1.0,
+    "coverage": 0.485,
+    "risk": 0.462,
+    "cov_lo": 0.396,
+    "cov_hi": 0.575,
+    "risk_lo": 0.338,
+    "risk_hi": 0.588
+   },
+   {
+    "threshold": 0.8824,
+    "coverage": 0.5,
+    "risk": 0.463,
+    "cov_lo": 0.41,
+    "cov_hi": 0.59,
+    "risk_lo": 0.342,
+    "risk_hi": 0.587
+   },
+   {
+    "threshold": 0.8462,
+    "coverage": 0.522,
+    "risk": 0.443,
+    "cov_lo": 0.425,
+    "cov_hi": 0.604,
+    "risk_lo": 0.328,
+    "risk_hi": 0.561
+   },
+   {
+    "threshold": 0.6857,
+    "coverage": 0.545,
+    "risk": 0.452,
+    "cov_lo": 0.463,
+    "cov_hi": 0.627,
+    "risk_lo": 0.338,
+    "risk_hi": 0.565
+   },
+   {
+    "threshold": 0.68,
+    "coverage": 0.582,
+    "risk": 0.449,
+    "cov_lo": 0.493,
+    "cov_hi": 0.664,
+    "risk_lo": 0.333,
+    "risk_hi": 0.553
+   },
+   {
+    "threshold": 0.6517,
+    "coverage": 0.59,
+    "risk": 0.456,
+    "cov_lo": 0.5,
+    "cov_hi": 0.672,
+    "risk_lo": 0.342,
+    "risk_hi": 0.562
+   },
+   {
+    "threshold": 0.649,
+    "coverage": 0.597,
+    "risk": 0.45,
+    "cov_lo": 0.507,
+    "cov_hi": 0.672,
+    "risk_lo": 0.337,
+    "risk_hi": 0.556
+   },
+   {
+    "threshold": 0.625,
+    "coverage": 0.604,
+    "risk": 0.444,
+    "cov_lo": 0.515,
+    "cov_hi": 0.679,
+    "risk_lo": 0.333,
+    "risk_hi": 0.549
+   },
+   {
+    "threshold": 0.6,
+    "coverage": 0.642,
+    "risk": 0.465,
+    "cov_lo": 0.56,
+    "cov_hi": 0.716,
+    "risk_lo": 0.354,
+    "risk_hi": 0.566
+   },
+   {
+    "threshold": 0.5769,
+    "coverage": 0.694,
+    "risk": 0.452,
+    "cov_lo": 0.612,
+    "cov_hi": 0.769,
+    "risk_lo": 0.348,
+    "risk_hi": 0.549
+   },
+   {
+    "threshold": 0.5765,
+    "coverage": 0.701,
+    "risk": 0.457,
+    "cov_lo": 0.619,
+    "cov_hi": 0.776,
+    "risk_lo": 0.353,
+    "risk_hi": 0.556
+   },
+   {
+    "threshold": 0.5714,
+    "coverage": 0.724,
+    "risk": 0.443,
+    "cov_lo": 0.649,
+    "cov_hi": 0.791,
+    "risk_lo": 0.343,
+    "risk_hi": 0.541
+   },
+   {
+    "threshold": 0.5318,
+    "coverage": 0.731,
+    "risk": 0.449,
+    "cov_lo": 0.657,
+    "cov_hi": 0.799,
+    "risk_lo": 0.349,
+    "risk_hi": 0.545
+   },
+   {
+    "threshold": 0.5172,
+    "coverage": 0.754,
+    "risk": 0.446,
+    "cov_lo": 0.679,
+    "cov_hi": 0.821,
+    "risk_lo": 0.346,
+    "risk_hi": 0.545
+   },
+   {
+    "threshold": 0.5,
+    "coverage": 0.784,
+    "risk": 0.438,
+    "cov_lo": 0.709,
+    "cov_hi": 0.843,
+    "risk_lo": 0.339,
+    "risk_hi": 0.535
+   },
+   {
+    "threshold": 0.4286,
+    "coverage": 0.813,
+    "risk": 0.44,
+    "cov_lo": 0.746,
+    "cov_hi": 0.873,
+    "risk_lo": 0.343,
+    "risk_hi": 0.538
+   },
+   {
+    "threshold": 0.4178,
+    "coverage": 0.821,
+    "risk": 0.445,
+    "cov_lo": 0.754,
+    "cov_hi": 0.881,
+    "risk_lo": 0.349,
+    "risk_hi": 0.543
+   },
+   {
+    "threshold": 0.4,
+    "coverage": 0.828,
+    "risk": 0.441,
+    "cov_lo": 0.761,
+    "cov_hi": 0.888,
+    "risk_lo": 0.348,
+    "risk_hi": 0.537
+   },
+   {
+    "threshold": 0.3894,
+    "coverage": 0.836,
+    "risk": 0.438,
+    "cov_lo": 0.769,
+    "cov_hi": 0.896,
+    "risk_lo": 0.342,
+    "risk_hi": 0.532
+   },
+   {
+    "threshold": 0.375,
+    "coverage": 0.843,
+    "risk": 0.442,
+    "cov_lo": 0.776,
+    "cov_hi": 0.903,
+    "risk_lo": 0.351,
+    "risk_hi": 0.535
+   },
+   {
+    "threshold": 0.3636,
+    "coverage": 0.858,
+    "risk": 0.443,
+    "cov_lo": 0.799,
+    "cov_hi": 0.918,
+    "risk_lo": 0.35,
+    "risk_hi": 0.536
+   },
+   {
+    "threshold": 0.3482,
+    "coverage": 0.866,
+    "risk": 0.448,
+    "cov_lo": 0.806,
+    "cov_hi": 0.918,
+    "risk_lo": 0.356,
+    "risk_hi": 0.538
+   },
+   {
+    "threshold": 0.3478,
+    "coverage": 0.888,
+    "risk": 0.437,
+    "cov_lo": 0.836,
+    "cov_hi": 0.94,
+    "risk_lo": 0.347,
+    "risk_hi": 0.529
+   },
+   {
+    "threshold": 0.3408,
+    "coverage": 0.896,
+    "risk": 0.442,
+    "cov_lo": 0.843,
+    "cov_hi": 0.94,
+    "risk_lo": 0.35,
+    "risk_hi": 0.53
+   },
+   {
+    "threshold": 0.3333,
+    "coverage": 0.925,
+    "risk": 0.452,
+    "cov_lo": 0.881,
+    "cov_hi": 0.963,
+    "risk_lo": 0.363,
+    "risk_hi": 0.537
+   },
+   {
+    "threshold": 0.2941,
+    "coverage": 0.94,
+    "risk": 0.46,
+    "cov_lo": 0.896,
+    "cov_hi": 0.978,
+    "risk_lo": 0.373,
+    "risk_hi": 0.549
+   },
+   {
+    "threshold": 0.2727,
+    "coverage": 0.948,
+    "risk": 0.465,
+    "cov_lo": 0.91,
+    "cov_hi": 0.978,
+    "risk_lo": 0.377,
+    "risk_hi": 0.553
+   },
+   {
+    "threshold": 0.25,
+    "coverage": 0.955,
+    "risk": 0.469,
+    "cov_lo": 0.918,
+    "cov_hi": 0.985,
+    "risk_lo": 0.383,
+    "risk_hi": 0.556
+   },
+   {
+    "threshold": 0.1765,
+    "coverage": 0.985,
+    "risk": 0.477,
+    "cov_lo": 0.963,
+    "cov_hi": 1.0,
+    "risk_lo": 0.397,
+    "risk_hi": 0.561
+   },
+   {
+    "threshold": 0.0,
+    "coverage": 1.0,
+    "risk": 0.478,
+    "cov_lo": 1.0,
+    "cov_hi": 1.0,
+    "risk_lo": 0.396,
+    "risk_hi": 0.56
+   }
+  ]
+ },
+ "candidates": {
+  "0.1": {
+   "threshold": 1.0,
+   "answered": {
+    "coverage": 0.014,
+    "risk": 0.0
+   },
+   "deployed": {
+    "coverage": 0.485,
+    "risk": 0.462
+   }
+  },
+  "0.15": {
+   "threshold": 1.0,
+   "answered": {
+    "coverage": 0.014,
+    "risk": 0.0
+   },
+   "deployed": {
+    "coverage": 0.485,
+    "risk": 0.462
+   }
+  },
+  "0.2": {
+   "threshold": 0.8462,
+   "answered": {
+    "coverage": 0.086,
+    "risk": 0.167
+   },
+   "deployed": {
+    "coverage": 0.522,
+    "risk": 0.443
+   }
+  },
+  "0.25": {
+   "threshold": 0.8462,
+   "answered": {
+    "coverage": 0.086,
+    "risk": 0.167
+   },
+   "deployed": {
+    "coverage": 0.522,
+    "risk": 0.443
+   }
+  }
+ }
+}

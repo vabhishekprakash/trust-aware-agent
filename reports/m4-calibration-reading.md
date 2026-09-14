@@ -71,9 +71,13 @@ is a sketch, not a curve.
 
 The confidence score carries real but weak information about correctness
 that is not explained by the action taken or the bucket, and it is
-usable for a selective policy: answering the top half by confidence in
-the decisive stratum roughly halves the error rate. It is not a precise
-probability at this data size. The test split, read once at M8, will say
+usable for a selective policy only weakly. With ties in the isotonic
+probabilities covered together, the risk among answered dev items falls
+from 49 [37, 60] percent when everything is answered to about 40 [26, 57]
+percent at half coverage (reports/m5-risk-coverage.md); an earlier draft
+of this note said "roughly halves", which a rank-ordered curve suggested
+and a tie-aware one does not support. It is not a precise probability at
+this data size. The test split, read once at M8, will say
 whether even the directional claim holds.
 
 ## Named finding: the free signals beat the paid ones
