@@ -151,6 +151,14 @@ what the draft does, and code maps the answers to a grade.
                     about what the handbook covers, a figure, an outside
                     detail)?
 
+The judge sees one passage, so code answers the last question where the
+whole corpus is needed: an acronym expanded differently from Appendix A
+(data/corpus/acronyms.json), and a claim that the handbook does not
+mention, cover, discuss, address, include or contain a term the text does
+contain, both count as unsupported whatever the judge said. A claim about a
+detail ("does not specify where X happens") is an abstention, not an
+existence claim, and is left alone.
+
 Every YES must be backed by words from the draft. When the draft contains
 the claimed answer, an alias, or its acronym, code settles that itself.
 Otherwise the judge gets a second, smaller call: copy the exact words in the
@@ -361,3 +369,18 @@ matching the gold or an alias every time; unanswerable 10 of 10; false
 premise 8 of 8; ambiguous 5 of 8. The three misses were drafted as ambiguous
 and read as answerable by the owner. Both figures go into the final report
 as measured limitations.
+
+2026-09-09, evening. The owner's rulings on the seven disagreements are in
+stage 2, stage 4 and the bucket table above, and in docs/decisions.md. The
+grader is now v9: it adds the unsupported-assertion question to every
+bucket, the question-aware specifics trigger, and three code checks against
+the whole corpus (acronym expansions against Appendix A, claims that the
+handbook does not mention a term it contains, and a "same answer" that must
+add something beyond the question). Rerun on the first 40 drafts and scored
+against the owner's grades with the four rule-based revisions applied
+(sheets 9, 16, 33 and 34), v9 agrees on the binary label on 38 of 39, 97
+percent. That is rubric fidelity, not blind agreement: the fixes were built
+against those drafts. The blind figure remains 82 percent. The second sheet,
+reports/grader-check-sheet-2.md, holds 25 fresh drafts the owner has not
+seen; its blind agreement, once graded, is the post-fix figure that gates
+mass grading. Nothing is locked and no split is made.

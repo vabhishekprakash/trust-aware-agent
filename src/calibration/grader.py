@@ -33,6 +33,11 @@ invented acronym expansion, or a right answer padded with claims from
 outside the handbook, is PARTIAL rather than CORRECT. An abstention scoped
 to "the passage" with nothing added stays CORRECT.
 
+The judge only ever sees one passage, so three of those checks are done by
+code with the whole corpus: an acronym expanded differently from Appendix A,
+a claim that the handbook does not mention a term it does contain, and a
+"same answer" backed only by words the question itself supplied.
+
 Where a question is about a specific piece of text (the answer for each
 reading, the premise correction) that text is quoted in the question; for
 the answerable bucket the gold answer is not quoted, because quoting it made
@@ -45,10 +50,19 @@ flipped a correct clarifying question from CORRECT to PARTIAL in both orders.
 from __future__ import annotations
 
 import copy
+import json
 import re
+from pathlib import Path
 from typing import Callable, Optional
 
-GRADER_VERSION = "grader-v8"
+ROOT = Path(__file__).resolve().parents[2]
+ACRONYMS_PATH = ROOT / "data" / "corpus" / "acronyms.json"
+PAGES_PATH = ROOT / "data" / "corpus" / "pages.jsonl"
+# Tests set these directly; otherwise they load lazily from the corpus files.
+ACRONYMS: Optional[dict] = None
+CORPUS: Optional[str] = None
+
+GRADER_VERSION = "grader-v9"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
@@ -336,9 +350,17 @@ def _reference_text(item: dict) -> str:
 
 
 def answer_tokens(item: dict, key: str) -> Optional[set]:
-    """Words a YES to an answer-bearing question must mention, or None when the question is not one."""
+    """Words a YES to an answer-bearing question must mention, or None when the question is not one.
+
+    Words the question itself supplies do not count: a draft that only echoes
+    the question has not given the answer. A judge once backed "gives NPR
+    7120.5" with "The NASA Systems Engineering Handbook", which shared only
+    the word NASA with an alias, and NASA was in the question.
+    """
+    asked = _tokens(item.get("question", ""))
     if key == "same":
-        return _tokens(_reference_text(item))
+        mine = _tokens(_reference_text(item))
+        return (mine - asked) or mine
     if key.startswith("reading"):
         readings = item.get("readings") or []
         index = int(key[len("reading"):]) - 1
@@ -347,7 +369,81 @@ def answer_tokens(item: dict, key: str) -> Optional[set]:
         for j, r in enumerate(readings):
             if j != index:
                 others |= _tokens(r["answer"])
-        return (mine - others) or mine
+        distinctive = (mine - others) or mine
+        return (distinctive - asked) or distinctive
+    return None
+
+
+_ACR_THEN_EXPANSION = re.compile(r"\b([A-Z][A-Za-z0-9&/-]{1,9})\s*\(([^()]{3,80})\)")
+_EXPANSION_THEN_ACR = re.compile(r"\b((?:[A-Z][A-Za-z&-]*\s+){1,6}[A-Z][A-Za-z&-]*)\s*\(([A-Z][A-Za-z0-9&/-]{1,9})\)")
+# Only existence claims count: "does not mention X" is false when the handbook
+# contains X. "Does not specify where X happens" is an abstention about a
+# detail and may well be true, so specify, define, describe and list are left out.
+_NEGATIVE_COVERAGE = re.compile(
+    r"\b(?:does\s+not|doesn't|nor\s+does\s+(?:it|the\s+\w+)|never)\s+"
+    r"(?:mention|cover|discuss|address|include|contain)\b([^.;!?\n]*)",
+    re.IGNORECASE,
+)
+_WH_WORD = re.compile(r"\b(?:where|when|how|what|which|why|who|whether)\b", re.IGNORECASE)
+_TERM = re.compile(r"\b[A-Z]{2,7}\b(?:\s+[A-Z]\b)?|\b(?:[A-Z][a-z]+(?:\s+(?:of|and|for|the))?\s+){1,4}[A-Z][a-z]+\b")
+_LEADING_ARTICLE = re.compile(r"^(?:the|a|an)\s+", re.IGNORECASE)
+
+
+def _acronyms() -> dict:
+    global ACRONYMS
+    if ACRONYMS is None:
+        ACRONYMS = json.loads(ACRONYMS_PATH.read_text(encoding="utf-8")) if ACRONYMS_PATH.exists() else {}
+    return ACRONYMS
+
+
+def _corpus() -> str:
+    global CORPUS
+    if CORPUS is None:
+        if PAGES_PATH.exists():
+            pages = [json.loads(l) for l in PAGES_PATH.read_text(encoding="utf-8").splitlines() if l.strip()]
+            CORPUS = " " + normalise(" ".join(p["text"].replace("\xad", "") for p in pages)) + " "
+        else:
+            CORPUS = ""
+    return CORPUS
+
+
+def _singular(phrase: str) -> str:
+    return " ".join(w[:-1] if len(w) > 3 and w.endswith("s") else w for w in phrase.split())
+
+
+def _in_corpus(term: str) -> bool:
+    corpus = _corpus()
+    if not corpus:
+        return False
+    phrase = normalise(term)
+    return f" {phrase} " in corpus or f" {_singular(phrase)} " in corpus
+
+
+def code_unsupported(item: dict, draft: str) -> Optional[str]:
+    """Words of the draft that assert something the corpus contradicts, or None.
+
+    Two checks the judge cannot make from one passage: an acronym expanded
+    differently from Appendix A, and a claim that the handbook does not
+    mention, cover or define a term that the handbook does contain.
+    """
+    text = draft.translate(_QUOTES)
+    table = _acronyms()
+    pairs = [(a, e) for a, e in _ACR_THEN_EXPANSION.findall(text)] + [(a, e) for e, a in _EXPANSION_THEN_ACR.findall(text)]
+    for acronym, expansion in pairs:
+        known = table.get(acronym)
+        if not known:
+            continue
+        expansion = _LEADING_ARTICLE.sub("", expansion.strip())
+        given = normalise(expansion)
+        if not any(given == normalise(k) or given in normalise(k) or normalise(k) in given for k in known):
+            return f"{acronym} ({expansion})"
+    for match in _NEGATIVE_COVERAGE.finditer(text):
+        span, rest = match.group(0), match.group(1)
+        if _WH_WORD.search(rest):
+            continue
+        for term in _TERM.findall(rest):
+            if term.strip() and _in_corpus(term):
+                return " ".join(span.split())[:200]
     return None
 
 
@@ -553,6 +649,10 @@ def _run_judge(record: dict, item: dict, draft: str, judge: Judge) -> dict:
                 known = code_quote(item, draft, key)
                 quotes[key] = known if known is not None else parse_extraction(judge(build_extraction_messages(item, draft, key)))
         answers, ungrounded = ground_answers(item, draft, answers, quotes)
+        contradicted = code_unsupported(item, draft)
+        if contradicted:
+            answers["unsupported"] = True
+            quotes["unsupported"] = contradicted
         grade_ = grade_from_answers(bucket, answers)
         record["judge_answers"].append(answers)
         record["judge_quotes"].append(quotes)
@@ -617,7 +717,11 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
     # specific follows the refusal phrase that the question did not already
     # mention. A refusal that goes on to name a new figure, date, or thing may
     # carry an invented answer, so the judge reads it.
-    plain_abstain = form == "ABSTAIN" and not mentions_specifics(abstain_tail(draft), item.get("question", ""))
+    plain_abstain = (
+        form == "ABSTAIN"
+        and not mentions_specifics(abstain_tail(draft), item.get("question", ""))
+        and code_unsupported(item, draft) is None
+    )
 
     if bucket == "unanswerable":
         if plain_abstain:

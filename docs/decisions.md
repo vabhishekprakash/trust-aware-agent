@@ -410,6 +410,38 @@ The 82 percent first-pass figure stands as the blind number. A second sheet
 of 25 fresh drafts, drawn the same way, gives the honest post-fix agreement
 once the owner has graded it blind.
 
+## Grader v9: three checks the judge cannot make from one passage
+
+v8 reached 33 of 39, 85 percent, on the rerun (reports/grader-check-
+rubric-fidelity-v8.md). Six disagreements were left. Two were the same
+bare-abstention-on-a-false-premise case the owner had ruled on for sheet
+16, so sheets 9 and 33 were revised to CORRECT under that rule and the
+revisions file records all four. One, sheet 19, resolves through the item:
+q0124 moved to answerable in the ambiguous pass, and there the draft is an
+exact match. Three were grader gaps of one kind: the judge sees a single
+passage, so it cannot tell that "Pre-Development Review" is the wrong
+expansion of PDR, that the handbook does discuss the Agency Baseline
+Commitment when a draft says it is not mentioned, or that "the NASA Systems
+Engineering Handbook" is not the same answer as "NPR 7120.5" when the only
+word they share came from the question.
+
+v9 does those three with code and the whole corpus. Appendix A is parsed
+into data/corpus/acronyms.json (187 entries, scripts/build_acronyms.py),
+and an acronym expanded differently from the table is an unsupported
+claim. A claim that the handbook does not mention, cover, discuss, address,
+include or contain a term is checked against the full text; verbs like
+"specify" and "define" are left out because "does not specify where X
+happens" is an abstention about a detail, and a claim containing a wh-word
+is skipped for the same reason. And the words that back a "same answer"
+must add something beyond the question's own words. Rerun on the same 40
+drafts, v9 gives 38 of 39, 97 percent, rubric fidelity (reports/grader-
+check-rubric-fidelity.md); the one miss is sheet 19. This is still not a
+blind number. The blind number is 82 percent, and the second sheet
+(reports/grader-check-sheet-2.md, 25 fresh drafts graded by v9 into
+data/eval/grader_check_key-2.jsonl) is where an honest post-fix figure
+comes from. Below about 90 percent there, the grader is still not good
+enough for mass grading.
+
 ## Ambiguous pass, 2026-09-09
 
 The blind item check put the item problem in the ambiguous bucket, so every

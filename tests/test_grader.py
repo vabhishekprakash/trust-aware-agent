@@ -198,6 +198,65 @@ def test_mentions_specifics_ignores_terms_echoed_from_the_question():
     assert mentions_specifics(" any details related to PDR (Pre-Development Review) for hardware projects.", question)
 
 
+@pytest.fixture(autouse=True)
+def small_corpus(monkeypatch):
+    """A tiny acronym table and corpus so the code checks do not read the real handbook."""
+    import calibration.grader as g
+
+    monkeypatch.setattr(g, "ACRONYMS", {"PDR": ["Preliminary Design Review"], "CE": ["Concurrent Engineering", "Chief Engineer"], "KDP": ["Key Decision Point"]})
+    monkeypatch.setattr(g, "CORPUS", " " + g.normalise("The Agency Baseline Commitment is set at KDP C. Reviews are held at key decision points. The Program Manager approves the SEMP.") + " ")
+
+
+def test_code_unsupported_catches_a_wrong_acronym_expansion():
+    from calibration.grader import code_unsupported
+
+    assert code_unsupported(UNANSWERABLE, "No details related to PDR (Pre-Development Review) are given.") == "PDR (Pre-Development Review)"
+    assert code_unsupported(UNANSWERABLE, "No details related to PDR (Preliminary Design Review) are given.") is None
+    assert code_unsupported(UNANSWERABLE, "The Chief Engineer (CE) signs it.") is None
+    assert code_unsupported(UNANSWERABLE, "The Cost Estimator (CE) signs it.") == "CE (Cost Estimator)"
+    assert code_unsupported(UNANSWERABLE, "The XYZ (Extra Yield Zone) is not in the table.") is None
+
+
+def test_code_unsupported_catches_a_false_claim_that_the_handbook_does_not_mention_a_term():
+    from calibration.grader import code_unsupported
+
+    draft = "The passage does not provide information about confidence levels, nor does it mention anything related to Agency Baseline Commitments or KDP C."
+    hit = code_unsupported(UNANSWERABLE, draft)
+    assert hit is not None and "Agency Baseline Commitments" in hit
+    assert code_unsupported(UNANSWERABLE, "The handbook does not mention the Quantum Flux Capacitor.") is None
+    assert code_unsupported(UNANSWERABLE, "The passage does not provide information about the Agency Baseline Commitment.") is None
+    # an abstention about a detail is not an existence claim
+    assert code_unsupported(UNANSWERABLE, "The handbook does not specify where lessons are captured after the Critical Design Review.") is None
+    assert code_unsupported(UNANSWERABLE, "The handbook does not mention when the Program Manager signs.") is None
+
+
+def test_wrong_expansion_makes_an_abstention_partial_even_if_the_judge_misses_it():
+    item = {**UNANSWERABLE, "question": "What minimum mass margin should a project hold at PDR?"}
+    draft = "The passage does not provide information about the mass margin or any details related to PDR (Pre-Development Review)."
+    r = grade(item, draft, judge=both(False, True, False))
+    assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
+    assert r["judge_quotes"][0]["unsupported"] == "PDR (Pre-Development Review)"
+
+
+def test_a_false_coverage_claim_blocks_the_rule_path_and_is_partial():
+    item = {**UNANSWERABLE, "question": "What confidence level must the Agency Baseline Commitment be funded to at KDP C?"}
+    draft = "The passage does not provide information about confidence levels, nor does it mention anything related to Agency Baseline Commitments or KDP C."
+    r = grade(item, draft, judge=both(False, True, False))
+    assert (r["decided_by"], r["grade"]) == ("judge", "PARTIAL")
+
+
+def test_same_answer_must_add_something_beyond_the_question():
+    item = {
+        **ANSWERABLE,
+        "question": "Which NASA requirements document says data management planning has to appear in the project plan?",
+        "gold_answer": "NPR 7120.5",
+        "gold_aliases": ["NPR7120.5", "7120.5", "NASA Procedural Requirements 7120.5"],
+    }
+    draft = "The NASA Systems Engineering Handbook (SEH) requires that data management planning appear in the project plan, " + "as the guidelines say. " * 8
+    r = grade(item, draft, judge=both(True, False, False, False, extract=lambda c: '"The NASA Systems Engineering Handbook (SEH)"'))
+    assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["same"], ["same"]])
+
+
 def test_abstain_tail_is_the_text_after_the_refusal_phrase():
     assert abstain_tail("The handbook does not give a cost for a CDR.") == " a cost for a CDR."
     assert abstain_tail("No refusal here.") == "No refusal here."
