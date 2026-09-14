@@ -118,5 +118,19 @@
   "sheet": "sheet2",
   "sheet_no": 24,
   "call": 0
+ },
+ {
+  "id": "N1",
+  "sheet": "sheet1",
+  "sheet_no": 19,
+  "call": 0,
+  "stage": "draw-pool regrade"
+ },
+ {
+  "id": "N2",
+  "sheet": "sheet1",
+  "sheet_no": 19,
+  "call": 1,
+  "stage": "draw-pool regrade"
  }
 ]

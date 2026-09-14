@@ -1,0 +1,39 @@
+{
+ "judge": "mistral:latest",
+ "digest": "6577803aa9a036369e481d648a2baebb381ebc6e897f2bb9a766a2aa7bfbc1cf",
+ "grader": "grader-v13",
+ "grader_sha256": "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485",
+ "first_run_pool": "7a2a82d",
+ "draw_pools": {
+  "final": null,
+  "sheet1": "1cc8664",
+  "sheet2": "7a2a82d"
+ },
+ "affected": [
+  {
+   "sheet": "sheet1",
+   "sheet_no": 19,
+   "item_id": "q0124",
+   "fields": [
+    "bucket",
+    "evidence",
+    "expected",
+    "gold_aliases",
+    "gold_answer",
+    "notes",
+    "readings"
+   ],
+   "bucket": [
+    "answerable",
+    "ambiguous"
+   ]
+  }
+ ],
+ "unloaded_before_start": [],
+ "started_at": "2026-09-14T05:36:00+00:00",
+ "wall_seconds": 33.6,
+ "calls": 2,
+ "live_calls": 2,
+ "adapted_drafts": 0,
+ "single_model_guard": "read Ollama's loaded models after every draft; would have stopped if any model other than mistral:latest was loaded"
+}

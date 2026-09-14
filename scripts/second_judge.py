@@ -3,15 +3,20 @@
 Usage:
     python scripts/second_judge.py replay     # llama3.1 v13 grades replayed from the cache; refuses any live call
     python scripts/second_judge.py run        # one pass, mistral:latest only; every reply kept verbatim
+    python scripts/second_judge.py regrade    # mistral:latest only, the drafts whose item differs between the run's pool and the draw-time pool
     python scripts/second_judge.py report     # reports/post-hoc-second-judge.md and .json
 
 Planned in docs/decisions.md ("Post hoc: a second judge") before any
 second-judge call. Grader v13 unchanged; same prompts, parser, 200-token
 cap, seed and context as the llama3.1 grades. Inputs are identical to those
-grades: sheets 1 and 2 against the item pool at commit 7a2a82d with no form
-hint, the final sheet against data/eval/dev.jsonl with the agent's action as
+grades: each sheet against the item pool it was drawn from (sheet 1 at
+1cc8664, sheet 2 at 7a2a82d) with no form hint, the final sheet against data/eval/dev.jsonl with the agent's action as
 the form hint. The lenient-parser, 600-token regrade of unreadable drafts is
 a labelled diagnostic, never the headline. No test item is read.
+
+The first run graded both sheets against 7a2a82d. Sheet 1 was drawn at
+1cc8664, and one of its items changed between the two, so the regrade stage
+grades that draft again with Mistral and the report merges it in.
 """
 
 import argparse
@@ -44,17 +49,17 @@ BASE_URL = "http://127.0.0.1:11434"
 FIRST_JUDGE = "llama3.1:latest"
 SECOND_JUDGE = "mistral:latest"
 GRADER_SHA = "a2eb938e82b0b63fa8a00c834e0569924e80b0a966ac1663b2ed9ca4986ad485"
-POOL_COMMIT = "7a2a82d"
+RUN_POOL = "7a2a82d"  # the pool the first Mistral run used for both sheets
 STRICT_CAP = 200
 ADAPTED_CAP = 600
 SHEETS = [
     {"name": "final", "title": "Final check: real agent outputs from dev", "sheet": "reports/final-blind-sheet.md", "key": "data/eval/final_blind_key.jsonl",
      "items": "dev", "form_hint": True, "blind_grader": "v13", "home_advantage": False},
     {"name": "sheet1", "title": "Sheet 1: model drafts under three passage conditions", "sheet": "reports/grader-check-sheet.md",
-     "key": "data/eval/grader_check_key-v13-rerun.jsonl", "items": "pool", "form_hint": False, "blind_grader": "v7", "home_advantage": True,
+     "key": "data/eval/grader_check_key-v13-rerun.jsonl", "items": "pool", "pool": "1cc8664", "form_hint": False, "blind_grader": "v7", "home_advantage": True,
      "revisions": "data/eval/grader_check_revisions.json"},
     {"name": "sheet2", "title": "Sheet 2: fresh model drafts", "sheet": "reports/grader-check-sheet-2.md", "key": "data/eval/grader_check_key-2-v13-rerun.jsonl",
-     "items": "pool", "form_hint": False, "blind_grader": "v10", "home_advantage": True},
+     "items": "pool", "pool": "7a2a82d", "form_hint": False, "blind_grader": "v10", "home_advantage": True},
 ]
 
 
@@ -76,11 +81,40 @@ def write_jsonl(path, rows):
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 
+def pool_at(commit):
+    raw = subprocess.run(["git", "show", f"{commit}:data/eval/items_candidates.jsonl"], cwd=ROOT, capture_output=True, check=True).stdout.decode("utf-8")
+    return {json.loads(l)["id"]: json.loads(l) for l in raw.splitlines() if l.strip()}
+
+
 def load_items():
-    dev = {r["id"]: r for r in jsonl(ROOT / "data" / "eval" / "dev.jsonl")}
-    raw = subprocess.run(["git", "show", f"{POOL_COMMIT}:data/eval/items_candidates.jsonl"], cwd=ROOT, capture_output=True, check=True).stdout.decode("utf-8")
-    pool = {json.loads(l)["id"]: json.loads(l) for l in raw.splitlines() if l.strip()}
-    return {"dev": dev, "pool": pool}
+    """Items by source: dev, and the pool at every commit a sheet was drawn from or the first run used."""
+    items = {"dev": {r["id"]: r for r in jsonl(ROOT / "data" / "eval" / "dev.jsonl")}}
+    for commit in {RUN_POOL} | {s["pool"] for s in SHEETS if s.get("pool")}:
+        items[f"pool@{commit}"] = pool_at(commit)
+    return items
+
+
+def item_of(items, sheet, item_id, commit=None):
+    """The item record a sheet's draft is graded against: its draw-time pool, or dev for the final sheet."""
+    if sheet["items"] == "dev":
+        return items["dev"][item_id]
+    return items[f"pool@{commit or sheet['pool']}"][item_id]
+
+
+def affected_drafts():
+    """Drafts whose item record differs between the first run's pool and the sheet's draw-time pool."""
+    items = load_items()
+    out = []
+    for sheet in SHEETS:
+        if sheet["items"] == "dev" or sheet["pool"] == RUN_POOL:
+            continue
+        for row in jsonl(ROOT / sheet["key"]):
+            before, now = item_of(items, sheet, row["item_id"], RUN_POOL), item_of(items, sheet, row["item_id"])
+            if before != now:
+                out.append({"sheet": sheet["name"], "sheet_no": row["sheet_no"], "item_id": row["item_id"],
+                            "fields": sorted(k for k in set(before) | set(now) if before.get(k) != now.get(k)),
+                            "bucket": [before.get("bucket"), now.get("bucket")]})
+    return out
 
 
 def form_hint_of(sheet, row):
@@ -95,7 +129,7 @@ def drafts():
     items = load_items()
     for sheet in SHEETS:
         for row in sorted(jsonl(ROOT / sheet["key"]), key=lambda r: r["sheet_no"]):
-            yield sheet, row, items[sheet["items"]][row["item_id"]]
+            yield sheet, row, item_of(items, sheet, row["item_id"])
 
 
 class RecordingJudge:
@@ -194,7 +228,7 @@ def cmd_run():
         if c["kind"] != "judge":
             continue
         sheet = next(s for s in SHEETS if s["name"] == c["sheet"])
-        keys = [k for k, _ in questions_for(items[sheet["items"]][c["item_id"]])]
+        keys = [k for k, _ in questions_for(item_of(items, sheet, c["item_id"]))]
         c["category"] = categorise_reply(keys, c["reply"], truncated=c["done_reason"] == "length")
     write_jsonl(OUT / "mistral-strict.jsonl", strict_rows)
     write_jsonl(OUT / "mistral-adapted.jsonl", adapted_rows)
@@ -206,6 +240,59 @@ def cmd_run():
            "adapted_drafts": len(adapted_rows), "strict_cap": STRICT_CAP, "adapted_cap": ADAPTED_CAP}
     (OUT / "run.json").write_text(json.dumps(run, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(run, indent=1))
+    return 0
+
+
+def cmd_regrade():
+    OUT.mkdir(parents=True, exist_ok=True)
+    grader_sha = hashlib.sha256((ROOT / "src" / "calibration" / "grader.py").read_bytes()).hexdigest()
+    if GRADER_VERSION != "grader-v13" or grader_sha != GRADER_SHA:
+        print(f"grader is not the frozen v13 ({GRADER_VERSION}, {grader_sha}); refusing to run")
+        return 1
+    replay = json.loads((OUT / "llama-replay.json").read_text(encoding="utf-8"))
+    if replay["mismatches"]:
+        print("the llama3.1 replay has not reproduced every committed grade under the draw-time pools; run the replay first")
+        return 1
+    affected = affected_drafts()
+    wanted = {(a["sheet"], a["sheet_no"]) for a in affected}
+    unloaded = unload_other_models()
+    tags = {m["name"]: m for m in httpx.get(f"{BASE_URL}/api/tags", timeout=10).json()["models"]}
+    provider = OllamaProvider(model=SECOND_JUDGE, base_url=BASE_URL, cache_dir=CACHE, num_ctx=4096)
+    calls, strict_rows, adapted_rows = [], [], []
+    started, started_at = time.time(), datetime.now(timezone.utc).isoformat(timespec="seconds")
+    todo = [(sheet, row, item) for sheet, row, item in drafts() if (sheet["name"], row["sheet_no"]) in wanted]
+    for sheet, row, item in todo:
+        context = {"pass": "strict", "stage": "draw-pool regrade", "sheet": sheet["name"], "sheet_no": row["sheet_no"], "item_id": row["item_id"],
+                   "draft_key": f"regrade/strict/{sheet['name']}/{row['sheet_no']}"}
+        rec = grade(item, row["draft"], judge=RecordingJudge(provider, STRICT_CAP, calls, context), form_hint=form_hint_of(sheet, row))
+        rec.update(sheet=sheet["name"], sheet_no=row["sheet_no"], question=row["question"])
+        strict_rows.append(rec)
+        loaded = [m["name"] for m in httpx.get(f"{BASE_URL}/api/ps", timeout=10).json().get("models", [])]
+        if any(name != SECOND_JUDGE for name in loaded):
+            print(f"another model is loaded ({loaded}); stopping so the pass stays single-model")
+            return 1
+        if rec["flag"] == "judge_unparsed":
+            context = {**context, "pass": "adapted", "draft_key": f"regrade/adapted/{sheet['name']}/{row['sheet_no']}"}
+            with lenient_parser():
+                adapted = grade(item, row["draft"], judge=RecordingJudge(provider, ADAPTED_CAP, calls, context), form_hint=form_hint_of(sheet, row))
+            adapted.update(sheet=sheet["name"], sheet_no=row["sheet_no"], question=row["question"])
+            adapted_rows.append(adapted)
+        print(f"{sheet['name']:<6} {row['sheet_no']:>2} {item['bucket']:<14} {rec['decided_by']:<6} llama {row['grade']:<8} mistral {rec['grade']:<8} {rec['flag'] or ''}", flush=True)
+    items = load_items()
+    for c in calls:
+        if c["kind"] == "judge":
+            sheet = next(s for s in SHEETS if s["name"] == c["sheet"])
+            c["category"] = categorise_reply([k for k, _ in questions_for(item_of(items, sheet, c["item_id"]))], c["reply"], truncated=c["done_reason"] == "length")
+    write_jsonl(OUT / "mistral-regrade-strict.jsonl", strict_rows)
+    write_jsonl(OUT / "mistral-regrade-adapted.jsonl", adapted_rows)
+    write_jsonl(OUT / "mistral-regrade-calls.jsonl", calls)
+    regrade = {"judge": SECOND_JUDGE, "digest": tags.get(SECOND_JUDGE, {}).get("digest"), "grader": GRADER_VERSION, "grader_sha256": grader_sha,
+               "first_run_pool": RUN_POOL, "draw_pools": {s["name"]: s.get("pool") for s in SHEETS}, "affected": affected,
+               "unloaded_before_start": unloaded, "started_at": started_at, "wall_seconds": round(time.time() - started, 1),
+               "calls": len(calls), "live_calls": sum(not c["cached"] for c in calls), "adapted_drafts": len(adapted_rows),
+               "single_model_guard": "read Ollama's loaded models after every draft; would have stopped if any model other than mistral:latest was loaded"}
+    (OUT / "regrade.json").write_text(json.dumps(regrade, indent=1) + "\n", encoding="utf-8", newline="\n")
+    print(json.dumps(regrade, indent=1))
     return 0
 
 
@@ -313,13 +400,24 @@ def cmd_report():
     llama = {(s["name"], r["sheet_no"]): r for s in SHEETS for r in jsonl(ROOT / s["key"])}
     strict = {(r["sheet"], r["sheet_no"]): r for r in jsonl(OUT / "mistral-strict.jsonl")}
     adapted = {(r["sheet"], r["sheet_no"]): r for r in jsonl(OUT / "mistral-adapted.jsonl")}
-    calls = jsonl(OUT / "mistral-calls.jsonl")
+    run_calls = jsonl(OUT / "mistral-calls.jsonl")
+    regrade = json.loads((OUT / "regrade.json").read_text(encoding="utf-8")) if (OUT / "regrade.json").exists() else None
+    regraded = set()
+    if regrade:
+        regraded = {(a["sheet"], a["sheet_no"]) for a in regrade["affected"]}
+        for key in regraded:
+            adapted.pop(key, None)
+        strict.update({(r["sheet"], r["sheet_no"]): r for r in jsonl(OUT / "mistral-regrade-strict.jsonl")})
+        adapted.update({(r["sheet"], r["sheet_no"]): r for r in jsonl(OUT / "mistral-regrade-adapted.jsonl")})
+    regrade_calls = jsonl(OUT / "mistral-regrade-calls.jsonl") if regrade else []
+    calls = [c for c in run_calls if (c["sheet"], c["sheet_no"]) not in regraded] + regrade_calls
     llama_calls = jsonl(OUT / "llama-calls.jsonl")
     run = json.loads((OUT / "run.json").read_text(encoding="utf-8"))
     replay = json.loads((OUT / "llama-replay.json").read_text(encoding="utf-8"))
     load = lambda name: json.loads((OUT / name).read_text(encoding="utf-8")) if (OUT / name).exists() else None
     classification, attribution, verification = load("independent-classification.json"), load("independent-attribution.json"), load("verification.json")
     corrections_check = load("corrections-verification.json")
+    regrade_check = load("regrade-verification.json")
     items = load_items()
     owner = {s["name"]: read_sheet(ROOT / s["sheet"]) for s in SHEETS}
     revisions = {int(k): v for k, v in json.loads((ROOT / "data" / "eval" / "grader_check_revisions.json").read_text(encoding="utf-8")).items()}
@@ -351,7 +449,7 @@ def cmd_report():
         analysts = {(d["sheet"], d["sheet_no"]): d for d in (attribution or {}).get("drafts", [])}
         disagreements = []
         for no in sorted(l_wrong | m_wrong):
-            rule = cause_by_rule(own[no], llama[(name, no)], strict[(name, no)], items[s["items"]][llama[(name, no)]["item_id"]])
+            rule = cause_by_rule(own[no], llama[(name, no)], strict[(name, no)], item_of(items, s, llama[(name, no)]["item_id"]))
             a = analysts.get((name, no))
             wrong = "both" if (no in l_wrong and no in m_wrong) else ("llama3.1 only" if no in l_wrong else "Mistral only")
             analyst_causes = None
@@ -401,11 +499,12 @@ def cmd_report():
     verdict = "about as well" if final["mistral_owner"][0] >= final["llama_owner"][0] - 1 else "noticeably worse"
     judge_calls = [c for c in calls if c["kind"] == "judge" and c["pass"] == "strict"]
     categories = Counter(c["category"] for c in judge_calls)
-    live = [c for c in calls if not c["cached"]]
+    live = [c for c in run_calls if not c["cached"]]
     secs = sorted(c["seconds"] for c in live)
     toks = sorted(c["eval_count"] or 0 for c in live)
     q = lambda xs, f: xs[int(f * (len(xs) - 1))] if xs else None
-    strict_copy = [c for c in calls if c["pass"] == "strict" and c["kind"] == "extraction"]
+    run_judge_calls = [c for c in run_calls if c["kind"] == "judge" and c["pass"] == "strict"]
+    strict_copy = [c for c in run_calls if c["pass"] == "strict" and c["kind"] == "extraction"]
     summary = {
         "verdict_final_sheet": verdict, "results": results,
         "pooled": {"labelled": len(pooled["llama"]), "llama": sum(pooled["llama"]), "mistral": sum(pooled["mistral"]), "adapted": sum(pooled["adapted"]),
@@ -416,21 +515,29 @@ def cmd_report():
         "unreadable_replies": [{k: c[k] for k in ("sheet", "sheet_no", "item_id", "call", "category", "done_reason", "eval_count", "reply")} for c in judge_calls if c["category"] != "parsed"],
         "adapted_reply_categories": dict(Counter(c.get("category", "parsed") for c in calls if c["kind"] == "judge" and c["pass"] == "adapted")),
         "habits": {"llama3.1": answer_habits(llama_calls), "mistral": answer_habits([c for c in calls if c["pass"] == "strict"])},
-        "calls": {"strict_judge": len(judge_calls), "strict_copy": len(strict_copy), "strict_copy_repeated_identical": len(strict_copy) - len({c["user_message"] for c in strict_copy}),
-                  "adapted_judge": sum(c["pass"] == "adapted" and c["kind"] == "judge" for c in calls), "adapted_copy": sum(c["pass"] == "adapted" and c["kind"] == "extraction" for c in calls),
-                  "cached": sum(c["cached"] for c in calls), "live": len(live)},
+        "calls": {"strict_judge": len(run_judge_calls), "strict_copy": len(strict_copy), "strict_copy_repeated_identical": len(strict_copy) - len({c["user_message"] for c in strict_copy}),
+                  "adapted_judge": sum(c["pass"] == "adapted" and c["kind"] == "judge" for c in run_calls), "adapted_copy": sum(c["pass"] == "adapted" and c["kind"] == "extraction" for c in run_calls),
+                  "cached": sum(c["cached"] for c in run_calls), "live": len(live), "note": "the first run's calls; the regrade's are under regrade"},
+        "regrade": ({**regrade, "judge_calls": sum(c["kind"] == "judge" for c in regrade_calls), "copy_calls": sum(c["kind"] == "extraction" for c in regrade_calls),
+                     "grades": {f"{k[0]}/{k[1]}": {"mistral": strict[k]["grade"], "llama": llama[k]["grade"], "decided_by": strict[k]["decided_by"]} for k in sorted(regraded)}}
+                    if regrade else None),
         "timing": {"wall_seconds": run["wall_seconds"], "median_seconds": q(secs, 0.5), "p90_seconds": q(secs, 0.9), "median_output_tokens": q(toks, 0.5), "p90_output_tokens": q(toks, 0.9)},
         "single_model_guard": "cmd_run read Ollama's loaded models after every draft and would have stopped if any model other than mistral:latest was loaded; the run log ends with exit 0",
         "harness_lock_in": harness_facts(calls, llama_calls, strict, llama, results),
         "who_ran_the_checks": "The owner's labels are the only human judgement. The readers, analysts, verifier and critic were language-model agents, not people.",
         "run": run, "replay": replay, "independent_classification": classification, "independent_attribution": attribution, "verification": verification,
+        "regrade_verification": regrade_check,
         "corrections_verification": ({**{k: v for k, v in corrections_check.items() if k not in ("reviewers", "later_rounds")},
                                       "later_rounds": [{k: v for k, v in r.items() if k != "reviewers"} for r in corrections_check.get("later_rounds", [])],
                                       "later_confirmed": sum(r["confirmed"] for r in corrections_check.get("later_rounds", []))} if corrections_check else None),
     }
     if verification:
         mismatches = []
+        regraded_sheets = {k[0] for k in regraded}
+        summary["verification_scope"] = {"regraded_sheets": sorted(regraded_sheets), "compared_now": sorted(v["sheet"] for v in verification["sheets"] if v["sheet"] not in regraded_sheets)}
         for v in verification["sheets"]:
+            if v["sheet"] in regraded_sheets:
+                continue
             x = results[v["sheet"]]
             pairs = {"drafts": (v["drafts"], x["drafts"]), "labelled": (v["labelled"], x["labelled"]), "judged": (v["judged"], x["judged"]),
                      "llama_agree": (v["llama_agree"], x["llama_owner"][0]), "mistral_agree": (v["mistral_agree"], x["mistral_owner"][0]),
@@ -516,7 +623,7 @@ def headline(s):
         + (f"But {word(len(shared_by_code))} of the {word(len(shared))} ({'; '.join(name(k, d) for k, d in shared_by_code)}) was decided by a code rule before any judge "
            "saw it, so the two share it by construction" + (", and the owner later changed that label" if all(d.get("revised_label") for _, d in shared_by_code) else "")
            + ". " if shared_by_code else "")
-        + f"The other {word(len(shared_judged))} reached a judge, and both recur under Mistral. So llama3.1's judged errors are not peculiar to llama3.1: they recur "
+        + f"The other {word(len(shared_judged))} reached a judge, and {'both' if len(shared_judged) == 2 else 'all ' + word(len(shared_judged))} recur under Mistral. So llama3.1's judged errors are not peculiar to llama3.1: they recur "
         "under an independently trained judge on the same rubric and harness. That does not show the rubric is sound, since Mistral makes errors llama3.1 does not. "
         "Nor does it show that the shared errors are the rubric's"
         + (f"; by the model-run analysts' reading, {word(len(judging_shared))} of the {word(len(shared_judged))} is a judging mistake both judges make." if judging_shared else "."),
@@ -544,11 +651,13 @@ def errors_section(s):
     both = sum(len(r[k]["overlap"]["both"]) for k in r)
     first_only = sum(len(r[k]["overlap"]["first_only"]) for k in r)
     second_only = sum(len(r[k]["overlap"]["second_only"]) for k in r)
+    by_code = sum(1 for k in r for d in r[k]["disagreements"] if d["wrong"] == "both" and d.get("decided_by") != "judge")
     out = ["## Where the errors fall", "",
            f"On the final sheet the two judges share {count(len(both_final), 'error')} ({drafts_list(both_final)}), and Mistral has {count(len(own_final), 'error')} of its own "
-           f"({drafts_list(own_final)}). Over all three sheets Mistral also misgrades every draft llama3.1 misgrades ({both} of {first}), and one of those was decided "
-           f"by a code rule before any judge saw it. Mistral adds {count(second_only, 'error')} of its own, while llama3.1 has {count(first_only, 'error')} of its own. That llama3.1 has none is expected on sheets 1 and 2, "
-           "where the rubric was revised until its disagreements there were fixed.", ""]
+           f"({drafts_list(own_final)}). Over all three sheets Mistral also misgrades every draft llama3.1 misgrades ({both} of {first})"
+           + (f", and {word(by_code)} of those {'was' if by_code == 1 else 'were'} decided by a code rule before any judge saw {'it' if by_code == 1 else 'them'}" if by_code else "")
+           + f". Mistral adds {count(second_only, 'error')} of its own, while llama3.1 has {count(first_only, 'error')} of its own. That llama3.1 has none is expected on sheets 1 and 2, "
+           "where the rubric was revised against llama3.1's disagreements.", ""]
     att = s.get("independent_attribution")
     rows = [(k, d) for k in ("final", "sheet1", "sheet2") for d in r[k]["disagreements"]]
     if att:
@@ -560,7 +669,10 @@ def errors_section(s):
                 "counting sheet 1, draft 34 as agreement: the rule names the code rule that decided it, the analysts name the label the owner later changed, and both are true. "
                 "Where the two differ, this report goes with the analysts. They read the drafts and the replies; the rule reads only flags and answers, assumes that an error "
                 "both judges make belongs to the rubric, and cannot tell a defensible answer from a wrong one. Their causes are a model's reading of the records, not a "
-                "person's.", "",
+                "person's."
+                + (" " + later if (later := " ".join(f"{d['sheet'].replace('sheet', 'Sheet ')}, draft {d['sheet_no']} was attributed after the draw-pool regrade by two further "
+                                                   "model-run analysts with the same instructions, who read the regraded records and the item as it stood when the sheet was drawn."
+                                                   for d in att["drafts"] if d.get("added"))) else ""), "",
                 "| sheet | draft | misgraded by | cause, two model-run analysts (not people) | cause, rule written after the run |", "|---|---|---|---|---|"]
         for k, d in rows:
             out.append(f"| {k} | {d['sheet_no']} | {d['wrong']} | {'; '.join(ANALYST_PHRASE[c] for c in (d['cause_analysts'] or []))} | {RULE_PHRASE[d['cause_rule']]} |")
@@ -623,8 +735,11 @@ def format_section(s):
     lines = [e for e in (cls or {}).get("entries", []) if not e["type"].startswith("whole")]
     unreadable = sum(v for k, v in cats.items() if k != "parsed")
     out = ["## Unreadable replies: task or format", "",
-           f"Mistral's strict pass made {sum(cats.values())} judge calls; the parser read {cats.get('parsed', 0)}. None stopped at the 200-token cap. "
-           f"Every reply is kept verbatim in reports/post-hoc-second-judge/mistral-calls.jsonl. There was only {count(len(s['unreadable_replies']), 'unreadable reply', 'unreadable replies')}, "
+           f"Mistral's strict grading made {sum(cats.values())} judge calls"
+           + (f", {s['regrade']['judge_calls']} of them in the draw-pool regrade" if s.get("regrade") else "")
+           + f"; the parser read {cats.get('parsed', 0)}. None stopped at the 200-token cap. "
+           f"Every reply is kept verbatim in reports/post-hoc-second-judge/mistral-calls.jsonl"
+           + (", and for the regraded draft in mistral-regrade-calls.jsonl" if s.get("regrade") else "") + f". There was only {count(len(s['unreadable_replies']), 'unreadable reply', 'unreadable replies')}, "
            "so the handful asked for is this one:", ""]
     for u in s["unreadable_replies"]:
         out += [f"{u['sheet']}, draft {u['sheet_no']}, second answer order, {u['eval_count']} tokens, stopped normally:", "", "```", u["reply"].strip(), "```", ""]
@@ -641,8 +756,11 @@ def format_section(s):
         maj = Counter(e["majority"] for e in lines)
         contradictory = [e for e in lines if e["majority"] == "contradictory"]
         split = [e for e in lines if not e["unanimous"]]
-        sentence = (f"The same three model-run readers also read the {len(lines)} parsed Mistral answer lines that carry added words, a check added after the run. "
-                    f"By majority {maj.get('clear', 0)} are clear, the added words backing the YES or NO given")
+        later_lines = [e for e in lines if e.get("added")]
+        sentence = (f"The same three model-run readers also read the {len(lines) - len(later_lines)} parsed Mistral answer lines that carry added words, a check added after the run. "
+                    + (f"Three further model-run readers, with the same instructions, read the {word(len(later_lines))} such lines from the draw-pool regrade, {len(lines)} in all. "
+                       if later_lines else "")
+                    + f"By majority {maj.get('clear', 0)} are clear, the added words backing the YES or NO given")
         if contradictory:
             sentence += (f", and {count(len(contradictory), 'is', 'are')} contradictory: "
                          + "; ".join(f"{e['sheet']}, draft {e['sheet_no']}, \"{e['text'].rstrip('.')}.\"" for e in contradictory)
@@ -724,6 +842,30 @@ def harness_section(s):
     return out
 
 
+def correction_section(s):
+    g = s.get("regrade")
+    if not g:
+        return []
+    rows = []
+    for a in g["affected"]:
+        key = f"{a['sheet']}/{a['sheet_no']}"
+        grades = g["grades"][key]
+        own = next((d["owner"] for d in s["results"][a["sheet"]]["disagreements"] if d["sheet_no"] == a["sheet_no"]), None)
+        rows.append((a, grades, own))
+    a, grades, own = rows[0]
+    first_run = g["first_run_pool"]
+    return ["## Correction, 2026-09-14: sheet 1 graded against the pool it was drawn from", "",
+            f"The first version of this report graded sheets 1 and 2 against git {first_run}, the item pool sheet 2 was drawn from. Sheet 1 was drawn at "
+            f"{g['draw_pools']['sheet1']}. {count(len(rows), 'item').capitalize()} on it changed between the two. On sheet 1, draft {a['sheet_no']}, a model-run pass over the "
+            f"ambiguous items, acting on the owner's blind grade, had moved the item from {a['bucket'][1]} to {a['bucket'][0]}. The owner ruled that each sheet is graded against the pool as it stood when the sheet was drawn and graded, "
+            "the rule set before this came up. So the draft was regraded against the item as drawn. llama3.1's grade came from the cache with no live call; Mistral's "
+            f"came from a second pass of {g['live_calls']} live calls with only Mistral loaded. "
+            + (f"Both judges now grade it {grades['llama']}" if grades["llama"] == grades["mistral"] else f"llama3.1 now grades it {grades['llama']} and Mistral {grades['mistral']}")
+            + (f" where the owner has {own}, so it becomes a shared error that reaches a judge." if own else ".")
+            + " Every figure below uses each sheet's draw-time pool. The figures that changed, with their old values, are listed in "
+            "reports/changed-numbers-2026-09-14.md; see also docs/report.md, measurement integrity, entry 2.", ""]
+
+
 def checks_section(s):
     out = ["## Independent checks, and who ran them", "",
            f"Every check below was run by code or by {MODEL_RUN}. The only person who graded anything in this experiment is the owner, whose labels are the ones on "
@@ -735,10 +877,16 @@ def checks_section(s):
         out.append("- A model-run verifier (a language-model agent, not a person) worked from the raw files with its own code, blind to this report and the script. "
                    "It recomputed each sheet's draft, label and judged counts, both judges' binary agreement with the owner, the judges' agreement with each other, the "
                    "misgraded draft numbers and the unreadable count. " + ("Every number matched." if not mm else f"Mismatches: {', '.join(mm)}.")
-                   + " It did not recompute the intervals, three-way agreement, order flips or copy-check counts. Added after the run.")
+                   + " It did not recompute the intervals, three-way agreement, order flips or copy-check counts. Added after the run."
+                   + (f" It checked the figures from before the draw-pool regrade, so its check is compared here only for {' and '.join(scope['compared_now'])}"
+                      + ("; the regraded figures were recounted by a second verifier (see the draw-pool regrade bullet)." if s.get("regrade_verification")
+                         else "; the regraded figures have not been independently recounted.")
+                      if (scope := s.get("verification_scope")) and scope["regraded_sheets"] else ""))
     if s.get("independent_classification"):
         out.append("- Three model-run readers (language-model agents, not people) classified the unreadable reply, a check planned before the run. After the run they "
-                   "also read the answer lines with added words. Each was blind to the code and to the other readers.")
+                   "also read the answer lines with added words. Each was blind to the code and to the other readers."
+                   + (" Three further readers with the same instructions read the lines added by the draw-pool regrade."
+                      if any(e.get("added") for e in s["independent_classification"]["entries"]) else ""))
     if s.get("independent_attribution"):
         out.append("- Two model-run analysts (language-model agents, not people) assigned causes to every misgraded draft, blind to the report, the rule and each other, "
                    "added after the run.")
@@ -756,7 +904,16 @@ def checks_section(s):
                    "raw logs found that 4 of Mistral's 7 counted echoes were NONE replies quoting a phrase, and that llama3.1's 1 was a leaves-out call that copied the "
                    "draft. It also found that the overlap counted a draft no judge saw, and that the critic had been credited with finding the colon bug. A second round of "
                    "the same kind, on the fixed text, found that the recount's denominators included instructions that quote an answer to go against, not a phrase to "
-                   f"find. A third round found only wording and test gaps; all {cv['later_confirmed']} later findings are fixed and recorded in the same file. The overcount is the seventh entry in the main report's measurement-integrity section, and the classifier has a test for each shape it missed.")
+                   f"find. A third round confirmed {word(cv['later_rounds'][-1]['confirmed'])} more findings, none of which changed a number; all {cv['later_confirmed']} later findings "
+                   "are fixed and recorded in the same file. The overcount is the seventh entry in the main report's measurement-integrity section, and the classifier has a test for each shape it missed.")
+    rv = s.get("regrade_verification")
+    g = s.get("regrade")
+    if g:
+        out.append(f"- The draw-pool regrade (reports/post-hoc-second-judge/regrade.json) is code, with the same single-model guard as the first pass."
+                   + (f" A model-run verifier (a language-model agent, not a person), working from the raw files with its own code, then recomputed the regraded sheet 1 and pooled "
+                      "figures (reports/post-hoc-second-judge/regrade-verification.json): "
+                      + ("every number matched." if not rv.get("mismatches") else f"mismatches: {', '.join(rv['mismatches'])}.") if rv else "")
+                   + " Three further model-run readers and two further model-run analysts, with the original instructions, read the new answer lines and the regraded draft.")
     out.append("- The llama3.1 replay and the Mistral pass are code: the replay refused any live model call, and the pass refused to run with any other model loaded.")
     return out + [""]
 
@@ -771,12 +928,15 @@ def render(s):
              f"Who did what. The owner's hand labels are the only human judgement in this experiment. The two judges are language models. The readers, analysts, "
              f"verifier, critic and reviewers named below are also {MODEL_RUN}, and are called model-run wherever they appear; they are not the human blind checks reported in the "
              "main report. Of these checks only one was planned before the run, the readers' classification of the unreadable reply. The cause rule, the readers' "
-             "reading of answer lines with added words, the analysts, the verifier, the critic and the check of the owner's corrections were all added after it.", "",
+             "reading of answer lines with added words, the analysts, the verifier, the critic, the check of the owner's corrections and the checks of the draw-pool "
+             "regrade were all added after it.", "",
              "Terms. Binary agreement counts CORRECT against PARTIAL or WRONG; three-way agreement needs the exact grade. 84 of the 85 drafts carry an owner label. "
              "The owner did grade sheet 1, draft 1, CORRECT like both judges. Its grade line is indented and the sheet reader skips it, so it counts as unlabelled "
              "here, as in every earlier figure for that sheet. A draft reaches a judge only when no code rule or exact match decides it first; both judges take the same route "
              "on every draft.", "",
-             "## Headline", ""]
+             ]
+    lines += correction_section(s)
+    lines += ["## Headline", ""]
     lines += headline(s)
     lines += harness_section(s)
     lines += errors_section(s)
@@ -799,15 +959,20 @@ def render(s):
               f"{c['adapted_judge']} judge calls and {c['adapted_copy']} copy call. Live calls took a median {t['median_seconds']} s, 90th percentile {t['p90_seconds']} s, "
               f"with a median {t['median_output_tokens']} output tokens, 90th percentile {t['p90_output_tokens']}. llama3.1's grades were replayed from the cache: all "
               f"{sum(s['replay']['reproduced'].values())} matched the committed grades exactly, over {s['replay'].get('calls')} calls, {word(s['replay'].get('live_calls') or 0)} of them live.", ""]
+    g = s.get("regrade")
+    if g:
+        lines[-2] += (f" The draw-pool regrade was a second, smaller pass with the same guard: {count(len(g['affected']), 'draft')}, {g['judge_calls']} judge "
+                      f"{'call' if g['judge_calls'] == 1 else 'calls'} and {word(g['copy_calls']) if g['copy_calls'] else 'no'} copy {'call' if g['copy_calls'] == 1 else 'calls'}, {g['live_calls']} of them live, "
+                      f"{g['wall_seconds']:.0f} s.")
     lines += checks_section(s)
     return "\n".join(lines) + "\n"
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("stage", choices=["replay", "run", "report"])
+    parser.add_argument("stage", choices=["replay", "run", "regrade", "report"])
     args = parser.parse_args()
-    return {"replay": cmd_replay, "run": cmd_run, "report": cmd_report}[args.stage]()
+    return {"replay": cmd_replay, "run": cmd_run, "regrade": cmd_regrade, "report": cmd_report}[args.stage]()
 
 
 if __name__ == "__main__":

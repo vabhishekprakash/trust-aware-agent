@@ -1,0 +1,89 @@
+{
+ "population": "decisive stratum: answerable items with the evidence retrieved, dev, out-of-fold probabilities",
+ "items": 50,
+ "errors": 17,
+ "base_error": 0.34,
+ "half": 25,
+ "variants": [
+  {
+   "vector": "full",
+   "fit": "logistic",
+   "distinct_values": 50,
+   "rank_ordered_top_half": {
+    "covered": 25,
+    "errors": 4,
+    "error": 0.16
+   },
+   "tie_aware_nearest_half": {
+    "threshold": 0.5332,
+    "covered": 25,
+    "errors": 4,
+    "error": 0.16,
+    "error_interval": [
+     0.03571428571428571,
+     0.32142857142857145
+    ]
+   }
+  },
+  {
+   "vector": "full",
+   "fit": "logistic+isotonic",
+   "distinct_values": 22,
+   "rank_ordered_top_half": {
+    "covered": 25,
+    "errors": 6,
+    "error": 0.24
+   },
+   "tie_aware_nearest_half": {
+    "threshold": 0.5577,
+    "covered": 22,
+    "errors": 4,
+    "error": 0.18181818181818182,
+    "error_interval": [
+     0.04,
+     0.36363636363636365
+    ]
+   }
+  },
+  {
+   "vector": "minus_logprobs",
+   "fit": "logistic",
+   "distinct_values": 50,
+   "rank_ordered_top_half": {
+    "covered": 25,
+    "errors": 8,
+    "error": 0.32
+   },
+   "tie_aware_nearest_half": {
+    "threshold": 0.6271,
+    "covered": 25,
+    "errors": 8,
+    "error": 0.32,
+    "error_interval": [
+     0.13621541501976284,
+     0.5185555555555555
+    ]
+   }
+  },
+  {
+   "vector": "minus_logprobs",
+   "fit": "logistic+isotonic",
+   "distinct_values": 23,
+   "rank_ordered_top_half": {
+    "covered": 25,
+    "errors": 8,
+    "error": 0.32
+   },
+   "tie_aware_nearest_half": {
+    "threshold": 0.5769,
+    "covered": 25,
+    "errors": 8,
+    "error": 0.32,
+    "error_interval": [
+     0.13636363636363635,
+     0.52
+    ]
+   }
+  }
+ ]
+}

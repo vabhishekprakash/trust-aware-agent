@@ -382,6 +382,47 @@
     "It commits to YES and explains the mismatch (a senior manager versus someone with change authority), which fits.",
     "YES is backed by a concrete difference: a senior manager with engineering expertise versus someone with change authority."
    ]
+  },
+  {
+   "id": "N1",
+   "sheet": "sheet1",
+   "sheet_no": 19,
+   "type": "one answer line",
+   "text": "Q2: NO (The candidate gives \"the FRR\" as the answer for both readings)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "The line commits to NO, and the extra words (the candidate gives the FRR for both readings) explain why the SAR or pre-Ship Review answer is absent, so they agree with NO.",
+    "The line says NO, and the explanation that the candidate gave \"the FRR\" for both readings backs that up, since it means the candidate did not give SAR or pre-Ship Review for reading 1.",
+    "The line commits to NO, and the aside that the candidate gives \"the FRR\" for both readings backs that up, since FRR is not SAR or pre-Ship Review."
+   ],
+   "added": "added after the draw-pool regrade of 2026-09-14, same prompt and method, run by language-model agents, not people"
+  },
+  {
+   "id": "N2",
+   "sheet": "sheet1",
+   "sheet_no": 19,
+   "type": "one answer line",
+   "text": "Q2: NO (The candidate gives \"the FRR (Flight Readiness Review)\" as the answer for both readings.)",
+   "votes": [
+    "clear",
+    "clear",
+    "clear"
+   ],
+   "majority": "clear",
+   "unanimous": true,
+   "notes": [
+    "The line commits to NO, and the extra words (the candidate gives the Flight Readiness Review for both readings) back up the NO without qualifying it.",
+    "The line says NO, and the explanation that the candidate gave \"the FRR (Flight Readiness Review)\" for both readings fits a no on SAR or pre-Ship Review for reading 1.",
+    "The line commits to NO, and the aside that the candidate gives \"the FRR (Flight Readiness Review)\" for both readings backs that up, since FRR is not SAR or pre-Ship Review."
+   ],
+   "added": "added after the draw-pool regrade of 2026-09-14, same prompt and method, run by language-model agents, not people"
   }
- ]
+ ],
+ "later_additions": "Entries N1 and N2 were added after the draw-pool regrade of 2026-09-14, same prompt and method, run by language-model agents, not people."
 }

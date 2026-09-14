@@ -56,6 +56,7 @@ def main() -> int:
     parser.add_argument("--revisions", default="", help="JSON file of sheet number to grade for grades the owner revised after the blind pass")
     parser.add_argument("--out", default=str(ROOT / "reports" / "grader-check-result.md"))
     parser.add_argument("--title", default="blind agreement")
+    parser.add_argument("--note", default="", help="a provenance paragraph printed under the title, such as which pool the key was graded against")
     args = parser.parse_args()
 
     owner = read_sheet(Path(args.sheet))
@@ -85,6 +86,8 @@ def main() -> int:
 
     first = key[pairs[0][0]]
     lines = [f"# Grader check: {args.title}", ""]
+    if args.note:
+        lines += [args.note, ""]
     if revised:
         lines += [
             "This is NOT a blind number. The owner graded the sheet blind once; that figure stands in",
@@ -99,7 +102,7 @@ def main() -> int:
     lines += [
         f"Grader {first['grader_version']}, judge {first['judge_model']}, drafts by the model under test.",
         "",
-        f"- drafts graded by the owner: {len(pairs)} of {len(key)}" + (f" (no grade written for sheet numbers {', '.join(map(str, ungraded))})" if ungraded else ""),
+        f"- drafts graded by the owner: {len(pairs)} of {len(key)}" + (f" (no grade line read for sheet numbers {', '.join(map(str, ungraded))})" if ungraded else ""),
         f"- binary label agreement (CORRECT against not CORRECT): {agree_binary} of {len(pairs)} ({100 * agree_binary / len(pairs):.0f} percent)",
         f"- three-way grade agreement: {agree_exact} of {len(pairs)} ({100 * agree_exact / len(pairs):.0f} percent)",
         f"- binary agreement per bucket: " + ", ".join(f"{b} {by_bucket_agree[b]} of {by_bucket[b]}" for b in sorted(by_bucket)),

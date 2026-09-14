@@ -555,5 +555,373 @@
     }
    ]
   }
- ]
+ ],
+ "distinct_defect_grouping": {
+  "run_by": "language-model agents, not people: one agent grouped the confirmed findings, and a second tried to refute the grouping",
+  "added": "2026-09-14, after the three rounds, for the report's Iterated model review paragraph",
+  "grouping": [
+   {
+    "round": 1,
+    "reviewers": 3,
+    "raw_findings": 20,
+    "confirmed": 15,
+    "refuted": 5,
+    "distinct": [
+     {
+      "members": [
+       "requirements:F2",
+       "numbers:echo-count-includes-none-replies"
+      ],
+      "description": "Mistral's '7 calls' of echoing was inflated. 4 of the 7 were NONE replies that quote the phrase (parse_extraction reads the quote before its NONE check), and 2 were one request, live then cached. Only 3 calls on 2 requests gave the phrase back. requirements:F2 also noted the two judges met this shape unequally (8 against 3).",
+      "class": "number",
+      "origin": "New in round 1. In commit 3524e8b ('seven calls, against llama3.1's one') and restated in the owner's correction 4."
+     },
+     {
+      "members": [
+       "requirements:F2"
+      ],
+      "description": "llama3.1's one counted echo (sheet1 draft 31) was a leaves-out call that copied the draft. _TARGET matched it through 'this answer:', a fourth shape, so 'three instruction shapes' in item 6 and the code comment was also false.",
+      "class": "number",
+      "origin": "New in round 1 and in 3524e8b. Only requirements:F2 reported it, bundled with the NONE defect, but it needed its own classifier fix and test (llama3.1 went from 1 to 0)."
+     },
+     {
+      "members": [
+       "disclosure:F1",
+       "requirements:F3",
+       "numbers:critic-did-not-find-colon-bug"
+      ],
+      "description": "docs/report.md, the post hoc checks bullet and docs/decisions.md say the model-run critic found the echo-count (colon) bug. critic-review.json shows it repeated the undercount and never mentions the pattern.",
+      "class": "attribution",
+      "origin": "New in round 1. In 3524e8b ('which found a bug in the echo count', 'The most serious was a bug in the echo count'), and the correction edits sharpened it to 'The critic found the echo-count bug'."
+     },
+     {
+      "members": [
+       "requirements:F1",
+       "numbers:overlap-3-of-3-includes-code-decided-draft"
+      ],
+      "description": "The headline says llama3.1's errors 'recur under an independently trained judge' (3 of 3). But sheet1 draft 34 was decided by a code rule before any judge saw it, so only 2 judged errors recur. docs/report.md and docs/decisions.md say the same.",
+      "class": "claim",
+      "origin": "New in round 1, introduced by the correction edits (3524e8b had only '(3 of 3)'). The pre-commit critic had flagged the same overclaim."
+     },
+     {
+      "members": [
+       "requirements:F4",
+       "numbers:integrity-before-committed-result"
+      ],
+      "description": "The integrity intro and layman guide were changed to 'before it reached a committed result' / 'finished result'. Entry 4 contradicts this: its halving figure was committed in a37aad6.",
+      "class": "claim",
+      "origin": "New in round 1, introduced by the correction edits (3524e8b said 'before it reached a claim' / 'became a claim')."
+     },
+     {
+      "members": [
+       "disclosure:F2",
+       "numbers:verifier-every-per-sheet-number"
+      ],
+      "description": "docs/report.md and docs/decisions.md say the model-run verifier recomputed 'every per-sheet number'. verification.json checks only 9 fields per sheet.",
+      "class": "claim",
+      "origin": "New in round 1. The decisions.md wording is in 3524e8b ('independent recount of every per-sheet number'), and the correction edits copied it into report.md."
+     },
+     {
+      "members": [
+       "disclosure:F4"
+      ],
+      "description": "The new checks-section intro, 'The model-run checks were kept blind in the sense stated for each', implies the critic was blind. It was not.",
+      "class": "disclosure",
+      "origin": "New in round 1, introduced by the correction edits."
+     },
+     {
+      "members": [
+       "requirements:F6"
+      ],
+      "description": "Harness lock-in table rows say words were 'found / not found in the draft', but for leaves-out calls the text checked is the reference. All 8 of llama3.1's 'not found' rows are leaves-out calls, and 6 of them copied words that are in the draft.",
+      "class": "claim",
+      "origin": "New in round 1. In 3524e8b ('| copied words not found in the draft | 8 | 2 |')."
+     },
+     {
+      "members": [
+       "requirements:F8"
+      ],
+      "description": "Changed sentences run past the house limit of about 34 words without being mostly numbers (87, 58, 38 and 36 words).",
+      "class": "style",
+      "origin": "New in round 1. The correction edits introduced or lengthened these sentences."
+     },
+     {
+      "members": [
+       "numbers:sheet1-draft1-never-graded"
+      ],
+      "description": "The Terms paragraph (and decisions.md) says sheet 1 draft 1 was 'never graded'. The owner did grade it, on an indented line the sheet parser skips.",
+      "class": "claim",
+      "origin": "New in round 1. In 3524e8b, outside the four corrections."
+     }
+    ],
+    "distinct_count": 10,
+    "by_class": {
+     "number": 2,
+     "claim": 5,
+     "attribution": 1,
+     "disclosure": 1,
+     "test": 0,
+     "wording": 0,
+     "style": 1
+    },
+    "changed_a_number": 2
+   },
+   {
+    "round": 2,
+    "reviewers": 2,
+    "raw_findings": 22,
+    "confirmed": 12,
+    "refuted": 10,
+    "distinct": [
+     {
+      "members": [
+       "recount:R2-1"
+      ],
+      "description": "The echo denominators, 13 and 10 'instructions that quote a phrase to find', include the contradict shape, which quotes an answer to go against. Only 7 and 2 requests quote a phrase to find.",
+      "class": "number",
+      "origin": "Introduced by the round-1 fix for the two echo defects. The denominators first appear in the recount rewrite (patches at 18:54-18:55 UTC)."
+     },
+     {
+      "members": [
+       "claims:R2-01"
+      ],
+      "description": "Sheet2 draft 20's echo is described as giving the phrase back 'instead of copying the draft'. That draft never states the correction, so there was nothing to copy and the strike was right. The mechanism rests on final draft 5 alone.",
+      "class": "claim",
+      "origin": "Incomplete fix of the round-1 Mistral echo defect. The rewrite narrowed the count but kept 'instead of copying', although the round-1 numbers reviewer's evidence had already noted draft 20 had nothing to copy. recount:R2-2 raised the same point and was refuted."
+     },
+     {
+      "members": [
+       "claims:R2-02"
+      ],
+      "description": "'The echo count those reviews corrected twice' credits the critic's review with a correction it did not make.",
+      "class": "attribution",
+      "origin": "The round-1 critic-credit defect again, in softer form, in text written for the round-1 fix."
+     },
+     {
+      "members": [
+       "claims:R2-03"
+      ],
+      "description": "docs/report.md and docs/decisions.md still call the unreadable reply a 'hedged non-answer', and decisions.md still says every critic defect was addressed.",
+      "class": "claim",
+      "origin": "New in round 2 but not new text: in 3524e8b, flagged by the pre-commit critic (defect 4), fixed only in the post hoc report, and missed by round 1."
+     },
+     {
+      "members": [
+       "claims:R2-05"
+      ],
+      "description": "The post hoc report does not label the verifier, critic and corrections check as added after the run, although decisions.md says they are labelled.",
+      "class": "disclosure",
+      "origin": "New in round 2. The incomplete 'added after the run' sentence dates from 3524e8b, and round 1's disclosure sweep missed it."
+     },
+     {
+      "members": [
+       "claims:R2-06"
+      ],
+      "description": "decisions.md says the check 'found that three of the committed statements were wrong'. At least five committed statements were found wrong. The fix changed 'three' to 'several'.",
+      "class": "number",
+      "origin": "Introduced by the round-1 fix, in the new decisions.md corrections entry."
+     },
+     {
+      "members": [
+       "recount:R2-6",
+       "claims:R2-07"
+      ],
+      "description": "decisions.md item 5 gives 'The rest were wording' as the full list of round-1 findings. It leaves out the integrity-intro and sentence-length findings, yet says all are addressed.",
+      "class": "claim",
+      "origin": "Introduced by the round-1 fix, in its decisions.md summary of round 1."
+     },
+     {
+      "members": [
+       "recount:R2-6",
+       "claims:R2-15"
+      ],
+      "description": "Sentences still run past about 34 words. The decisions.md sentence round 1 cited grew from 58 to 63 words, a report.md integrity sentence is 51 words, and the round-1 fix added new 42-word and 37-word sentences.",
+      "class": "style",
+      "origin": "Incomplete fix of the round-1 style defect, plus overlong sentences written in the round-1 fix."
+     },
+     {
+      "members": [
+       "claims:R2-10"
+      ],
+      "description": "The heading and intro say six errors while entry 6 'holds two errors in one count', seven by the section's own rule. The layman guide says six too. The fix made it seven.",
+      "class": "number",
+      "origin": "Introduced by the round-1 fix for the echo defects, which folded the second echo error into entry 6."
+     },
+     {
+      "members": [
+       "claims:R2-11"
+      ],
+      "description": "The docs/report.md blind-check table still says sheet 1 had '39 graded of 40'. The fix changed it to '40, one grade line unread'.",
+      "class": "number",
+      "origin": "Incomplete fix of the round-1 'never graded' defect: fixed in the post hoc report but not in the main report table, which has said this since 3524e8b."
+     },
+     {
+      "members": [
+       "claims:R2-12"
+      ],
+      "description": "decisions.md calls the refuting agents only 'an agent', never model-run or language-model agents.",
+      "class": "disclosure",
+      "origin": "Introduced by the round-1 fix, in text recording the corrections check."
+     }
+    ],
+    "distinct_count": 11,
+    "by_class": {
+     "number": 4,
+     "claim": 3,
+     "attribution": 1,
+     "disclosure": 2,
+     "test": 0,
+     "wording": 0,
+     "style": 1
+    },
+    "changed_a_number": 4
+   },
+   {
+    "round": 3,
+    "reviewers": 2,
+    "raw_findings": 11,
+    "confirmed": 7,
+    "refuted": 4,
+    "distinct": [
+     {
+      "members": [
+       "numbers:R3-1"
+      ],
+      "description": "'The other copy calls quote nothing, the draft, or an answer the copied words must go against' and the _TARGET comment leave out the 'same' shape, which quotes the question (17 of Mistral's 54 copy calls).",
+      "class": "claim",
+      "origin": "Introduced by the round-2 fix for the denominators. The sentence and code comment were written at 19:18-19:19 UTC."
+     },
+     {
+      "members": [
+       "numbers:R3-2",
+       "claims:R3-7"
+      ],
+      "description": "decisions.md says the classifier has 'a test for each shape'. No test covered the 'state this correction' branch that sheet2 draft 20's echo depends on, and none pinned the 'same' shape to None.",
+      "class": "test",
+      "origin": "The overstated sentence came from the round-2 fix. The coverage gap itself was raised in round 2 as recount:R2-4 and refuted there."
+     },
+     {
+      "members": [
+       "claims:R3-1"
+      ],
+      "description": "The docs/report.md Harness lock-in subsection still says Mistral gave the phrase back 'instead of copying on 2'. A later sentence in the same paragraph says draft 20 had nothing to copy.",
+      "class": "claim",
+      "origin": "Incomplete fix of the round-2 draft-20 defect (claims:R2-01): fixed in the post hoc report and decisions.md, not in report.md."
+     },
+     {
+      "members": [
+       "claims:R3-4"
+      ],
+      "description": "The integrity intro says 'The first five checks were' and names three; the other two are in the next sentence. The fix reworded it to 'first three ... fourth and fifth', and no count changed.",
+      "class": "wording",
+      "origin": "Introduced by the round-2 fix for sentence length, which split the 51-word sentence (19:21 UTC)."
+     },
+     {
+      "members": [
+       "claims:R3-5"
+      ],
+      "description": "decisions.md item 6 files false statements (draft 1 'never graded', the integrity intro) under 'wording'. It still leaves out the round-2 findings on 'corrected twice', 'three' and the refuting agents' label.",
+      "class": "claim",
+      "origin": "Incomplete fix of the round-2 incomplete-list defect (recount:R2-6, claims:R2-07). The list was extended but stayed incomplete."
+     },
+     {
+      "members": [
+       "claims:R3-8"
+      ],
+      "description": "Sentences over the limit: a 42-word overlap sentence and two 36-word sentences.",
+      "class": "style",
+      "origin": "Incomplete fix of the round-2 style defect (one 36-word sentence replaced the 37-word one recount:R2-6 flagged). The 42-word sentence was written in the round-1 overlap fix at 18:54 UTC and round 2 missed it."
+     }
+    ],
+    "distinct_count": 6,
+    "by_class": {
+     "number": 0,
+     "claim": 3,
+     "attribution": 0,
+     "disclosure": 0,
+     "test": 1,
+     "wording": 1,
+     "style": 1
+    },
+    "changed_a_number": 0
+   }
+  ],
+  "observation": "Confirmed findings fell 15, 12, 7, but distinct defects went 10, 11, 6. So the defects did not shrink every round: round 2 had one reviewer fewer and still found one more distinct defect than round 1, and only round 3 dropped, to 6, none of which changed a number. The count never reached zero, and zero was never tested, because the round-3 fixes were committed as 6ee42a4 within a minute of the last edit, with no fourth round. Nine of round 2's 11 defects and all 6 of round 3's were created, brought back or left half-fixed by the previous round's fixes, so each round mostly caught what the last fix introduced.",
+  "caveats": [
+   "Reviewer count per round was 3, 2, 2. Per reviewer that is 5.0, 6.0 and 3.5 confirmed findings, and 3.3, 5.5 and 3.0 distinct defects, so the raw per-round totals are not like for like.",
+   "Scope and prompts narrowed each round (workflow scripts launched 18:32, 18:57 and 19:22 UTC, in the session transcript). Round 1 had a disclosure sweep, a requirements check and a number tracer over all in-scope files. Round 2 dropped the separate disclosure sweep, aimed the recount at named sections and gave the claims reviewer an 8-point checklist. Round 3 limited both reviewers to named sections, had the claims reviewer check a list of round-2 items, and added 'Do not re-report fixed items or wording preferences'.",
+   "Reviewers were told earlier findings. The round-2 prompt listed round-1 findings (a) to (h) and said they had been addressed. The round-3 prompt listed round-2 findings (1) to (11), described the intended fixes, and asked the claims reviewer to confirm each was fixed. That points attention at known defects, so later rounds are not independent samples.",
+   "The run stopped after round 3. The round-3 fixes (a new correction-shape test, a rewritten decisions.md item 6, sentence splits, a new 'test for each of the five copy shapes' sentence and a later_rounds pointer) were applied at 19:40-19:41 UTC and committed as 6ee42a4 at 01:11:26 +0530 (19:41:26 UTC) without review. Given how often earlier fixes caused new defects, those fixes may contain some.",
+   "Every count depends on a model-run refuter told to default to real=false, and the refuters were inconsistent. recount:R2-2 was refuted while claims:R2-01, making the same draft-20 point, was confirmed. recount:R2-4 (untested correction branch) was refuted in round 2 and confirmed in round 3 as numbers:R3-2 and claims:R3-7. Some refuted findings were acted on anyway: the later_rounds pointer from the round-3 claims reviewer's refuted R3-6 is now in docs/decisions.md.",
+   "The deduplication and class labels are one model-run reader's judgement, not blind and not second-coded. I split round 1's requirements:F2 into two defects (Mistral's NONE and cache inflation, llama3.1's leaves-out copy) because each needed its own classifier fix and test. The project's own records merge them (item (a) in the round-2 prompt; the claims:R2-07 verdict counts 'nine distinct defects'), which would make round 1 nine. requirements:F2 and recount:R2-6 each belong to two defects.",
+   "I treated sentence-length findings as one style defect per round even though they cite different sentences. A strict rule that defects are separate when one fix does not fix the other would split them and raise the style counts.",
+   "Class calls that could go either way: the verifier-scope overstatement, the 'draft' table labels and 'never graded' are classed claim, not disclosure or wording. 'Changed a number' counts a defect whose fix changed a reported figure (7 against 1 echoes, llama3.1's 1, 13 and 10, three to several, six to seven errors, 39 to 40 graded). It does not count claims:R3-4, where 'five' became 'first three ... fourth and fifth' without changing any count.",
+   "The project's own summary says round 3 'found only wording and test gaps'. Under these classes, 3 of round 3's 6 defects were false or self-contradicting statements (claims), so that summary understates round 3.",
+   "The findings are not equally severe. Entries marked high severity number 4, 0 and 0 across the rounds, and medium 5, 4 and 2, so severity fell faster than the distinct count.",
+   "Rounds did not review the same text. Round 1 reviewed the correction edits on top of 3524e8b, and later rounds reviewed the whole working tree, so each round mixed new defects with leftovers. Round 2 still found defects that had been in the text since 3524e8b (the hedged non-answer, the missing added-after-the-run labels), so no round's recall is known.",
+   "All reviewers and refuters were language-model agents, run by the same assistant session that wrote the fixes. They were not people, were not blind to the report, and all three rounds ran within about 70 minutes before the commit.",
+   "On the owner's proposed entry-7 wording, a note rather than a verdict. Round 1 (requirements:F4, numbers:integrity-before-committed-result) confirmed that entry 4's halving figure was committed in a37aad6. The confirmed claims:R2-06 verdict lists at least five other statements committed in 3524e8b and later found wrong (the critic credit, the verifier's scope, the 'draft' table labels, 'never graded', besides the echo count), and the critic credit appeared in three documents. These records do not back 'the only error that reached a commit' without qualification. Whether any of those was repeated downstream as fact was not checked here."
+  ],
+  "refutation": {
+   "entry": "Model-run deduplication of the confirmed findings in reports/post-hoc-second-judge/corrections-verification.json (3 review rounds before commit 6ee42a4)",
+   "field_verdicts": [
+    {
+     "field": "rounds[].reviewers / raw_findings / confirmed / refuted",
+     "holds": true,
+     "correction": "",
+     "evidence": "Counted directly from the JSON. Round 1: disclosure 3 confirmed + 2 refuted, requirements 6 + 3, numbers 6 + 0, so 20 raw, 15 confirmed, 5 refuted. Round 2 (later_rounds[0]): recount 2 + 4, claims 10 + 6, so 22 / 12 / 10. Round 3 (later_rounds[1]): numbers 2 + 1, claims 5 + 3, so 11 / 7 / 4. The file's own top-level confirmed/refuted fields match. Reviewers 3, 2, 2 match the three workflow scripts in the session transcript."
+    },
+    {
+     "field": "distinct[].members (every confirmed finding in exactly one group)",
+     "holds": false,
+     "correction": "Coverage is complete: all 34 confirmed IDs appear, no refuted ID is used, and the duplicate IDs are told apart correctly (numbers:R3-1 vs claims:R3-1, recount:R2-6 vs claims:R2-06). But two findings are in two groups each. requirements:F2 is in round-1 groups 1 and 2, and recount:R2-6 is in the round-2 incomplete-list and sentence-length groups. So 'exactly one group' does not hold. Caveat 6 discloses this, and each of the two findings really does bundle two defects.",
+     "evidence": "Membership lists compared with the confirmed arrays: round 1 has 16 member slots for 15 IDs, round 2 has 13 slots for 12 IDs, round 3 has 7 slots for 7 IDs."
+    },
+    {
+     "field": "group boundaries (merges and splits)",
+     "holds": false,
+     "correction": "The agent splits llama3.1's leaves-out echo out of requirements:F2 because it 'needed its own classifier fix and test'. It does not apply that rule to group 1. Group 1 merges three things: (a) NONE replies read as echoes, fixed by a NONE-first check in the classifier; (b) final draft 5 counted twice, live then cached, fixed by reporting per distinct request; (c) the unequal exposure (8 vs 3), fixed by giving denominators. Under the stated rule round 1 would be 11 or 12 distinct, not 10. Then the observation that round 2 found more distinct defects than round 1 no longer holds. Caveat 6 only covers the opposite choice (merging to 9). Every other group looks right: the three critic-credit entries are one defect, and the critic-blind finding is correctly kept apart from the critic-credit one.",
+     "evidence": "requirements:F2 problem text lists the NONE replies, the cache repeat, the leaves-out shape and 'Mistral 8 times, llama3.1 3 times' as separate points. numbers:echo-count evidence suggests '3 calls against 1, or 2 distinct replies against 1'. The final text reports calls and distinct requests separately (post hoc md line 37, report.md entry 7)."
+    },
+    {
+     "field": "distinct[].description",
+     "holds": true,
+     "correction": "",
+     "evidence": "Each description checked against its members' problem, evidence and verdict text. Examples: group 1 (4 NONE, final 5 twice with one cached, 3 calls on 2 requests) matches numbers:echo-count-includes-none-replies. Group 6 '9 fields per sheet' matches verification.json, whose three sheet objects carry exactly drafts, labelled, judged, llama_agree, mistral_agree, judges_agree_all_drafts, the two wrong lists and mistral_unparsed. R3-1 '17 of Mistral's 54' matches. R2-06 'three to several' matches final decisions.md line 1235."
+    },
+    {
+     "field": "distinct[].origin",
+     "holds": false,
+     "correction": "Two origins are wrong. (1) Round 1 group 2 says it is 'in 3524e8b'. llama3.1's count of 1 and the judge_compare.py comment ('names the phrase it wants found in three shapes', line 118) were in 3524e8b. But item 6's 'one of the three instruction shapes' was written by the correction edits at 18:29:27 UTC. 3524e8b's integrity section had only five entries. (2) Round 2 claims:R2-11 says the report.md table 'has said this since 3524e8b'. The line '39 graded of 40' was added in cc88828 (2026-09-12), which is an ancestor of origin/main, so it had already reached the remote. That also makes it a pre-existing defect rather than something 'left half-fixed' by round 1's fixes, which weakens the 'nine of 11' count. The other origins check out: the 3524e8b quotes for the echo count, critic credit, verifier, table label, never graded, hedged non-answer and the added-after-the-run sentence; the correction-edit origins of the overlap 'recur' wording (18:22 UTC), the blind sentence and 'The critic found the echo-count bug' (18:29 UTC); round-1 fix times of 18:54-18:55 UTC; round-2 fix times of 19:18-19:21 UTC; the 42-word overlap parenthetical written at 18:54:08.",
+     "evidence": "git show 3524e8b:docs/report.md line 222 reads 'five errors' and has no item 6. git log -S '39 graded of 40' -- docs/report.md gives cc88828, and git merge-base --is-ancestor cc88828 origin/main returns 0. Transcript tool_use at 2026-09-13T18:29:27 (patch_repo) contains 'one of the three instruction shapes'."
+    },
+    {
+     "field": "distinct[].class, by_class, changed_a_number",
+     "holds": false,
+     "correction": "The by_class totals do add up (10, 11, 6). But caveat 8 defines 'changed a number' as a defect whose fix changed a reported figure, and claims:R2-01 meets that definition. Its fix changed 'rests on little: two requests and one grade' to 'one request and one grade' in the post hoc report, report.md and decisions.md item 4. It is classed claim and not counted, so under the stated definition round 2's changed_a_number should be 5, not 4. The round-1 overlap fix is also treated inconsistently. It replaced '3 of 3 ... recur under an independently trained judge' with 'the other two ... recur'. That is classed claim, while R2-06 ('three' to 'several') is counted as a number. Treated the same way, round 1 would be 3. Classing claims:R3-4 as wording, and R3-2/R3-7 as test rather than a false claim about test coverage, can be defended either way; caveat 8 discloses R3-4.",
+     "evidence": "The transcript patch at 18:55:54 UTC has decisions.md 'rests on two requests and one grade'. The committed 6ee42a4 has decisions.md line 1274 'rests on one request and one grade', post hoc md line 37 'one request and one grade, with the habit behind it seen on two', and report.md line 399 'It rests on little: one'. The claims:R2-01 problem text quotes the two-request wording in all three files."
+    },
+    {
+     "field": "observation",
+     "holds": false,
+     "correction": "The factual parts hold: 15/12/7 confirmed, no fourth round, and 6ee42a4 committed at 19:41:26 UTC, 16 seconds after the last patch at 19:41:10. Two claims rest on disputable choices. 'Round 2 ... still found one more distinct defect than round 1' only holds under the agent's own grouping, which applies its split rule inconsistently (see group boundaries); under a consistent split round 1 has as many distinct defects as round 2, or more. 'Nine of round 2's 11' counts R2-11 as a half-finished fix, but its table line predates everything (cc88828). A strict count is eight. A safer wording: distinct defects stayed around 10 to 11 for two rounds and fell to 6 in round 3; most later-round defects came from the previous round's fixes; and zero was never tested.",
+     "evidence": "Workflow launches at 18:32:48, 18:57:34 and 19:22:35 UTC. Round-3 edits at 19:40:06 to 19:41:10 UTC. Commit Bash call at 19:41:23 UTC. No Workflow call after 19:22."
+    },
+    {
+     "field": "caveats",
+     "holds": false,
+     "correction": "Accurate: caveat 1 (5.0/6.0/3.5 and 3.3/5.5/3.0); caveat 3 (round-2 prompt lists (a) to (h) as addressed, round-3 prompt lists (1) to (11) and asks for confirmation); caveat 4 (new correction-shape test test_classify_copy_an_echo_of_the_correction_phrase, rewritten item 6, later_rounds pointer, no review); caveats 7, 9, 10 (high 4/0/0, medium 5/4/2); caveat 12 (about 69 minutes). Inaccurate or incomplete:\n(a) Caveat 2 overstates how much the scope narrowed. Round 1's number tracer was already limited to named 'changed prose' sections. Round 2's COMMON already said 'Do not re-report something that is now fixed'. Round 1 already excluded 'stylistic preferences that break no rule'. Round 3's claims reviewer still read the post hoc report in full. Caveat 11's 'whole working tree' also contradicts caveat 2's 'named sections'.\n(b) Caveat 5's second example is not refuter inconsistency. recount:R2-4 was refuted against the text then in place ('a test for each shape it missed', which was accurate). R3-2 and R3-7 were confirmed against a new decisions.md sentence, 'with a test for each shape', written in the round-2 fix at 19:21:08 UTC. The R3-2/R3-7 group's own origin says so correctly. numbers:R3-3 (refuted) raised the later_rounds pointer point too, not only claims:R3-6.\n(c) Caveat 8's list of number-changing fixes leaves out R2-01 (two requests to one request).\n(d) Caveat 6 covers only the merge direction, not a stricter split of group 1.\n(e) Caveat 13 is right that the records do not support 'the only error that reached a commit', but it understates the evidence. Its parenthetical names four statements besides the echo count. Other committed statements later found wrong include: 'hedged non-answer' and 'every defect was addressed' (R2-03, in 3524e8b report.md and decisions.md); the added-after-the-run labelling claim (R2-05); llama3.1's 1 and the 'three shapes' code comment. Two errors reached origin/main, not only a commit: entry 4's halving figure (a37aad6) and '39 graded of 40' (cc88828). 3524e8b and 6ee42a4 are not on origin/main. On repetition downstream: the critic credit was repeated and sharpened by the assistant's correction edits. The owner's correction 1 quoted the committed '3 of 3 overlap', and the edit built on it ('recur under an independently trained judge') was confirmed in round 1 as an overclaim, because one of the three was code-decided, which critic-review.json defect 1 had flagged before commit. That is a second possible case of committed text being quoted back and acted on, though the count 3 of 3 itself was correct.",
+     "evidence": "wf1/wf2/wf3 scripts extracted from Workflow tool_use inputs in f9691170...jsonl (COMMON blocks and reviewer prompts). claims:R2-04's refutation reason text. The transcript patch at 19:21:08 has 'with a test for each shape'. Owner message at 2026-09-13T18:18:50 (correction 1: 'State the weakened claim the 3 of 3 overlap does support'; correction 4: 'Mistral echoed it on 7 calls against llama's 1'). git merge-base --is-ancestor gives a37aad6 0, cc88828 0, 3524e8b 1, 6ee42a4 1. critic-review.json defects[1] ('One of the 3 shared errors (sheet 1, draft 34) ... no judge made it') and defects[4] ('hedged non-answer ... overstates it')."
+    }
+   ],
+   "overall_holds": false,
+   "summary": "The raw, confirmed and refuted counts are right: 20/15/5, 22/12/10 and 11/7/4 from 3, 2 and 2 reviewers. All 34 confirmed findings are covered and no refuted finding is used. Most descriptions and origins match the JSON, git (3524e8b against 6ee42a4) and the session transcript's patch and workflow times. Round 3's fixes were committed within seconds of the last patch, with no fourth review round.\n\nThe result still does not hold as a whole:\n- Two findings sit in two groups each (requirements:F2, recount:R2-6). This is disclosed.\n- The split rule is applied unevenly. llama3.1's leaves-out echo is split out because it needed its own fix. Group 1 still merges the NONE misreading, the cached double count and the 8-vs-3 exposure, each fixed differently. Under a consistent split round 1 would have at least as many distinct defects as round 2, so 'round 2 found one more' falls.\n- Two origins are wrong. Item 6's 'three instruction shapes' came from the correction edits, not 3524e8b. '39 graded of 40' dates from cc88828, which is already on origin/main, not from 3524e8b.\n- changed_a_number misses R2-01, whose fix changed 'two requests and one grade' to 'one request'. The overlap fix is classed inconsistently with R2-06.\n- Caveat 2 overstates how much the prompts narrowed. Caveat 5's R2-4/R3-2 example is not refuter inconsistency, since the sentence under review had changed.\n- On the owner's proposed entry-7 wording, the records go further against it than caveat 13 says. Entry 4's halving figure (a37aad6) and '39 graded of 40' (cc88828) both reached origin/main. 3524e8b also committed more wrong statements: 'hedged non-answer', 'every defect was addressed', and the added-after-the-run labelling claim. The owner's correction 1 quoted the committed '3 of 3' overlap, and the edit built on it was confirmed as an overclaim in round 1, a flaw the pre-commit critic had already flagged.\n\nScratch extracts are in C:/Users/Admin/AppData/Local/Temp/claude/h--trust-aware-agent/f9691170-7ca5-4a04-881f-bf9699440823/scratchpad/propagation/cv/ (r1.txt, r2.txt, r3.txt, wf1.txt to wf3.txt, and the A_/B_ file versions at 3524e8b and 6ee42a4)."
+  },
+  "range_reported": {
+   "round_1": "9 to 12",
+   "round_2": 11,
+   "round_3": 6,
+   "why": "The grouping above gives 10 for round 1. The refuter showed that splitting consistently by fix gives 11 or 12, and this file's own round-2 verdicts (R2-07) count nine distinct defects by merging two, so the report gives 9 to 12."
+  }
+ }
 }

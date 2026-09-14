@@ -121,6 +121,25 @@
     "The draft gives only the validation reading, which the rules map to PARTIAL. The human graded CORRECT, and docs/annotation-guide.md records that the owner \"treated [q0115's validation reading] as the natural answer\". Mistral correctly gave reading2 YES and reading1 NO (its reading1 YES was ungrounded), so PARTIAL/PARTIAL. Llama gave PARTIAL, then WRONG (reading2 NO) with flag position_disagreement, but even its lenient PARTIAL is label 0.",
     "Human CORRECT, but the draft answers only the validation reading, and the rubric maps one reading to PARTIAL (the annotation guide notes the owner treated q0115's validation reading as the natural answer). Mistral's grounded answers (reading1 NO, reading2 YES) gave PARTIAL/PARTIAL. Llama's reference_first answers gave PARTIAL, and its candidate_first answers (reading2 NO) gave WRONG, so the stricter WRONG was kept (position_disagreement). Either Llama grade is label 0, so order did not change the binary label."
    ]
+  },
+  {
+   "sheet": "sheet1",
+   "sheet_no": 19,
+   "llama_cause": [
+    "rubric_or_question_wording",
+    "rubric_or_question_wording"
+   ],
+   "mistral_cause": [
+    "rubric_or_question_wording",
+    "rubric_or_question_wording"
+   ],
+   "analysts_agree": true,
+   "evidence": [
+    "The human's blind grade is CORRECT and the revisions file only changes draft 34. Both judges answered Q1 NO, Q2 NO, Q3 YES in both orders (judge_answers flags=false, reading1=false, reading2=true; the \"FRR\" quote verified, judge_ungrounded empty, no flag), which is accurate for a draft that names only FRR. Grader rule lines 324-329 give CORRECT only if the draft flags the ambiguity or hits every reading, so one reading scores PARTIAL (label 0), which matches the item notes at 1cc8664 (expected \"clarify\"; \"a lone 'FRR' or 'SAR' answers one reading\"). The human accepted the lone FRR answer anyway. Mistral's odd aside on Q2 (\"gives the FRR as the answer for both readings\") did not change its NO.",
+    "The human's blind grade is CORRECT and was never revised (the revisions file only changes draft 34). Llama gave PARTIAL in both orders (label 0, no flag, judge_ungrounded empty) by answering Q1 NO, Q2 NO, Q3 YES, and Mistral's regrade record shows the same answers, the same PARTIAL/PARTIAL and the same 'FRR' quote. Those answers fit the draft, which names only the FRR and does not ask which reading is meant. The PARTIAL comes from the ambiguous-bucket rule in grader.py (`if a[\"flags\"] or hits == len(readings): CORRECT` else PARTIAL) and the item notes at 1cc8664 ('a lone FRR or SAR answers one reading'), which the human did not accept. Mistral added an odd aside ('gives the FRR as the answer for both readings'), but its Q2 is still NO."
+   ],
+   "added": "added after the draw-pool regrade of 2026-09-14, same prompt and method, run by language-model agents, not people"
   }
- ]
+ ],
+ "later_additions": "Sheet 1, draft 19 was added after the draw-pool regrade of 2026-09-14, same prompt and method, run by language-model agents, not people; the analysts read the regraded Mistral records and the item as drawn at git 1cc8664."
 }

@@ -141,5 +141,19 @@
   "question": "Does the candidate state a different answer, or something that contradicts the reference answer?",
   "answer_line": "Q2: YES, the candidate states a different answer as they mention a senior manager with engineering expertise, while the reference answer refers to someone with program/project change authority.",
   "parser_read_as": "YES"
+ },
+ {
+  "id": "N1",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the System Acceptance Review (SAR) or pre-Ship Review\" as the answer for reading 1?",
+  "answer_line": "Q2: NO (The candidate gives \"the FRR\" as the answer for both readings)",
+  "parser_read_as": "NO"
+ },
+ {
+  "id": "N2",
+  "type": "one answer line",
+  "question": "Does the candidate give \"the System Acceptance Review (SAR) or pre-Ship Review\" as the answer for reading 1?",
+  "answer_line": "Q2: NO (The candidate gives \"the FRR (Flight Readiness Review)\" as the answer for both readings.)",
+  "parser_read_as": "NO"
  }
 ]

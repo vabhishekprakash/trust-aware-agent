@@ -34,7 +34,7 @@ If the calibrator's ordering were reliable, the ANSWER band would be more accura
 | answerable items the agent answered | 12/16 (75% [50, 94]) | 18/20 (90% [75, 100]) | 5/8 (62% [25, 88]) |
 | all answered items | 12/22 (55% [32, 77]) | 18/29 (62% [45, 79]) | 6/19 (32% [11, 53]) |
 
-At this sample size the calibrator's ordering is not reliable enough for the top band to outperform the middle one. That is one finding seen three ways: the band accuracies here, the AUROC of 0.69 [0.59, 0.78], and the flat risk-coverage curve. The intervals cover the reversal; the report does not treat it as a separate effect.
+At this sample size the calibrator's ordering is not reliable enough for the top band to outperform the middle one. That is one finding seen three ways: the band accuracies here, the AUROC of 0.70 [0.61, 0.79], and the flat risk-coverage curve. [Corrected 2026-09-14: this sentence first gave 0.69 [0.59, 0.78], the plain logistic fit's AUROC, not the calibrator's (reports/m4-calibration.md); see docs/report.md, measurement integrity, entry 9.] The intervals cover the reversal; the report does not treat it as a separate effect.
 
 ## Deployed columns, with their caveat
 

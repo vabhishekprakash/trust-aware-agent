@@ -1,0 +1,179 @@
+{
+ "run_by": "a language-model agent, not a person",
+ "method": "Model-run verifier after the draw-pool regrade of 2026-09-14. It wrote its own Python, imported nothing from the repository's src or scripts, and did not open the post hoc report, its JSON, the changed-numbers list, the script or docs/report.md. It recomputed every sheet and the pooled figures, bootstrap intervals and paired differences, v13 sheet 1 rubric fidelity with the owner's revisions, and draft 19's records, from the owner sheets, the llama3.1 keys, the Mistral records with the regrade row, and the pool at git 1cc8664. Mismatches were computed by code against reports/post-hoc-second-judge.json.",
+ "verifier_method": "Model-run check: I am a language-model agent, not a person. My own Python lives in C:/Users/Admin/AppData/Local/Temp/claude/h--trust-aware-agent/f9691170-7ca5-4a04-881f-bf9699440823/scratchpad/drawpool-verify/verify.py (plus mine/e4.py and mine/style.py). It imports nothing from the repo. It does not open the report files I was told to skip, any test file, or Ollama.\n\nHow I computed the numbers:\n- **Owner grades:** a draft is a line matching ^### n. Its grade is the first word after a line starting exactly with \"grade:\" and must be CORRECT, PARTIAL or WRONG. Sheet 1 draft 1 has an indented grade line, so it is unlabelled. That gives 84 labelled of 85.\n- **Joining:** llama3.1 keys join on sheet_no. Mistral rows come from mistral-strict.jsonl, with the sheet1/19 row replaced by mistral-regrade-strict.jsonl (CORRECT became PARTIAL). I checked that item_id matches on every row.\n- **Bootstrap:** numpy default_rng(42), 1000 resamples, default linear percentiles, run separately for each judge. The paired difference uses its own rng(42) and shares idx between the judges. Pooled lists run final, then sheet1, then sheet2.\n- **Rubric fidelity:** the revisions file {\"34\":\"CORRECT\"} is applied by sheet number (blind grade PARTIAL). Result: 38 binary and 35 three-way of 39. v12's rerun key gives the same 38 and 35.\n- **Buckets:** q0124 is ambiguous at 1cc8664 and e4ccdc8 (the commit holding the owner's sheet 1 grades) and at 85b699c. It is answerable from 569294b on.\n\nCross-checks that matched:\n- Of the 40 sheet 1 items, only q0124 differs between 1cc8664 and 7a2a82d. The fields that differ match regrade.json.\n- Sheet 2's 25 items are identical at d787c53 and 7a2a82d.\n- Across the three llama3.1 keys, decided_by is now rules 40, exact 9, judge 36 (at HEAD it was 40, 10, 35).\n- The key diff changes only row 19. llama-replay has live_calls 0, and the two new llama rows are cached. The Mistral regrade made 2 live calls in 33.6 s.\n- The overlap is 4 drafts, 3 of them judged (1010, 2019, 3010).\n- grader-check-rubric-fidelity-v13.md matches my recount: 38/39 and 35/39, buckets, conditions, the confusion table, the grade-only list 9/16/33, and the old 39/39 and 36/39 at HEAD.\n- Entry 4 recount matches: 50 items with 17 errors; full logistic 16 [4, 32]; minus_logprobs isotonic 32 [14, 52]. The \"Three numbers\" wording in decisions.md was chosen by the owner through AskUserQuestion at 05:48.\n\nDefects found:\n1. docs/decisions.md, the 2026-09-13 result entry, has pre-regrade counts with no correction note. It says \"Format did not fail (69 of 70 replies parsed\", \"the 19 parsed answer lines with added words\", \"assigning causes to the 7 misgraded drafts\" and \"agreed with each other on all 7 drafts and with the script's rule on 5\". The raw files now give 72 strict judge replies (mistral-calls 70 plus 2 regrade calls). They give 21 one-answer-line entries in independent-classification.json and 8 drafts in independent-attribution.json. The bracket note added to the next entry covers only the overlap and the entry count.\n2. docs/decisions.md, the preregistration design entry, still says \"Forty of the 85 drafts are decided by code rules and 10 by exact match under v13, so the judge can change at most 35 grades\". It also says \"sheets 1 and 2 against the item pool at commit 7a2a82d\", with no note. The regraded keys give exact 9 and judge 36. Low severity, since this is a preregistration.\n3. docs/decisions.md, new entry item 5, has a sentence of about 53 words with little number content, breaking the 34-word rule. It starts: \"Two changes, both shown to the owner: \\\"of the seven\\\" became \\\"of the eight\\\" ... rested on entry 2's pool.\" Near the limit, not flagged: the llama3.1 sentence in item 2 (about 36 words), the 40-word note in grader-check-rubric-fidelity-v13.md and the 38-word bracket in annotation-guide.md.\n4. docs/decisions.md, item 3, cites \"(scripts/integrity_entry4_recount.py)\" right after \"the first correction's 49 to 40 figures describe all 70 answered items\". That script computes only the 50-item stratum. The 70, 49 and about 40 come from reports/m5-risk-coverage.md.\n\nAnother agent overwrote my scratch pools.py after I had run it. The results above were computed before that change.",
+ "figures": {
+  "sheets": [
+   {
+    "sheet": "final",
+    "drafts": 20,
+    "labelled": 20,
+    "judged": 9,
+    "judged_labelled": 9,
+    "llama_agree": 19,
+    "mistral_agree": 18,
+    "llama_agree_judged": 8,
+    "mistral_agree_judged": 7,
+    "llama_three_way": 18,
+    "mistral_three_way": 17,
+    "judges_agree_all_drafts": 19,
+    "llama_wrong_sheet_nos": [
+     10
+    ],
+    "mistral_wrong_sheet_nos": [
+     5,
+     10
+    ],
+    "llama_interval": [
+     0.95,
+     0.85,
+     1
+    ],
+    "mistral_interval": [
+     0.9,
+     0.75,
+     1
+    ],
+    "paired_difference": [
+     0.05,
+     0,
+     0.15
+    ]
+   },
+   {
+    "sheet": "sheet1",
+    "drafts": 40,
+    "labelled": 39,
+    "judged": 17,
+    "judged_labelled": 17,
+    "llama_agree": 37,
+    "mistral_agree": 36,
+    "llama_agree_judged": 16,
+    "mistral_agree_judged": 15,
+    "llama_three_way": 34,
+    "mistral_three_way": 33,
+    "judges_agree_all_drafts": 39,
+    "llama_wrong_sheet_nos": [
+     19,
+     34
+    ],
+    "mistral_wrong_sheet_nos": [
+     8,
+     19,
+     34
+    ],
+    "llama_interval": [
+     0.9487179487179487,
+     0.8717948717948718,
+     1
+    ],
+    "mistral_interval": [
+     0.9230769230769231,
+     0.8205128205128205,
+     1
+    ],
+    "paired_difference": [
+     0.02564102564102555,
+     0,
+     0.07692307692307698
+    ]
+   },
+   {
+    "sheet": "sheet2",
+    "drafts": 25,
+    "labelled": 25,
+    "judged": 10,
+    "judged_labelled": 10,
+    "llama_agree": 24,
+    "mistral_agree": 22,
+    "llama_agree_judged": 9,
+    "mistral_agree_judged": 7,
+    "llama_three_way": 19,
+    "mistral_three_way": 18,
+    "judges_agree_all_drafts": 23,
+    "llama_wrong_sheet_nos": [
+     10
+    ],
+    "mistral_wrong_sheet_nos": [
+     2,
+     4,
+     10
+    ],
+    "llama_interval": [
+     0.96,
+     0.88,
+     1
+    ],
+    "mistral_interval": [
+     0.88,
+     0.72,
+     1
+    ],
+    "paired_difference": [
+     0.08,
+     0,
+     0.2
+    ]
+   }
+  ],
+  "pooled": {
+   "sheet": "pooled",
+   "drafts": 85,
+   "labelled": 84,
+   "judged": 36,
+   "judged_labelled": 36,
+   "llama_agree": 80,
+   "mistral_agree": 76,
+   "llama_agree_judged": 33,
+   "mistral_agree_judged": 29,
+   "llama_three_way": 71,
+   "mistral_three_way": 68,
+   "judges_agree_all_drafts": 81,
+   "llama_wrong_sheet_nos": [
+    1010,
+    2019,
+    2034,
+    3010
+   ],
+   "mistral_wrong_sheet_nos": [
+    1005,
+    1010,
+    2008,
+    2019,
+    2034,
+    3002,
+    3004,
+    3010
+   ],
+   "llama_interval": [
+    0.9523809523809523,
+    0.9047619047619048,
+    0.9880952380952381
+   ],
+   "mistral_interval": [
+    0.9047619047619048,
+    0.8449404761904762,
+    0.9642857142857143
+   ],
+   "paired_difference": [
+    0.04761904761904756,
+    0.011904761904761862,
+    0.09523809523809523
+   ]
+  },
+  "rubric_fidelity_v13_sheet1": {
+   "binary": 38,
+   "three_way": 35,
+   "of": 39
+  },
+  "draft19": {
+   "bucket_at_1cc8664": "ambiguous",
+   "llama_grade": "PARTIAL",
+   "mistral_grade": "PARTIAL",
+   "owner": "CORRECT",
+   "decided_by": "judge (both judges; before the regrade both were CORRECT by exact match on the 7a2a82d item, bucket answerable)"
+  }
+ },
+ "mismatches": [],
+ "defects_reported": "The verifier also reported stale counts in dated docs/decisions.md entries, an over-long sentence and a citation that did not back its figures; all four are addressed in docs/decisions.md."
+}

@@ -127,7 +127,7 @@ def main() -> int:
     for label, m in (("answerable items the agent answered", answered & (bucket == "answerable")), ("all answered items", answered)):
         lines.append(f"| {label} | " + " | ".join(band_acc(m & (outcome == o)) for o in ("ANSWER", "VERIFY", "ESCALATE")) + " |")
     lines += ["", "At this sample size the calibrator's ordering is not reliable enough for the top band to outperform the middle one. "
-              "That is one finding seen three ways: the band accuracies here, the AUROC of 0.69 [0.59, 0.78], and the flat risk-coverage curve. "
+              "That is one finding seen three ways: the band accuracies here, the AUROC of 0.70 [0.61, 0.79], and the flat risk-coverage curve. "  # corrected 2026-09-14: was the plain logistic fit's 0.69
               "The intervals cover the reversal; the report does not treat it as a separate effect.", ""]
 
     passthrough = ~answered

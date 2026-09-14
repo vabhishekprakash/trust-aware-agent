@@ -65,12 +65,17 @@ assumption, a judgement the model cannot make at this size.
 Every answer was graded by a second language model, and that grader was
 checked against a person three times without the person seeing its
 verdicts; the last check agreed 19 times in 20. The 100 test questions
-were locked away and read once, after the whole analysis had been written
-down and committed, including what would count as good, bad, or too good
-to believe. Seven times during the project a number was wrong or looked
-better than it was, and each time two checks disagreed and the error was
-found before a released version of the report carried it. All seven are
-listed in the report.
+were locked away and read once, after the whole analysis had been
+written down and committed, including what would count as good, bad, or
+too good to believe. Nine times during the project a number was wrong or
+looked better than it was. Six were found when two checks disagreed,
+before a released version of the report carried them. One grader figure
+was caught but misread, and stayed in the released report and project
+notes until a later audit of the project history, run by language-model
+agents rather than people. Two more were missed at the time: one was
+dropped from a draft without anyone noticing, and one stayed in a
+released project note. The same audit, and a check of its corrections,
+found both. All nine are listed in the report.
 
 ## What a reader should take away
 

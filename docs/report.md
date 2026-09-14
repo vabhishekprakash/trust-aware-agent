@@ -219,32 +219,53 @@ rejection is a judgement this model does not have at 3B. The step is
 off, behind a flag, and the full account is reports/premise-step.md. On
 test the bucket stayed at 0 of 20.
 
-## Measurement integrity: seven errors caught by internal checks
+## Measurement integrity: nine errors caught by internal checks
 
-Seven times during this project a number was wrong or flattering for a
-reason unrelated to what it claimed to measure. Each time a disagreement
-between two checks caught it before any tagged version of this report
-carried it. The first three checks were a rerun against a fixed
+Nine times during this project a number was wrong or flattering for a
+reason unrelated to what it claimed to measure. Six of them were caught
+by a disagreement between two checks before any tagged version of this
+report carried them. Entry 2 was caught the same way, but the account
+written at the time took the wrong item pool for the right one. Its
+wrong figure stayed in this report's own entry 2, the v13
+rubric-fidelity report, the annotation guide and the decisions log of
+the tagged releases until 2026-09-14. Entries 8 and 9 were not caught at
+the time. Entry 8 was dropped in a rewrite without comment and found
+later by a model-run audit of the git history. Entry 9 stayed in a
+policy note of the tagged releases until a model-run check of that
+audit's corrections found it. That audit also found that the first
+accounts of entries 1, 4 and 5 were imprecise, and they are given here
+as it found them. The first three checks were a rerun against a fixed
 reference, a second grading of the same drafts and a diagnostic that
 moved one feature at a time. The fourth and fifth were a tie-aware
 recomputation of a curve and a strata query against the committed rows.
-The last two were model-run
-reviews, by language-model agents and not people, checked against the
-raw call logs. Seven instances make that a pattern of the process rather
-than an anecdote, and a reader should expect more of the same kind.
+The rest were model-run reviews, by language-model agents and not
+people, checked against the raw call logs and the git history. Nine
+instances make that a pattern of the process rather than an anecdote,
+and a reader should expect more of the same kind.
 
-1. The v9 judge question. A fourth yes-or-no question added to the judge
-   produced YES on true statements and flipped three binary labels on
-   the 21 worked examples. It was removed and the support check moved
-   into code that reads the corpus. Rule since then: no judge prompt
-   change without rerunning the examples.
+1. The v8 judge question. A fourth yes-or-no question was added to the
+   judge in v8. It was first run on the 21 worked examples under v9,
+   after v9 had already been committed as the current grader. There it
+   produced YES on true statements and flipped three binary labels. It
+   was removed in v10 and the support check moved into code that reads
+   the corpus. Rule since then: no judge prompt change without rerunning
+   the examples.
 2. The pool snapshot. A rerun of grader v13 on the first blind sheet
-   showed 39 of 39 against 38 of 39 for v12. The one changed row was an
-   item that sat as answerable in the pool snapshot and as ambiguous in
-   the pool the earlier rerun used; the new rule never touched it. Rule
-   since then: a rubric-fidelity rerun grades against the exact pool the
-   sheet was drawn from, by a script that takes the snapshot as an
-   argument and regenerates nothing.
+   showed 39 of 39 against 38 of 39 for v12. The one changed row, sheet
+   19, was graded against git 7a2a82d, the pool sheet 2 was drawn from.
+   There a model-run pass over the ambiguous items, acting on the
+   owner's blind grade for sheet 19, had moved that item to answerable.
+   Sheet 1 was drawn at 1cc8664, where the item was ambiguous. The
+   account written at the time saw that the change came from the pool,
+   not the rule, but took the later pool for the right one. It kept 39
+   of 39 as v13's figure, and the post hoc second-judge experiment
+   graded sheet 1 against the same pool. Regraded against 1cc8664 on
+   2026-09-14, v13 gives 38 of 39, and the second-judge figures were
+   recomputed (reports/grader-check-rubric-fidelity-v13.md,
+   reports/post-hoc-second-judge.md). Rule since then: a rubric-fidelity
+   rerun grades each sheet against the exact pool it was drawn from, by
+   a script that takes the snapshot as an argument and regenerates
+   nothing.
 3. The lp_tokens feature. The full vector beat the vector without
    log-probabilities by 0.04 AUROC pooled and 0.10 in the decisive
    stratum on dev. A post-hoc diagnostic, labelled as such, showed the
@@ -257,18 +278,28 @@ than an anecdote, and a reader should expect more of the same kind.
    stated.
 4. The halving figure. An earlier reading said that answering the most
    confident half of the decisive stratum roughly halved the error rate.
-   That came from a rank-ordered risk-coverage curve; the isotonic
-   probabilities carry many ties and a rank order splits a tie at a point
-   no real threshold can reach. The tie-aware curve gave 49 [37, 60] to
-   about 40 [26, 57] percent. The earlier figure was wrong and is
-   recorded rather than deleted; the authors found it themselves.
+   A recount on dev (reports/integrity-entry4-recount.md) shows where
+   that could come from. For the full feature vector, which was dropped,
+   the error in the stratum falls from 34 percent to 16 [4, 32] percent
+   among the most confident 25 of 50 items. For the confirmed calibrator
+   it falls only to 32 [14, 52] percent, the same with ties split or
+   covered together. The correction written at the time was right that
+   the figure was wrong, but not about why. It blamed a rank-ordered
+   curve splitting isotonic ties, and it cited 49 [37, 60] to about 40
+   [26, 57] percent, which describe all 70 answered items
+   (reports/m5-risk-coverage.md), not the decisive stratum. The earlier
+   figure and its first correction are recorded rather than deleted.
 5. The confounder table. The first draft of this report's confounder
-   table used the pre-reserve dev figures for the unanswerable and
-   false-premise rows next to merged-dev figures for the answerable row.
-   A query of the committed feature rows disagreed with the table and
-   the rows were corrected to the merged 134 items throughout. The rule
-   since then is that every number in the report is traced to a committed
-   file by the script that reads it, and none is typed from memory.
+   table labelled its unanswerable and false-premise dev cells as
+   figures from before the reserve joined, next to merged-dev figures
+   for the answerable row. A query of the committed feature rows
+   disagreed, and the rows were set to the merged 134 items before the
+   table was first committed. The label described the error loosely. The
+   false-premise cells were already the merged figures, and the
+   unanswerable cells matched neither the merged split nor the
+   pre-reserve split in reports/dev-run-v1.md. The rule since then is
+   that every number in the report is traced to a committed file by the
+   script that reads it, and none is typed from memory.
 6. The echo count undercounted, post hoc. The second-judge report counts
    how often a judge, asked to copy words that back a YES, gives back the
    phrase the instruction quotes instead. Its first rendering used a
@@ -280,17 +311,62 @@ than an anecdote, and a reader should expect more of the same kind.
    found the colon. Like lp_tokens, it was a number that read as a finding
    and came from how it was measured. The pattern has a test for the
    shape it missed.
-7. The echo count overcounted, post hoc. The recount after entry 6,
-   7 calls against 1, was committed with the second-judge report, and it
+7. The echo count overcounted, post hoc. The recount after entry 6, 7
+   calls against 1, was committed with the second-judge report, and it
    was too high. After the owner read that report and asked for
-   corrections, model-run reviewers recounted from the raw logs with their
-   own code. They found that 4 of the 7 were NONE replies that quote the
-   phrase in an explanation, and that llama3.1's 1 was a leaves-out call
-   that copied the draft. A second round found that the recount's
-   denominators counted instructions quoting an answer to go against, not
-   a phrase to find. Counted by distinct request, Mistral gave the phrase
-   back on 2 of the 7 instructions that quote one, and llama3.1 on 0 of 2.
-   The classifier has a test for each shape it had wrong.
+   corrections, model-run reviewers recounted from the raw logs with
+   their own code. They found that 4 of the 7 were NONE replies that
+   quote the phrase in an explanation, and that llama3.1's 1 was a
+   leaves-out call that copied the draft. A second round found that the
+   recount's denominators counted instructions quoting an answer to go
+   against, not a phrase to find. Counted by distinct request, Mistral
+   gave the phrase back on 2 of the 7 instructions that quote one, and
+   llama3.1 on 0 of 2. The classifier has a test for each shape it had
+   wrong. The count went from the committed report into a summary to the
+   owner, who quoted it in a correction request and made it the basis of
+   the harness lock-in section. Entries 3, 5 and 6 never left a working
+   draft.
+8. The dropped confounder bullet. The first draft of this report listed
+   among its limitations that answerable items were correct 27 of 38
+   times with the evidence retrieved and 2 of 8 without. Those are the
+   100-item figures from before the reserve joined, set beside a
+   134-item headline; the merged figures are 33 of 50 and 3 of 12. The
+   bullet was committed in 23a21e4 on 2026-09-11, pushed that evening,
+   and sat at the remote tip until the next morning's push. It was
+   removed in 3a183ad, when the report was rewritten, without comment
+   and before any tag. No check caught it at the time. A model-run audit
+   of the git history found it on 2026-09-14, and no owner message had
+   repeated it.
+9. The calibrator's AUROC in the policy note. reports/m5-policy.md said
+   that the calibrator's ordering had an AUROC of 0.69 [0.59, 0.78].
+   That is the plain logistic fit of the confirmed vector. The frozen
+   calibrator, logistic plus isotonic, has 0.70 [0.61, 0.79]
+   (reports/m4-calibration.md). The figure reached the owner as the
+   calibrator's, the owner quoted it back when asking for the
+   band-accuracy paragraph, and it went into this report and the policy
+   note in d4968e8 on 2026-09-11, pushed that evening. The
+   preregistration gave the right figure, and the report's copy was
+   dropped in 3a183ad without comment. The policy note kept 0.69 through
+   all three tagged releases. A model-run check of the 2026-09-14
+   corrections found it, and the note and the script that writes it were
+   corrected. The difference is small; the attribution was wrong.
+
+Numbers in the owner's own messages. This is not an integrity entry, but
+it belongs with them. Before the preregistration was committed, the
+owner quoted 0.76, the dropped full vector's AUROC in the decisive
+stratum, as the expected figure for the frozen system, beside 0.69 as
+the pooled figure; 0.69 had already been quoted earlier that day and is
+entry 9. The preregistration was committed with the confirmed
+calibrator's figures, 0.70 [0.61, 0.79] pooled and 0.63 [0.45, 0.80] in
+the stratum, and a note that 0.76 was not the frozen system's number.
+The owner accepted the 0.76 correction before anything rested on it.
+Five numbers have now reached the owner's own messages before their
+correction: entry 7's echo count; entry 4's first correction, 49 to 40
+[26, 57], quoted for the decisive stratum though it describes all 70
+answered items, and put into the report; the 3 of 3 overlap that rested
+on entry 2's pool; 0.76; and 0.69, the plain logistic fit's pooled AUROC
+quoted as the frozen calibrator's 0.70 (entry 9). Entries 1, 2, 4, 8 and
+9 reached pushed commits.
 
 The test read adds an entry of a different kind: the preregistered
 audit ran regardless of band. Provenance held on every row and the
@@ -349,33 +425,38 @@ nothing. The full account is reports/post-hoc-second-judge.md.
 The question was whether judge choice or rubric quality carried the
 agreement between the grader and the owner's blind labels. The 85 drafts
 on the three blind sheets were regraded with grader v13 unchanged and
-Mistral 7B Instruct as the judge in place of llama3.1 8B.
+Mistral 7B Instruct as the judge in place of llama3.1 8B. Each sheet is
+graded against the item pool it was drawn from. The first version graded
+sheet 1 against sheet 2's pool; one draft changed, and both judges were
+regraded on it on 2026-09-14 (measurement integrity, entry 2). The
+figures below are the corrected ones.
 
 At this size the experiment cannot separate a real difference between
 the judges from the advantage the harness gives llama3.1. Judge choice
-measurably mattered: pooled over 84 labelled drafts, llama3.1 agrees with
-the owner on 81 and Mistral on 77, a paired difference of +4.8 points
-[+1.2, +9.5] that excludes zero. But three of Mistral's four extra errors
-fall on the two sheets where the rubric was tuned with llama3.1 as the
-judge, and the fourth was taken by the copy-the-words check described
-below. On the final sheet, the only one never used to develop the rubric,
-llama3.1 agrees on 19 of 20, 95 [85, 100] percent, and Mistral on
-18 of 20, 90 [75, 100] percent. The rule fixed before the run reads that
-as about as well, and was written to count it as support for rubric over
-model. The report does not draw that conclusion, a choice the owner
-made after seeing the result: only 9 of those 20 drafts reach a judge,
-and the pooled interval excludes zero.
+measurably mattered: pooled over 84 labelled drafts, llama3.1 agrees
+with the owner on 80 and Mistral on 76, a paired difference of +4.8
+points [+1.2, +9.5] that excludes zero. But three of Mistral's four
+extra errors fall on the two sheets where the rubric was tuned with
+llama3.1 as the judge, and the fourth was taken by the copy-the-words
+check described below. On the final sheet, the only one never used to
+develop the rubric, llama3.1 agrees on 19 of 20, 95 [85, 100] percent,
+and Mistral on 18 of 20, 90 [75, 100] percent. The rule fixed before the
+run reads that as about as well, and was written to count it as support
+for rubric over model. The report does not draw that conclusion, a
+choice the owner made after seeing the result: only 9 of those 20 drafts
+reach a judge, and the pooled interval excludes zero.
 
 The overlap supports a weaker claim, and no more. Mistral misgrades all
-three drafts llama3.1 misgrades, but a code rule decided one of them
-before any judge saw it, so that one is shared by construction. The other
-two reached a judge and recur under Mistral, so llama3.1's judged errors
-are not peculiar to llama3.1. That does not show the rubric is sound, and
-it does not show the shared errors are the rubric's.
+four drafts llama3.1 misgrades, but a code rule decided one of them
+before any judge saw it, so that one is shared by construction. The
+other three reached a judge and recur under Mistral, so llama3.1's
+judged errors are not peculiar to llama3.1. That does not show the
+rubric is sound, and it does not show the shared errors are the
+rubric's.
 
-Mistral did not fail on format: 69 of its 70 judge replies parsed under
-llama3.1's conventions. The one that did not gave no yes or no to one
-of its three questions.
+Mistral did not fail on format: 71 of its 72 judge replies parsed under
+llama3.1's conventions. The one that did not gave no yes or no to one of
+its three questions.
 
 ### Harness lock-in
 
@@ -400,6 +481,23 @@ graders that use a language model as the judge. It rests on little: one
 request and one grade. Whether an instruction that does not quote its
 target removes the effect was not tested.
 
+### Iterated model review
+
+Three rounds of model-run review (language-model agents, not people)
+checked the owner's corrections before commit. Confirmed findings fell
+from 15 to 12 to 7. Counted as distinct defects the fall is less clear,
+9 to 12, then 11, then 6, depending on how findings are grouped
+(reports/post-hoc-second-judge/corrections-verification.json). Most
+defects in rounds 2 and 3 were introduced or left half-fixed by the
+previous round's fixes. None of round 3's defects changed a number, but
+three of its six were false or self-contradicting statements. Zero was
+never reached or tested: round 3's fixes were committed without a fourth
+round. The rounds used 3, 2 and 2 reviewers, were told earlier findings,
+and narrowed in scope, so they are not independent samples. The shape
+resembles the grader's history, thirteen versions each fixing what the
+last check found, with the final blind check still disagreeing on one
+draft in twenty.
+
 ### Who ran the checks
 
 The owner's labels are the only human judgement in this experiment. The
@@ -407,14 +505,18 @@ replay and the single-model guard were code. Every other check was
 model-run, by language-model agents and not people. Three readers
 classified Mistral's unreadable reply. Two analysts assigned causes to
 the misgraded drafts. A verifier recomputed each sheet's counts, both
-judges' binary agreement with the owner and the misgraded drafts. A
-critic reviewed the first rendering. After the owner's corrections, two
-rounds of reviewers checked the corrected text, each reviewer followed by
-an agent told to refute its findings. None of them is one of the human
-blind checks described earlier in this report. The analysts found that
-one error both judges share is a judging mistake, not the rubric's. The
-echo count, wrong once in each direction, is entries 6 and 7 of the
-measurement-integrity section.
+judges' binary agreement with the owner and the misgraded drafts, before
+the draw-pool regrade; a second verifier recomputed the regraded
+figures, with their intervals, and every number matched. A critic
+reviewed the first rendering. After the owner's corrections, three
+rounds of reviewers checked the corrected text, each reviewer followed
+by a model-run agent told to refute its findings. After the draw-pool
+regrade, three more readers and two more analysts, with the original
+instructions, read the new answer lines and the regraded draft. None of
+them is one of the human blind checks described earlier in this report.
+The analysts found that one error both judges share is a judging
+mistake, not the rubric's. The echo count, wrong once in each direction,
+is entries 6 and 7 of the measurement-integrity section.
 
 ## Reproduction
 

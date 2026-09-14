@@ -763,23 +763,29 @@ Anyone proposing a threshold later starts from those medians.
 ## Grader v13: a clarifying question that names both readings, 2026-09-11
 
 The judge answered NO to "asks which reading is meant" on both
-rule-composed questions of the form "do you mean X, or Y" in the dev run,
-against the guide's rule that a CLARIFY naming both readings is CORRECT.
-v13 decides that case in code. The draft must contain a "do you mean"
-question offering one alternative per reading; each alternative must share
-at least two content words with its reading or that reading's answer, and
-that pairing must fit better than any other, so two alternatives that only
-echo the question do not pass. A question that names one reading, or none,
-still goes to the judge. Checked before use: examples 19 of 21 grades, 21 of
-21 labels, no binary flip against v12; sheet 1 rubric fidelity 39 of 39
-binary (the one change from v12, sheet 19, is the pool snapshot's bucket
-for that item, not the rule); sheet 2 rubric fidelity 24 of 25 binary,
-unchanged. On the dev run one grade changed, q0107, WRONG to CORRECT. The
-composed question on q0126 names one reading (both alternatives describe
-the Flight Readiness Review) and stays with the judge, WRONG. Both regrades
-of the sheets use scripts/regrade_key.py against the pool snapshot the
-sheets were built from (git 7a2a82d), so the drafts are exactly the ones
-the owner graded.
+rule-composed questions of the form "do you mean X, or Y" in the dev
+run, against the guide's rule that a CLARIFY naming both readings is
+CORRECT. v13 decides that case in code. The draft must contain a "do you
+mean" question offering one alternative per reading; each alternative
+must share at least two content words with its reading or that reading's
+answer, and that pairing must fit better than any other, so two
+alternatives that only echo the question do not pass. A question that
+names one reading, or none, still goes to the judge. Checked before use:
+examples 19 of 21 grades, 21 of 21 labels, no binary flip against v12;
+sheet 1 rubric fidelity 39 of 39 binary (the one change from v12, sheet
+19, is the pool snapshot's bucket for that item, not the rule)
+[corrected 2026-09-14: sheet 1 was drawn at 1cc8664, not 7a2a82d, which
+is sheet 2's pool; graded against 1cc8664, v13 gives 38 of 39 binary and
+35 of 39 three-way, as v12 did; see "The draw-time pool, entry 8 and the
+corrected descriptions, 2026-09-14"]; sheet 2 rubric fidelity 24 of 25
+binary, unchanged. On the dev run one grade changed, q0107, WRONG to
+CORRECT. The composed question on q0126 names one reading (both
+alternatives describe the Flight Readiness Review) and stays with the
+judge, WRONG. Both regrades of the sheets use scripts/regrade_key.py
+against the pool snapshot the sheets were built from (git 7a2a82d), so
+the drafts are exactly the ones the owner graded. [Corrected 2026-09-14:
+7a2a82d is the pool sheet 2 was drawn from. Sheet 1 was drawn at
+1cc8664.]
 
 ## The label distribution before M3, 2026-09-11
 
@@ -1136,20 +1142,23 @@ second judge. It touches no test item and refits nothing.
 Design. The 85 drafts on the three blind sheets (84 carry a hand label;
 sheet 1, draft 1 was never graded [note added after the run: the owner
 did grade it; its grade line is indented and the sheet reader skips it])
-are regraded with grader v13 unchanged
-(src/calibration/grader.py SHA-256 a2eb938e...), same prompts, same
-parser, same 200-token cap, seed 42, temperature 0, num_ctx 4096, with
-mistral:latest (Mistral 7B Instruct, Q4_K_M) as the judge. Inputs are
-identical to the llama3.1 v13 grades: sheets 1 and 2 against the item pool
-at commit 7a2a82d with no form hint, the final sheet against
-data/eval/dev.jsonl with the agent's action as the form hint. The llama3.1
-grades are first replayed from the cache with a transport that refuses any
-live call; if a single replayed grade differs from the committed key, the
-run stops. All Mistral judging happens in one pass with only Mistral
-loaded. Every call's reply is kept verbatim with its stop reason and token
-counts. Forty of the 85 drafts are decided by code rules and 10 by exact
-match under v13, so the judge can change at most 35 grades; that is part
-of the result, not a footnote.
+are regraded with grader v13 unchanged (src/calibration/grader.py
+SHA-256 a2eb938e...), same prompts, same parser, same 200-token cap,
+seed 42, temperature 0, num_ctx 4096, with mistral:latest (Mistral 7B
+Instruct, Q4_K_M) as the judge. Inputs are identical to the llama3.1 v13
+grades: sheets 1 and 2 against the item pool at commit 7a2a82d with no
+form hint, the final sheet against data/eval/dev.jsonl with the agent's
+action as the form hint. The llama3.1 grades are first replayed from the
+cache with a transport that refuses any live call; if a single replayed
+grade differs from the committed key, the run stops. All Mistral judging
+happens in one pass with only Mistral loaded. Every call's reply is kept
+verbatim with its stop reason and token counts. Forty of the 85 drafts
+are decided by code rules and 10 by exact match under v13, so the judge
+can change at most 35 grades; that is part of the result, not a
+footnote. [After the draw-pool regrade of 2026-09-14, 9 are decided by
+exact match and at most 36 grades can change. That regrade grades sheet
+1 against 1cc8664, the pool it was drawn from, not 7a2a82d as planned
+here.]
 
 What is reported, final sheet first because it is the only sheet the rubric
 was never developed against, then sheets 1 and 2 with the home advantage
@@ -1302,3 +1311,90 @@ The agreement figures and intervals did not change.
    committed statements were wrong, and called the refuting agents only
    "an agent". The list of shapes left out the question-quoting one, and
    several sentences ran too long.
+
+[After the draw-pool regrade of 2026-09-14, the overlap in item 1 is
+four drafts, three of them judged, and item 3's seven entries became
+eight, and then nine. There were three rounds of model-run review, not
+two. The third confirmed seven findings, and three of its six distinct
+defects were false or self-contradicting statements, not wording. In the
+result entry above, the regrade makes the parsed replies 71 of 72, the
+answer lines with added words 21, the misgraded drafts 8 and the rule's
+agreement with the analysts 6 of 8. See the entry below.]
+
+## The draw-time pool, entry 8 and the corrected descriptions, 2026-09-14
+
+Owner rulings, after a model-run audit of the git history and session
+records (language-model agents, not people) traced where each integrity
+entry had travelled.
+
+1. Each blind sheet is graded against the item pool as it stood when the
+   owner graded it: sheet 1 against git 1cc8664, sheet 2 against
+   7a2a82d. The blind check measures agreement on the item as graded,
+   and the draw-time rule was set before this came up. Sheet 2's 25
+   items are identical at 7a2a82d and at d787c53, the commit that added
+   the sheet, so its grades do not change. On sheet 1 one item differs:
+   draft 19, q0124, ambiguous when drawn. A model-run pass over the
+   ambiguous items later moved it to answerable, acting on the owner's
+   blind grade. The owner's own ruling on sheet 19 had been that the
+   one-reading rule stands and the item goes to that pass.
+2. Regrade and recompute. llama3.1's v13 grade for draft 19 against the
+   draw-time item came from the cache, with no model loaded, and the
+   rerun key changed on that row only: CORRECT by exact match became
+   PARTIAL by the judge. Mistral was regraded on that draft alone, with
+   only Mistral loaded (2 live calls, 34 s), and also gives PARTIAL. The
+   owner's blind grade is CORRECT, so it is a new shared error that
+   reaches a judge. Two model-run analysts, with the original
+   instructions, both put it down to the rubric: the judges answered
+   correctly for a draft naming one reading of an ambiguous item, and
+   the rule scores that PARTIAL. Three model-run readers classed both
+   new answer lines with added words as clear. v13's sheet 1 rubric
+   fidelity is 38 of 39 binary and 35 of 39 three-way. Pooled
+   second-judge agreement is 80 and 76 of 84, and the paired difference
+   is unchanged at +4.8 points [+1.2, +9.5]. Every changed figure and
+   its old value is in reports/changed-numbers-2026-09-14.md.
+3. Entries 1, 4 and 5 of the measurement-integrity section are described
+   as the audit found them. Entry 1's question was added in v8 and first
+   run on the examples under v9. Entry 4's claim holds for the dropped
+   full vector (34 to 16 [4, 32] percent in the decisive stratum) and
+   not for the confirmed calibrator (34 to 32 [14, 52]), ties or no ties
+   (scripts/integrity_entry4_recount.py). The first correction's 49 to
+   40 figures describe all 70 answered items
+   (reports/m5-risk-coverage.md). Entry 5's cells were labelled
+   pre-reserve loosely. Entry 2 is rewritten around the draw-time pool.
+4. The pre-reserve confounder bullet (27 of 38 and 2 of 8, beside a
+   134-item headline) is entry 8. It was committed, pushed, sat at the
+   remote tip overnight and was removed in a rewrite without comment.
+   The section is eight entries, and its intro says which were caught
+   before a tagged release and which were not.
+5. The review-rounds paragraph is used as the owner approved it. The
+   entry 7 line changed twice, each time by the owner's choice. First
+   the 3 of 3 overlap, which rested on entry 2's pool, was added as an
+   exception. Then a model-run check of the rewrite found that the
+   line's claim was false. Entry 4's first correction, 49 to 40 [26,
+   57], had also reached the owner's messages as fact and gone into the
+   report. The owner moved every comparison with owner messages into the
+   context note. Entry 7 now gives its own path and says that entries 3,
+   5 and 6 never left a working draft.
+6. A context note, not an entry. Before the preregistration was
+   committed, the owner quoted 0.76, the dropped full vector's stratum
+   AUROC, and 0.69, the plain logistic fit's pooled AUROC, as the frozen
+   system's expected figures. The 0.76 was corrected before anything
+   rested on it. The 0.69 had been quoted earlier that day and had
+   already gone into a pushed report; it is entry 9. Five numbers have
+   now reached the owner's own messages before their correction: entry
+   7's count, entry 4's first correction, the 3 of 3 overlap, 0.76 and
+   0.69.
+7. A model-run check of these corrections found that reports/m5-policy.md
+   still gave the calibrator's AUROC as 0.69 [0.59, 0.78], the plain
+   logistic fit's figure, in all three tagged releases; the calibrator's
+   is 0.70 [0.61, 0.79]. The owner quoted it on 2026-09-11 and it went
+   into a pushed report, which later dropped it without comment. The
+   owner ruled it integrity entry 9, and the section is nine entries.
+   The note and the string in scripts/policy_apply.py were corrected
+   with a dated note; the script was not re-run. The same check found
+   that no committed file held the grouping behind the distinct-defect
+   counts in the rounds paragraph, and that the committed review record
+   counts round 1 as nine. On the owner's choice the paragraph says
+   9 to 12, then 11, then 6, and the model-run grouping with its
+   refuter's notes is in
+   reports/post-hoc-second-judge/corrections-verification.json.
