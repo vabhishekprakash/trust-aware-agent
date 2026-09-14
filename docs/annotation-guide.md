@@ -293,9 +293,42 @@ alone. v3 failed the condition on one example (21), so position sensitivity
 was fixed before anything else. On the same 21 examples grader v7 has no
 order flip that changes the binary label; its one flip, example 19, is
 grade-only. It matches the expected label on 21 of 21 and the expected grade
-on 19 of 21, and its two grade misses are examples 3 and 19. The owner has
-not yet seen the v7 report.
-Mass grading is gated on the blind grader check in reports/grader-check-sheet.md
-reaching about 90 percent agreement on the binary label. Nothing in
-data/eval is locked and no split is made until the owner has returned both
-blind sheets and the review sample.
+on 19 of 21, and its two grade misses are examples 3 and 19.
+
+2026-09-09, later. The owner signed off grader v7 on the version table below.
+Grade and label matches are against the writer's expected grade for the
+worked examples, as they stand after the rulings above; flips are order
+flips among the drafts the judge saw.
+
+    version  grade matches  label matches  order flips  flips that changed the label
+    v1       13 of 20       13 of 20       4 of 15      4
+    v2       14 of 20       16 of 20       3 of 15      3
+    v3       18 of 21       20 of 21       4 of 16      1
+    v4       16 of 21       18 of 21       2 of 18      0
+    v5       15 of 21       18 of 21       3 of 17      0
+    v6       18 of 21       20 of 21       1 of 17      0
+    v7       19 of 21       21 of 21       1 of 17      0
+
+Sign-off on the examples is not the last word. Mass grading is gated on the
+blind grader check in reports/grader-check-sheet.md reaching about 90
+percent agreement with the owner on the binary label; below that the grader
+is fixed first, whatever the table says. Nothing in data/eval is locked and
+no split is made until the owner has returned both blind sheets and the
+review sample.
+
+2026-09-09, blind checks returned. Grader check: the owner graded 39 of 40
+model drafts and agreed with the judge on the binary label on 32 of 39, 82
+percent (reports/grader-check-result.md). That is below the bar, so grader
+v7 is not signed off in practice and mass grading waits. One of the seven
+disagreements is a judge error (an abstention on an unanswerable item
+graded as an answer). The other six are rubric questions the owner's grades
+raise and this guide does not yet settle: an abstention that refers to "the
+passage" rather than the handbook, or adds an invented detail; a bare
+abstention on a false-premise question; a right answer padded with claims
+from outside the handbook; and one ambiguous item the owner read as having
+one natural answer. Item check: the owner's bucket matched the drafted
+bucket on 37 of 40 items, 92 percent (reports/item-check-result.md);
+answerable 14 of 14 with the owner's answer matching the gold or an alias
+every time, unanswerable 10 of 10, false premise 8 of 8, ambiguous 5 of 8.
+The three misses were drafted as ambiguous and read as answerable by the
+owner. Both figures go into the final report as measured limitations.

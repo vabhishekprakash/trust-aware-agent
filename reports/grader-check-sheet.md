@@ -12,13 +12,13 @@ spans correct, wrong and borderline without anyone picking drafts by hand.
 
 ### 1
 
-question: In what year did the Space Shuttle Program, whose Transition Management Plan is given as a closeout example, fly its last mission?
+    question: In what year did the Space Shuttle Program, whose Transition Management Plan is given as a closeout example, fly its last mission?
 
-reference: the handbook does not answer this question
+    reference: the handbook does not answer this question
 
-draft: The passage does not provide information about when the Space Shuttle Program's last mission flew.
+    draft: The passage does not provide information about when the Space Shuttle Program's last mission flew.
 
-grade:
+    grade:CORRECT
 
 ### 2
 
@@ -29,7 +29,7 @@ reference: acceptable forms: 2008; December of 2008; Dec 2008; December, 2008
 
 draft: NASA changed its risk management approach in December of 2008 to make it more proactive.
 
-grade:
+grade:CORRECT
 
 ### 3
 
@@ -39,8 +39,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about joint cost and schedule confidence levels, nor does it mention anything related to Agency Baseline Commitments or KDP C.
 
-grade:
-
+grade:PARTIAL
 ### 4
 
 question: Which Department of Defense acquisition milestones correspond to NASA's Key Decision Points?
@@ -49,7 +48,7 @@ reference: the handbook does not answer this question
 
 draft: NASA's Key Decision Points (KDPs) are analogous to certain Department of Defense acquisition milestones, though they do not exactly match all DoD-specific stages. The closest equivalents in terms of major decision points and risk acceptance would be considered the Program Review and System Definition Reviews for NASA.
 
-grade:
+grade:WRONG
 
 ### 5
 
@@ -59,7 +58,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about the minimum mass margin percentage or any details related to PDR (Pre-Development Review) for hardware projects.
 
-grade:
+grade:PARTIAL
 
 ### 6
 
@@ -70,7 +69,7 @@ reference: acceptable forms: Preliminary Design Review; the Preliminary Design R
 
 draft: The verification plan is baselined at the Preliminary Design Review (PDR).
 
-grade:
+grade:CORRECT
 
 ### 7
 
@@ -81,7 +80,7 @@ reference: acceptable forms: regression test; regression tests; regression
 
 draft: The NASA Systems Engineering Handbook does not provide a specific name for the formal practice of rerunning earlier acceptance tests, especially for software.
 
-grade:
+grade:WRONG
 
 ### 8
 
@@ -91,7 +90,7 @@ reference: the handbook does not answer this question
 
 draft: The NASA Systems Engineering Handbook does not specifically recommend a commercial software package for configuration status accounting; it provides guidance on best practices rather than specific tool recommendations.
 
-grade:
+grade:CORRECT
 
 ### 9
 
@@ -101,7 +100,7 @@ reference: the question's assumption is false; the handbook says: The handbook s
 
 draft: The NASA Systems Engineering Handbook does not specify where technology development lessons learned should be captured after the Critical Design Review.
 
-grade:
+grade:WRONG
 
 ### 10
 
@@ -112,7 +111,7 @@ reference: acceptable forms: NPR7120.5; 7120.5; NASA Procedural Requirements 712
 
 draft: The NASA Systems Engineering Handbook (SEH) requires that data management planning be included in the Program/Project Plan, the Configuration Management Plan, or as a separate document. This is outlined in the SEH guidelines for ensuring comprehensive and integrated project management practices.
 
-grade:
+grade:WRONG
 
 ### 11
 
@@ -123,7 +122,7 @@ reference: acceptable forms: Qualification Unit; a qualification unit; qual unit
 
 draft: The hardware unit that matches a flight unit in form, fit, and function but is subjected to environmental extremes and is typically not flown is called a Ground Test Unit (GTU).
 
-grade:
+grade:WRONG
 
 ### 12
 
@@ -134,7 +133,7 @@ reference: acceptable forms: SRR and SDR; System Requirements Review and System 
 
 draft: The NASA Systems Engineering Handbook suggests that for small projects, certain high-level reviews such as System Requirements Review (SRR) and Preliminary Design Review (PDR) could be merged into a single review to streamline processes while still maintaining essential oversight.
 
-grade:
+grade:WRONG
 
 ### 13
 
@@ -145,7 +144,7 @@ reference: acceptable forms: environmental test chamber; test chamber; an enviro
 
 draft: The handbook does not provide an example of an enabling product for the test phase in the context of space flight systems.
 
-grade:
+grade:WRONG
 
 ### 14
 
@@ -155,7 +154,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about the number of members in a Standing Review Board.
 
-grade:
+grade:CORRECT
 
 ### 15
 
@@ -166,7 +165,7 @@ reference: acceptable forms: SRR; System Requirements Review; the SRR; a System 
 
 draft: The System Requirements Review (SRR) is typically held according to the NASA Systems Engineering Handbook.
 
-grade:
+grade:CORRECT
 
 ### 16
 
@@ -176,7 +175,7 @@ reference: the question's assumption is false; the handbook says: The handbook g
 
 draft: The passage provided does not contain information about functional analysis or any specific steps involved in it.
 
-grade:
+grade:WRONG
 
 ### 17
 
@@ -186,7 +185,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about which contractor handled the NOAA N-Prime spacecraft or details of a specific mishap investigation.
 
-grade:
+grade:CORRECT
 
 ### 18
 
@@ -196,7 +195,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about the dollar cost cap on projects selected through an Announcement of Opportunity in an uncoupled program.
 
-grade:
+grade:CORRECT
 
 ### 19
 
@@ -207,7 +206,7 @@ reference: reading 2: ready for a safe and successful flight or launch -> the Fl
 
 draft: The FRR (Flight Readiness Review) phase signs off that the system is ready.
 
-grade:
+grade:CORRECT
 
 ### 20
 
@@ -217,7 +216,7 @@ reference: the question's assumption is false; the handbook says: MOPs are thems
 
 draft: The NASA Systems Engineering Handbook refers to these as "MOMs" (Measurement of Performance), which are the more technical, supplier-oriented measures derived from the MOPs (Measurements of Performance).
 
-grade:
+grade:WRONG
 
 ### 21
 
@@ -228,7 +227,7 @@ reference: acceptable forms: 400M; $400 million; 400 million; 400 million dollar
 
 draft: The passage does not provide information about cost guidance for program/project types or specific ranges for life-cycle costs. Therefore, it cannot answer how much one cost range exceeds another.
 
-grade:
+grade:WRONG
 
 ### 22
 
@@ -239,7 +238,7 @@ reference: acceptable forms: ConOps; ConOps document; the Concept of Operations;
 
 draft: Validation testing is traced back to requirements documentation, ensuring that the system meets its intended objectives as specified in the requirements.
 
-grade:
+grade:WRONG
 
 ### 23
 
@@ -250,7 +249,7 @@ reference: acceptable forms: thirty-two; 32 more; 32 more principles than functi
 
 draft: The SAE/EIA-649-2 standard for configuration management includes 13 underlying principles in addition to its specific configuration management functions, which adds up to a total of 18 elements. Therefore, there are 5 additional underlying principles beyond the configuration management functions endorsed by NASA.
 
-grade:
+grade:WRONG
 
 ### 24
 
@@ -260,7 +259,7 @@ reference: the handbook does not answer this question
 
 draft: The NASA Systems Engineering Handbook does not specify the minimum number of alternatives required before running a trade study.
 
-grade:
+grade:CORRECT
 
 ### 25
 
@@ -271,7 +270,7 @@ reference: acceptable forms: NASA-HDBK-2203; NASA HDBK 2203; NASA Software Engin
 
 draft: The NASA Systems Engineering Handbook does not say anything about entrance and exit criteria for milestone reviews in software projects.
 
-grade:
+grade:WRONG
 
 ### 26
 
@@ -281,7 +280,7 @@ reference: the handbook does not answer this question
 
 draft: The NASA Systems Engineering Handbook passage does not provide information about the duration of Phase B or any other phases relative to the type of mission.
 
-grade:
+grade:CORRECT
 
 ### 27
 
@@ -291,7 +290,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about the number of years technical data must be kept after a system is retired.
 
-grade:
+grade:CORRECT
 
 ### 28
 
@@ -301,7 +300,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not provide information about which contractor built the Orion test article.
 
-grade:
+grade:CORRECT
 
 ### 29
 
@@ -312,7 +311,7 @@ reference: acceptable forms: mission operations manager or project manager; the 
 
 draft: In Phase E, the Configuration Control Board that oversees the transition of new operational capabilities is chaired by the mission operations manager or the project manager.
 
-grade:
+grade:CORRECT
 
 ### 30
 
@@ -322,7 +321,7 @@ reference: the handbook does not answer this question
 
 draft: The exact costs can vary significantly depending on many factors, but generally, advancing a critical technology by one Technology Readiness Level (TRL) step through the NASA Technology Assessment process involves substantial investments in research and development.
 
-grade:
+grade:WRONG
 
 ### 31
 
@@ -333,7 +332,7 @@ reference: acceptable forms: Product Transition; Product Transition Process; pro
 
 draft: The process that acts as the bridge from one system level up to the next and is typically considered the last of the product realization processes in systems engineering is the System Level Design Review (SLDR).
 
-grade:
+grade:WRONG
 
 ### 32
 
@@ -344,7 +343,7 @@ reference: acceptable forms: a widely adopted and standardized quality managemen
 
 draft: AS9100, developed by the Aerospace Industries Association (AIA), is a quality management system standard specifically tailored for the aerospace and defense industries to ensure product safety and reliability.
 
-grade:
+grade:PARTIAL
 
 ### 33
 
@@ -354,7 +353,7 @@ reference: the question's assumption is false; the handbook says: For a program 
 
 draft: The passage does not provide information on where the project should record the approved tailoring after it has been requested and approved by the OCE.
 
-grade:
+grade:WRONG
 
 ### 34
 
@@ -364,7 +363,7 @@ reference: the handbook does not answer this question
 
 draft: The passage does not say anything about commercial space flight mishaps or lessons learned from such incidents. Therefore, it cannot answer which specific mishaps supplied those lessons.
 
-grade:
+grade:PARTIAL
 
 ### 35
 
@@ -375,7 +374,7 @@ reference: acceptable forms: four; four criteria; 4 criteria
 
 draft: The handbook states that each objective should generally satisfy four criteria.
 
-grade:
+grade:CORRECT
 
 ### 36
 
@@ -386,7 +385,7 @@ reference: reading 2: the top-level (final) end product -> the intended end user
 
 draft: The passage does not provide information about who receives an end product during the Product Transition Process.
 
-grade:
+grade:WRONG
 
 ### 37
 
@@ -397,7 +396,7 @@ reference: acceptable forms: Configuration Control Board; CCB; the CCB; a CCB vi
 
 draft: A Configuration Control Board normally approves changes to project information that is held under configuration control.
 
-grade:
+grade:CORRECT
 
 ### 38
 
@@ -408,7 +407,7 @@ reference: reading 2: readiness to proceed with routine in-space operations afte
 
 draft: The flight readiness review (FRR) is the final major systems engineering and management process that clears a spaceflight vehicle, its crew, and associated operations for launch after all design, development, manufacturing, integration, test, and verification activities have been completed.
 
-grade:
+grade:WRONG
 
 ### 39
 
@@ -419,7 +418,7 @@ reference: acceptable forms: four; 4 levels; four levels; from TRL 9 to TRL 5; 9
 
 draft: When a flight-proven heritage unit is reused in a different architecture and environment, its Technical Readiness Level (TRL) typically falls by one or two TRL levels to account for the potential changes in performance, reliability, and integration challenges.
 
-grade:
+grade:WRONG
 
 ### 40
 
@@ -430,5 +429,5 @@ reference: reading 2: the review held when major assets are ready for final disp
 
 draft: The passage does not contain information about any review checks for disposing of a system.
 
-grade:
+grade:WRONG
 

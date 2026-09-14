@@ -322,5 +322,50 @@ PARTIAL, and example 19 flips between PARTIAL and WRONG with the order and
 takes WRONG. Both leave the binary label unchanged and both are the cases
 the owner ruled to keep flagged. v7 costs about two extra judge calls per
 draft. Grading the 21 examples from a cold cache takes about ten minutes.
-The owner has not yet seen the v7 report; the blind grader check is the
-gate for mass grading.
+The owner signed off v7 on that table on 2026-09-09, with the blind grader
+check as the gate for mass grading.
+
+## The two blind checks, 2026-09-09
+
+Grader check. Forty drafts by qwen2.5:3b-instruct on verified candidate
+items, under three conditions the model did not know it was in (its own
+evidence passage, no passage, another item's passage), shuffled. The owner
+graded 39 without seeing the judge. Binary agreement: 32 of 39, 82 percent,
+below the 90 percent bar, so v7 is not signed off in practice and nothing is
+mass graded yet. Per bucket: answerable 17 of 18, ambiguous 3 of 4, false
+premise 3 of 4, unanswerable 9 of 13. Per condition: no passage 12 of 13,
+own evidence 11 of 13, distractor passage 9 of 13. Where the two disagreed,
+the owner was stricter than the judge in six cases and more lenient in one.
+
+Read one by one, the seven disagreements split into one judge error and six
+rubric gaps. The judge error: an abstention on an unanswerable item ("the
+passage does not provide information about the dollar cost cap...") went to
+the judge because a capitalised name followed the refusal, and the judge
+answered that the draft offers an answer. The rubric gaps, which the guide
+does not settle and the owner's grades do: three abstentions phrased as
+"the passage does not provide" rather than the handbook, one of them adding
+a wrong expansion of PDR and one adding a false claim about what the
+handbook mentions, which the owner graded PARTIAL and the grader CORRECT;
+one bare abstention on a false-premise item, CORRECT by the guide's table
+and WRONG to the owner; one right answer padded with claims from outside
+the handbook (the Aerospace Industries Association, defence), CORRECT to
+the grader and PARTIAL to the owner; and one ambiguous item whose one-sided
+answer the owner graded CORRECT, reading the item as having a natural
+answer. Those six are decisions for the owner before the grader changes.
+
+Item check. The owner labelled 40 held-back items from the handbook alone.
+Bucket agreement 37 of 40, 92 percent: answerable 14 of 14, and the owner's
+answer contained the gold answer or an alias every time; unanswerable 10 of
+10; false premise 8 of 8, corrections matching the drafted fix; ambiguous 5
+of 8. The three misses were drafted as ambiguous and read as answerable:
+the second reading rested on a distinction the handbook draws (Concept of
+Operations against Operations Concept, MOEs against MOPs, requirements
+validation against product validation) that a user asking the question
+would not have in mind. In two of the three the owner noted the near-call.
+That is the failure the guide names, "if one reading is clearly what any
+reader would mean, the item is not ambiguous", and it is the bucket to
+re-read across all candidates during the review. Unanswerable, which the
+owner expected to be the shakiest bucket, matched on every item.
+
+Both figures are measured limitations and go into the final report as they
+stand.
