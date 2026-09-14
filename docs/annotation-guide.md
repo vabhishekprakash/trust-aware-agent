@@ -463,17 +463,17 @@ stratified with seed 42 (reports/split-summary.md).
 
 Addendum, 2026-09-11, grader v13. A clarifying question of the form "do you
 mean X, or Y" that names both readings of an ambiguous item is CORRECT by
-rule, decided in code (each alternative shares at least two content words,
-not from the question, with its reading or that reading's answer, and the
-pairing fits better than any other). The judge had graded both such
-questions in the first dev run WRONG. Checked before use: the 21 examples
-give 19 of 21 grades and 21 of 21 labels, no binary flip against v12 (the
-one CLARIFY example stays with the judge, which grades it CORRECT as
-before). Sheet 1 rubric fidelity 39 of 39 binary and 36 of 39 three-way;
-the single change from v12 is sheet 19, and that comes from grading against
-the pool snapshot in which its item had moved to answerable, not from the
-rule. Sheet 2 rubric fidelity 24 of 25 binary and 19 of 25 three-way, no
-change from v12. On the dev run the rule changed one grade, q0107, WRONG to
+rule, decided in code. Each alternative must share at least two content
+words, not from the question, with its reading or that reading's answer,
+and the pairing must fit better than any other. The judge had graded both
+such questions in the first dev run WRONG. Checked before use: the 21
+examples give 19 of 21 grades and 21 of 21 labels, with no binary flip
+against v12. The one CLARIFY example stays with the judge, which grades it
+CORRECT as before. Sheet 1 rubric fidelity is 39 of 39 binary and 36 of 39
+three-way. The single change from v12 there is sheet 19, and it comes from
+grading against the pool snapshot in which that item had moved to
+answerable, not from the rule. Sheet 2 rubric fidelity is 24 of 25 binary
+and 19 of 25 three-way, unchanged from v12. On the dev run the rule changed one grade, q0107, WRONG to
 CORRECT; the other composed question, q0126, names one reading and stays
 WRONG with the judge. The blind figures are unchanged: 82 percent (v7, sheet
 1) and 80 percent (v10, sheet 2).
