@@ -708,3 +708,41 @@ action available to the agent, the ninety-odd items in those two buckets
 would measure a missing feature rather than confidence. M2 therefore builds
 both as first-class actions of the plan-act loop (ask which reading is
 meant; say the handbook does not cover it), before any signal is measured.
+
+## Dev run v1, untuned, 2026-09-10 and 2026-09-11
+
+The first full run of the agent over the 100 dev items, k=8, no abstain
+threshold, graded by v12 (reports/dev-run-v1.md, rows in
+reports/dev-run-v1.jsonl, one per item with the trace and the grade). The
+owner asked for the confounder number from the first run, not derived
+later, so the trace records whether a target evidence chunk was retrieved
+and at what rank, using the recall script's definition.
+
+Results the next steps rest on. Answerable accuracy is 27 of 38 with the
+evidence retrieved and 2 of 8 without it. The false-clarify rate is 6 of 46
+(13 percent), under the owner's bar of a fifth; one of the six was a format
+slip (the model wrote ONE READING as an answer inside a READING line), and
+the parser now drops such lines, which was not rerun. The other five list
+a contrast rather than a reading: verification against validation, six
+steps against seven, an Event Readiness Review against a Key Decision
+Point. The model built on the false premise in 14 of 20 items and never
+corrected one; the other 6 abstained (PARTIAL). Spurious CALC lines on 7 of
+96 non-calculator items, all uncomputable. The best retrieval score does
+not separate correct from incorrect answers (medians 0.755 and 0.752) and
+barely separates retrieved from unretrieved evidence (0.748 and 0.727), so
+a score threshold would abstain almost at random. The threshold is chosen
+with the owner from those distributions, not in this pass.
+
+Grader note, not acted on. Both rule-composed CLARIFY responses on
+ambiguous items (q0107, q0126) were graded WRONG by the judge, which
+answered NO to "asks which reading is meant" although the guide's rule
+grades a CLARIFY that names the two readings CORRECT. A code rule for a
+CLARIFY that names both readings would be grader v13; it needs the 21
+examples and both rubric-fidelity sheets rerun first. The grades stand as
+v12 gave them.
+
+Time. 1,800 s for 100 items, half in the readings step and half in the
+draft; retrieval is negligible. Grading was interrupted once by a session
+end and once by a dropped connection; the final pass took 710 s with 53
+items replayed from the cache, so no clean grading wall clock exists for
+this run.

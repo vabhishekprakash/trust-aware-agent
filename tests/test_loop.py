@@ -61,6 +61,13 @@ def test_parse_readings_run_together_on_one_line():
     assert distinct_answers(readings) == 2
 
 
+def test_an_answer_of_one_reading_is_not_a_reading():
+    text = "READING: more than one system | ANSWER: MORE THAN ONE | READING: Reading 1: building more than one | ANSWER: ONE READING"
+    readings = parse_readings(text)
+    assert [r["answer"] for r in readings] == ["MORE THAN ONE"]
+    assert distinct_answers(readings) == 1
+
+
 def test_clarify_question_falls_back_to_answers_for_bare_labels():
     readings = [{"reading": "[1]", "answer": "the CDR"}, {"reading": "2", "answer": "the CDR"}, {"reading": "3", "answer": "the PRR"}]
     assert clarify_question(readings) == "Do you mean the CDR, or the PRR?"

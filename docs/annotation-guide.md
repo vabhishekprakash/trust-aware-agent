@@ -330,7 +330,10 @@ quarter of questions never have their evidence in front of the model at any
 affordable k, and the same k feeds the retrieval-support signal, the abstain
 rule and the answer itself. The final report must separate retrieval failure
 from confidence failure where it can, for example by reporting calibration
-with retrieval quality held fixed, or state that it cannot.
+with retrieval quality held fixed, or state that it cannot. The first full
+dev run put numbers on it: answerable items were correct 27 of 38 times
+with the evidence chunk retrieved and 2 of 8 times without it
+(reports/dev-run-v1.md).
 
 After drafting, the owner reviews the set. As it happened, the blind item
 check and the owner's calls on the ambiguous bucket stood in for the

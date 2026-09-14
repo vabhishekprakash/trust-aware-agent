@@ -47,6 +47,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--rows", default=str(ROOT / "reports" / "dev-run-v1.jsonl"))
     parser.add_argument("--out", default=str(ROOT / "reports" / "dev-run-v1.md"))
+    parser.add_argument("--grading-note", default="", help="one sentence about how the grading pass went, appended to the wall clock section")
     args = parser.parse_args()
     rows = [json.loads(l) for l in Path(args.rows).read_text(encoding="utf-8").splitlines() if l.strip()]
     manifest = json.loads(Path(args.rows).with_name(Path(args.rows).stem + "-manifest.json").read_text(encoding="utf-8"))
@@ -104,6 +105,14 @@ def main() -> int:
     if clar:
         dg = Counter((r["draft_grade"] or r["grade"])["grade"] for r in clar)
         lines.append(f"- What the draft behind those CLARIFYs would have scored: " + ", ".join(f"{g} {dg[g]}" for g in GRADES) + ".")
+        artefact = [r for r in clar if any(p["answer"].strip().upper().startswith("ONE READING") for p in r["readings"]["parsed"])]
+        lines.append(f"- Items where a listed 'answer' was the words ONE READING, a format slip the parser took as a reading: {len(artefact)}"
+                     + (f" ({', '.join(r['item_id'] for r in artefact)}). Without them the rate is {pct(len(clar) - len(artefact), len(ans))}." if artefact else "."))
+        lines.append("- The readings the model listed on those items:")
+        for r in clar:
+            lines.append(f"  - {r['item_id']}: {r['question']}")
+            for p in r["readings"]["parsed"]:
+                lines.append(f"    - {p['reading']} => {p['answer']}")
     amb = by_bucket["ambiguous"]
     lines.append(f"- For contrast, CLARIFY on ambiguous items: {pct(sum(r['action'] == 'CLARIFY' for r in amb), len(amb))}, readings fired {pct(sum(r['readings']['fired'] for r in amb), len(amb))}.")
 
@@ -167,6 +176,18 @@ def main() -> int:
         f"- Actions on false-premise items: " + ", ".join(f"{a} {sum(r['action'] == a for r in fp)}" for a in ACTIONS) + ".",
     ]
 
+    # grader notes
+    amb_clar = [r for r in amb if r["action"] == "CLARIFY"]
+    lines += ["", "## Grader notes", ""]
+    for r in amb_clar:
+        flags = [a.get("flags") for a in r["grade"].get("judge_answers") or []]
+        lines.append(f"- {r['item_id']}: the rule's composed CLARIFY was graded {r['grade']['grade']} by the judge, whose answers to "
+                     f"'asks which reading is meant' were {flags}. Response: {r['response']}")
+    if amb_clar:
+        lines.append("- The guide grades a CLARIFY that names the two readings CORRECT. The judge did not read the composed question as "
+                     "asking which reading is meant. A code rule for that case is a grader change and needs the 21 examples and both "
+                     "rubric-fidelity sheets rerun before it is used; these grades stand as v12 gave them.")
+
     # best score distribution for the threshold discussion
     lines += ["", "## Best retrieval score, for choosing the abstain threshold", "", "Nothing was tuned in this run. Per bucket, then by grade label among items where the agent answered.", ""]
     for b in BUCKETS:
@@ -189,6 +210,8 @@ def main() -> int:
         f"- Calls served from the cache: {run['cached_calls_by_step']}.",
         f"- Grading: {manifest['grading_wall_seconds']:.0f} s, decided by {manifest['decided_by']}.",
     ]
+    if args.grading_note:
+        lines.append(f"- {args.grading_note}")
     Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print("\n".join(lines))
     return 0

@@ -61,7 +61,9 @@ def parse_readings(text: str) -> list[dict]:
 
     Empty for ONE READING or an unreadable reply.
     """
-    return [{"reading": m.group(1).strip(), "answer": m.group(2).strip()} for m in _READING.finditer(text)]
+    readings = [{"reading": m.group(1).strip(), "answer": m.group(2).strip()} for m in _READING.finditer(text)]
+    # A model that writes "READING: ... | ANSWER: ONE READING" has said there is one reading, not given one.
+    return [r for r in readings if not r["answer"].upper().startswith("ONE READING")]
 
 
 def distinct_answers(readings: list[dict]) -> int:
