@@ -966,3 +966,22 @@ reply a round number; agreement with the graded draft separates (max
 Jaccard 0.85 against 0.70, form agreement 0.95 against 0.77); the
 log-probability summaries barely move (first-token -0.16 against -0.28,
 mean -0.18 against -0.19, minimum reversed). Nothing is fitted yet.
+
+## M4 on dev: three variants, three strata, the log-probabilities dropped, 2026-09-12
+
+Before fitting: the log-probability mismatch is 44 of 134 pooled and 20 of
+50 in the decisive stratum, and on the matched subset the logprob means by
+label are flat (reports/logprob-mismatch.md). Fitted as planned
+(reports/m4-calibration.md, reading in reports/m4-calibration-reading.md):
+out-of-fold AUROC 0.73 pooled and 0.76 decisive for the full vector; the
+same without the action features, so the calibrator is not an action
+detector; a bucket-detector accuracy of 0.59 against a prior of 0.46,
+with discrimination surviving inside the stratum, so not only a bucket
+detector. Dropping the logprob features costs 0.04 pooled and 0.10 in the
+stratum on point estimates, and a post-hoc diagnostic, labelled as such,
+showed the whole gain is lp_tokens, the token count of a regenerated text
+that differs from the graded one on 40 percent of the stratum. That is a
+length artefact, not a confidence signal, so the logprob features are
+dropped and the cost is stated. Recommended: minus_logprobs with logistic
+plus isotonic. Artifacts for all three variants, fitted on all of dev with
+seed 42 and library versions, are in data/calibrators/. Test untouched.
