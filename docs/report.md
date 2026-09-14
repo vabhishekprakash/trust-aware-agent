@@ -10,25 +10,25 @@ reader should assume every claim is directional at this data size.
 ## Abstract
 
 The calibrated confidence did not transfer to the held-out test split,
-and the decision policy built on it withheld correct answers: at the
+and the decision policy built on it withheld correct answers. At the
 frozen thresholds the error rate among shown answers on test was 64 [49,
 80] percent against a base rate of 56 [43, 70] percent. The read landed
 in the preregistered "worse" band and is reported as the result, with no
 refitting and no second read.
 
 On the development set the confidence separated right from wrong answers
-weakly but above chance, AUROC 0.70 [0.61, 0.79] pooled and 0.63 [0.45,
-0.80] in the decisive stratum, the answerable questions whose evidence
-was retrieved. On test the pooled AUROC was 0.66 [0.56, 0.76], inside the
-dev interval, and the decisive-stratum point estimate was at chance, 0.49
-[0.29, 0.72], on 26 correct against 10 wrong; that sample cannot support
-a strong claim in either direction. Two findings did hold direction on
-test. Retrieval decides most of the outcome: answerable items were
-correct 26 of 36 times with the evidence retrieved and 0 of 10 without.
-And the cheap signals beat the expensive ones: agreement alone at 0.71
-[0.60, 0.80] pooled and the free trace signals at 0.70 [0.59, 0.80]
-scored above the confirmed 39-feature vector at 0.66 [0.56, 0.76], with
-overlapping intervals, the same ordering the dev data suggested. A
+weakly but above chance: AUROC 0.70 [0.61, 0.79] pooled and 0.63 [0.45,
+0.80] in the decisive stratum. That stratum is the answerable questions
+whose evidence was retrieved. On test the pooled AUROC was 0.66 [0.56,
+0.76], inside the dev interval. The decisive-stratum point estimate was
+at chance, 0.49 [0.29, 0.72], on 26 correct against 10 wrong; that sample
+cannot support a strong claim in either direction. Two findings did hold
+direction on test. Retrieval decides most of the outcome: answerable
+items were correct 26 of 36 times with the evidence retrieved and 0 of
+10 without. And the cheap signals beat the expensive ones. Agreement
+alone at 0.71 [0.60, 0.80] pooled and the free trace signals at 0.70
+[0.59, 0.80] scored above the confirmed 39-feature vector at 0.66 [0.56,
+0.76], with overlapping intervals, the ordering the dev data suggested. A
 premise-check step built to move the false-premise bucket off zero made
 every bucket worse and is reported as a negative result. The grader's
 labels were checked blind three times, most recently at 19 of 20 on real
@@ -37,8 +37,8 @@ agent outputs.
 ## What was built
 
 The agent retrieves eight chunks of the handbook with a small embedding
-model, asks the language model whether the question has two readings
-the passages answer differently, drafts an answer, runs a two-operand
+model and asks the language model whether the question has two readings
+the passages answer differently. It drafts an answer, runs a two-operand
 calculator when the draft asks for one, and decides among answering,
 asking which reading is meant, and saying the handbook does not say.
 Every step is written to a trace. Thirty-nine features computed from the
@@ -52,10 +52,10 @@ Details are in docs/explanations, numbered 00 to 09.
 
 ## The data and the grader
 
-Two hundred questions in four buckets, drafted and verified by language
-model agents over the handbook and graded by a language model judge
-inside a staged grader: answerable, ambiguous, unanswerable, and built on
-a false premise. Split 100 and 100, stratified by bucket, seed 42; 34
+Two hundred questions in four buckets: answerable, ambiguous,
+unanswerable, and built on a false premise. They were drafted and
+verified by language model agents over the handbook and graded by a
+language model judge inside a staged grader. Split 100 and 100, stratified by bucket, seed 42; 34
 reserve items joined dev later, so dev is 134. The test split was read
 by one script, once, after the analysis was preregistered
 (reports/m8-preregistration.md). The ambiguous bucket has 9 items in
@@ -102,7 +102,7 @@ Pooled discrimination on test sits inside the dev interval. In the
 decisive stratum, where bucket and retrieval are held fixed and the
 model's judgement decides, the test point estimate is at chance. With 26
 correct against 10 wrong the interval runs from 0.29 to 0.72, so the
-sample cannot support a strong claim in either direction: it is not
+sample cannot support a strong claim in either direction. It is not
 evidence that the confidence works there, and it is not proof that it
 does not. The reliability figure shows why the curve is a sketch: 60 of
 the 100 test items land in a single bin.
@@ -118,9 +118,9 @@ above the base risk, and the preregistration defined that alone as
 
 This is the sharpest result in the project and it gets its own section.
 The policy showed an answer at or above a probability of 0.58, flagged it
-between 0.35 and 0.58, and withheld it below 0.35, thresholds chosen on
-dev as a coverage choice because no error target of 10 to 25 percent was
-reachable there with meaningful coverage.
+between 0.35 and 0.58, and withheld it below 0.35. The thresholds were
+chosen on dev as a coverage choice, because no error target of 10 to 25
+percent was reachable there with meaningful coverage.
 
 | answered items | dev (70, 36 correct) | test (54, 24 correct) |
 |---|---|---|
@@ -137,18 +137,18 @@ rose from 56 to 64 percent. Two thresholds tuned on 134 dev items did
 not transfer, which is exactly the overfitting risk the preregistration
 existed to expose. A deployed version of this system would withhold
 correct answers. On dev the same policy had moved the error rate from
-49 to 41 percent with an interval that already included no effect; the
-report said then that the claim waited for the test read, and the test
-read settled it the other way.
+49 to 41 percent with an interval that already included no effect. The
+report said then that the claim waited for the test read. The test read
+settled it the other way.
 
 ![Risk against coverage, dev and test](assets/risk-coverage.png)
 
 ![Policy outcomes per bucket, dev and test](assets/buckets.png)
 
-The deployed view, all items with the agent's own abstentions and
-clarifications passing through, is flattered by the unanswerable bucket
-(24 of 25 correct abstentions on test, untouched by any threshold) and
-punished by false-premise abstentions graded PARTIAL. The answered
+The deployed view counts the agent's own abstentions and clarifications
+as shown. It is flattered by the unanswerable bucket, 24 of 25 correct
+abstentions on test that no threshold touches, and punished by
+false-premise abstentions graded PARTIAL. The answered
 population above is the policy's real work.
 
 ## The free signals beat the paid ones, on dev and in direction on test
@@ -166,18 +166,18 @@ a richer vector beats a poorer one. Neither held here.
 ![Baselines and the confirmed vector, AUROC with intervals](assets/baselines.png)
 
 On test the two smaller systems scored above the confirmed vector, with
-overlapping intervals, and the free signals, computed from the trace at
-no cost, matched agreement, which costs 23 seconds of sampling per
-question. On dev the widest gap by label in the decisive stratum was
-lexical support, the share of the answer's words found in the best
-retrieved chunk, 0.73 for correct answers against 0.49 for wrong ones.
+overlapping intervals. The free signals, computed from the trace at no
+cost, matched agreement, which costs 23 seconds of sampling per question.
+On dev the widest gap by label in the decisive stratum was lexical
+support, the share of the answer's words found in the best retrieved
+chunk: 0.73 for correct answers against 0.49 for wrong ones.
 Verbalized confidence clustered at round numbers and inverted inside the
 answerable bucket on both splits. This is reported as directional and
 confirmed in direction, not as a proven ranking: the intervals overlap
-everywhere. Read as a design result, on a small model over a niche
+everywhere. Read as a design result: on a small model over a niche
 corpus, whether the answer's words are in the passage tells you more
-than asking the model how sure it is, and adding the expensive signals
-to the vector did not help on held-out data.
+than asking the model how sure it is. Adding the expensive signals to
+the vector did not help on held-out data.
 
 ## The retrieval confounder
 
@@ -213,8 +213,8 @@ test the bucket stayed at 0 of 20.
 ## Measurement integrity: four numbers that looked better than they were
 
 The grader, the item pool, the feature vector and a curve each produced
-one episode where a number improved for a reason that had nothing to do
-with what it claimed to measure. They are reported together because the
+one episode where a number improved for a reason unrelated to what it
+claimed to measure. They are reported together because the
 pattern is the same and a reader should expect more of it.
 
 1. The v9 judge question. A fourth yes-or-no question added to the judge
@@ -233,7 +233,7 @@ pattern is the same and a reader should expect more of it.
    log-probabilities by 0.04 AUROC pooled and 0.10 in the decisive
    stratum on dev. A post-hoc diagnostic, labelled as such, showed the
    entire gain was lp_tokens, the token count of a draft regenerated with
-   log-probabilities on, a text that differs from the graded draft on 40
+   log-probabilities on. That text differs from the graded draft on 40
    percent of the stratum. Its coefficient paired with a negative one on
    the response's own length: a length difference between two
    generations, not a confidence signal, and one that would not
@@ -248,8 +248,8 @@ pattern is the same and a reader should expect more of it.
    recorded rather than deleted; the authors found it themselves.
 
 The test read adds a fifth entry of a different kind: the preregistered
-audit ran regardless of band. Provenance held on every row, the split's
-seed and counts matched, and 15 test items were flagged as
+audit ran regardless of band. Provenance held on every row and the
+split's seed and counts matched. Fifteen test items were flagged as
 near-duplicates of dev items, 14 by the same-evidence-page rule that
 pairs an item with the false-premise item drafted from the same passage.
 Removing them changed nothing: pooled AUROC 0.67 [0.56, 0.77], decisive
@@ -261,19 +261,19 @@ Removing them changed nothing: pooled AUROC 0.67 [0.56, 0.77], decisive
   a language model judge. Human checks are the three blind samples
   above; the signed-off one is 19 of 20 on real outputs.
 - Every dev metric describes the out-of-fold calibrator. The shipped
-  artifact is refit on all 134 dev items, its probabilities differ from
+  artifact is refit on all 134 dev items. Its probabilities differ from
   the measured ones by 0.094 on average and up to 0.415 on dev, and its
   calibration was measured only by the test read above. The dashboard
   caps the shown probability at the isotonic step below the top one, so
-  nothing displays as certain; the cap is a presentation guard, not a
+  nothing displays as certain. The cap is a presentation guard, not a
   fix, and the page says so.
 - The explanation layer reports single-feature contributions as the fit
   gives them. The correlated retrieval-score features receive opposite
   signs, so individual coefficients are not interpretable as effects, a
-  known consequence of correlated inputs in a linear model; the
+  known consequence of correlated inputs in a linear model. The
   breakdown leads with sums by signal family and states the caveat.
 - VERIFY is a flag, not a verification loop. The problem statement's
-  tool-based verification is not implemented: retrieval recall is the
+  tool-based verification is not implemented. Retrieval recall is the
   same at k=10 as at k=8, a second draft mostly repeats the first, and
   the premise step is the precedent for a second pass making things
   worse.
