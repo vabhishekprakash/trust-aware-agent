@@ -15,16 +15,16 @@ buys little, and a second draft from the same model mostly repeats the
 first. And the premise step is the precedent: a second model pass built
 to fix a measured gap made every bucket worse.
 
-The two thresholds are tuned on dev to a target risk, the error rate
-among the answers the policy lets through. Above the upper threshold the
-answer is shown; below the lower one it is escalated; between them it is
-flagged. The tradeoff is coverage: a lower target risk means fewer
-answers shown. The owner picks the target from the risk-coverage curve.
+The two thresholds were set on dev as a coverage choice, not a risk
+guarantee: no error target of 10 to 25 percent was reachable with useful
+coverage, so the owner chose to escalate about the bottom quarter of
+answered items and flag the middle tertile. Above the upper threshold the
+answer is shown; below the lower one it is escalated; between, flagged.
 
 A common misconception: high coverage at low risk means the policy works.
 Not if the covered items are the easy abstentions on unanswerable
 questions while every hard answer is escalated; that bucket is reported
 on its own.
 
-Summary: three outcomes from two thresholds tuned on dev; VERIFY is a
-flag; the unanswerable bucket is reported on its own.
+Summary: three outcomes from two thresholds chosen on dev for coverage;
+VERIFY is a flag; the unanswerable bucket is reported on its own.

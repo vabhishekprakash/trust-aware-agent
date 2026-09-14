@@ -1,0 +1,8 @@
+{
+ "variant": "minus_logprobs",
+ "fit": "logistic+isotonic",
+ "thresholds": {"answer": 0.58, "escalate": 0.35},
+ "chosen_by": "owner, 2026-09-12",
+ "basis": "a coverage choice on dev, not a risk guarantee: escalate about the bottom quarter of answered items, flag the middle tertile; no risk target of 10 to 25 percent was reachable with meaningful coverage (reports/m5-risk-coverage.md)",
+ "alternative_recorded": {"target_risk": 0.20, "threshold": 0.846, "coverage_of_answered": "6 of 70"}
+}

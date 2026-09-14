@@ -11,9 +11,12 @@ docs/explanations/07-policy.md for why the loop was not built.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
 
 OUTCOMES = ("ANSWER", "VERIFY", "ESCALATE", "CLARIFY", "ABSTAIN")
+POLICY_PATH = Path(__file__).resolve().parents[2] / "data" / "calibrators" / "policy.json"
 
 
 @dataclass(frozen=True)
@@ -24,6 +27,12 @@ class Thresholds:
     def __post_init__(self):
         if not 0.0 <= self.escalate <= self.answer <= 1.0:
             raise ValueError("need 0 <= escalate <= answer <= 1")
+
+
+def load_thresholds(path: str | Path = POLICY_PATH) -> Thresholds:
+    """The thresholds the owner chose on dev, kept next to the calibrator artifact."""
+    record = json.loads(Path(path).read_text(encoding="utf-8"))
+    return Thresholds(answer=float(record["thresholds"]["answer"]), escalate=float(record["thresholds"]["escalate"]))
 
 
 def decide(agent_action: str, probability: float, thresholds: Thresholds) -> str:

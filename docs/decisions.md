@@ -1032,3 +1032,23 @@ hard would score well and be useless, and if that is what happens the
 report says so. M5 adds the risk-coverage curve with its band and a
 per-bucket table of the policy's actions with counts next to rates.
 Nothing is tuned until the owner picks the target. Test is not touched.
+
+## Thresholds chosen, 2026-09-12: a coverage choice, not a risk guarantee
+
+On the out-of-fold probabilities of the confirmed calibrator, no risk
+target of 10, 15, 20 or 25 percent among answered items was reachable
+with meaningful coverage on dev: the risk stays near 40 percent from 20
+to 80 percent coverage and reaches 17 [0, 55] percent only at 9 [3, 16]
+percent coverage (reports/m5-risk-coverage.md, thresholds tie-aware). The
+owner chose option 2 with a tertile VERIFY band: ANSWER at or above 0.58,
+VERIFY from 0.35 to 0.58, ESCALATE below 0.35, recorded in
+data/calibrators/policy.json next to the calibrator artifact. Rules for
+reporting it: no claim that the policy reduces error, since the intervals
+overlap heavily; the point estimate moves in the expected direction and
+the interval does not exclude no effect; the claim waits for the single
+read of test at M8. The corrected halving figure stays visible as a
+measurement-integrity episode. The deployed columns carry the caveat
+about 34 pass-through abstentions and 11 PARTIAL false-premise
+abstentions wherever they appear. The 20 percent target at threshold
+0.846, six of seventy answered items shown, is reported as the
+alternative so a reader sees what a risk guarantee would cost.

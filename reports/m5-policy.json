@@ -1,0 +1,1203 @@
+{
+ "policy": {
+  "variant": "minus_logprobs",
+  "fit": "logistic+isotonic",
+  "thresholds": {
+   "answer": 0.58,
+   "escalate": 0.35
+  },
+  "chosen_by": "owner, 2026-09-12",
+  "basis": "a coverage choice on dev, not a risk guarantee: escalate about the bottom quarter of answered items, flag the middle tertile; no risk target of 10 to 25 percent was reachable with meaningful coverage (reports/m5-risk-coverage.md)",
+  "alternative_recorded": {
+   "target_risk": 0.2,
+   "threshold": 0.846,
+   "coverage_of_answered": "6 of 70"
+  }
+ },
+ "per_bucket": {
+  "answerable": {
+   "ANSWER": {
+    "n": 16,
+    "correct": 12
+   },
+   "VERIFY": {
+    "n": 20,
+    "correct": 18
+   },
+   "ESCALATE": {
+    "n": 8,
+    "correct": 5
+   },
+   "ABSTAIN": {
+    "n": 12,
+    "correct": 1
+   },
+   "CLARIFY": {
+    "n": 6,
+    "correct": 0
+   }
+  },
+  "ambiguous": {
+   "ANSWER": {
+    "n": 1,
+    "correct": 0
+   },
+   "VERIFY": {
+    "n": 4,
+    "correct": 0
+   },
+   "ESCALATE": {
+    "n": 3,
+    "correct": 1
+   },
+   "ABSTAIN": {
+    "n": 0,
+    "correct": 0
+   },
+   "CLARIFY": {
+    "n": 1,
+    "correct": 1
+   }
+  },
+  "unanswerable": {
+   "ANSWER": {
+    "n": 0,
+    "correct": 0
+   },
+   "VERIFY": {
+    "n": 0,
+    "correct": 0
+   },
+   "ESCALATE": {
+    "n": 0,
+    "correct": 0
+   },
+   "ABSTAIN": {
+    "n": 33,
+    "correct": 32
+   },
+   "CLARIFY": {
+    "n": 1,
+    "correct": 0
+   }
+  },
+  "false_premise": {
+   "ANSWER": {
+    "n": 5,
+    "correct": 0
+   },
+   "VERIFY": {
+    "n": 5,
+    "correct": 0
+   },
+   "ESCALATE": {
+    "n": 8,
+    "correct": 0
+   },
+   "ABSTAIN": {
+    "n": 11,
+    "correct": 0
+   },
+   "CLARIFY": {
+    "n": 0,
+    "correct": 0
+   }
+  },
+  "all": {
+   "ANSWER": {
+    "n": 22,
+    "correct": 12
+   },
+   "VERIFY": {
+    "n": 29,
+    "correct": 18
+   },
+   "ESCALATE": {
+    "n": 19,
+    "correct": 6
+   },
+   "ABSTAIN": {
+    "n": 56,
+    "correct": 33
+   },
+   "CLARIFY": {
+    "n": 8,
+    "correct": 1
+   }
+  }
+ },
+ "rows": [
+  {
+   "item_id": "q0003",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.8824,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0009",
+   "bucket": "answerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.1765,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0011",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.3333,
+   "outcome": "ESCALATE",
+   "label": 1
+  },
+  {
+   "item_id": "q0013",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0015",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.68,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0019",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0022",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3636,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0023",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.4286,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0028",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0032",
+   "bucket": "answerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.625,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0037",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.6,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0039",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.6,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0040",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0041",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5714,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0043",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.1765,
+   "outcome": "ESCALATE",
+   "label": 1
+  },
+  {
+   "item_id": "q0044",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0046",
+   "bucket": "answerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.4286,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0047",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0048",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0049",
+   "bucket": "answerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.3636,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0050",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5172,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0052",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0053",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5172,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0055",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.0,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0058",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.3478,
+   "outcome": "ESCALATE",
+   "label": 1
+  },
+  {
+   "item_id": "q0060",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 1.0,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0061",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0068",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.4,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0073",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.6,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0074",
+   "bucket": "answerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.2941,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0075",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.68,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0076",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.4286,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0079",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5172,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0081",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.3894,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0082",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.1765,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0083",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.3636,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0084",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.6857,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0087",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.25,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0089",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.0,
+   "outcome": "ESCALATE",
+   "label": 1
+  },
+  {
+   "item_id": "q0090",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0091",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.3478,
+   "outcome": "ESCALATE",
+   "label": 1
+  },
+  {
+   "item_id": "q0093",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.625,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0094",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.649,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0096",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.4286,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0103",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.5769,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0107",
+   "bucket": "ambiguous",
+   "agent_action": "CLARIFY",
+   "probability": 0.0,
+   "outcome": "CLARIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0113",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.2727,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0114",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.5765,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0119",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5769,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0120",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.4286,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0123",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.5318,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0126",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.3482,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0127",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.6517,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0130",
+   "bucket": "ambiguous",
+   "agent_action": "ANSWER",
+   "probability": 0.3478,
+   "outcome": "ESCALATE",
+   "label": 1
+  },
+  {
+   "item_id": "q0131",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.6857,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0134",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0137",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3333,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0138",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5714,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0143",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6857,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0144",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 1.0,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0146",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6857,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0147",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.8824,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0152",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5769,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0155",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.68,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0156",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5769,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0159",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0161",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5172,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0162",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5172,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0163",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.8462,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0164",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0168",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0170",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0172",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0174",
+   "bucket": "unanswerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.3478,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0177",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.7,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0179",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0181",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5172,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0183",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.8462,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0185",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6373,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0190",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.4286,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0196",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.375,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0198",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.5172,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0205",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.68,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0206",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.68,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0207",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.3333,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0208",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.2941,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0209",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0215",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.3636,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0221",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3901,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0223",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3333,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0224",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3333,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0225",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.25,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0226",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.4178,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0227",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.7,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0229",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.1765,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0231",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.2941,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0233",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.3333,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0235",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.1765,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0236",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.6857,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0238",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.1765,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0002",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.8462,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0010",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.375,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0016",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.3408,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0027",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.68,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0031",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.6,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0033",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.8462,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0051",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3333,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0057",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.3333,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0059",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5714,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0062",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.2353,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0063",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.5714,
+   "outcome": "VERIFY",
+   "label": 1
+  },
+  {
+   "item_id": "q0064",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.1765,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0069",
+   "bucket": "answerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0071",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.68,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0077",
+   "bucket": "answerable",
+   "agent_action": "CLARIFY",
+   "probability": 0.625,
+   "outcome": "CLARIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0086",
+   "bucket": "answerable",
+   "agent_action": "ANSWER",
+   "probability": 0.8462,
+   "outcome": "ANSWER",
+   "label": 1
+  },
+  {
+   "item_id": "q0145",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5769,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0150",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.7,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0154",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.8824,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0157",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6857,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0167",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.8824,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0178",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.6,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0187",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.75,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0188",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 0.5,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0191",
+   "bucket": "unanswerable",
+   "agent_action": "ABSTAIN",
+   "probability": 1.0,
+   "outcome": "ABSTAIN",
+   "label": 1
+  },
+  {
+   "item_id": "q0197",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.8824,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0202",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.6,
+   "outcome": "ANSWER",
+   "label": 0
+  },
+  {
+   "item_id": "q0204",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.1765,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0212",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.375,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0216",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.5,
+   "outcome": "VERIFY",
+   "label": 0
+  },
+  {
+   "item_id": "q0218",
+   "bucket": "false_premise",
+   "agent_action": "ABSTAIN",
+   "probability": 0.4286,
+   "outcome": "ABSTAIN",
+   "label": 0
+  },
+  {
+   "item_id": "q0219",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.2941,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0222",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.3333,
+   "outcome": "ESCALATE",
+   "label": 0
+  },
+  {
+   "item_id": "q0237",
+   "bucket": "false_premise",
+   "agent_action": "ANSWER",
+   "probability": 0.68,
+   "outcome": "ANSWER",
+   "label": 0
+  }
+ ]
+}
