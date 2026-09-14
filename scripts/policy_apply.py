@@ -111,6 +111,25 @@ def main() -> int:
               "is made on dev; the single read of the test split at M8 is where that is settled. The alternative row shows what a risk guarantee would "
               f"cost here: {policy['alternative_recorded']['coverage_of_answered']} answered items shown.", ""]
 
+    # accuracy per band, with intervals: the confident band should beat the flagged one and here it does not
+    def band_acc(mask, n=1000):
+        k = int(mask.sum())
+        if k == 0:
+            return "0/0"
+        rng = np.random.default_rng(SEED)
+        vals = y[mask]
+        boots = [rng.choice(vals, k, replace=True).mean() for _ in range(n)]
+        return f"{int(vals.sum())}/{k} ({100 * vals.mean():.0f}% [{100 * np.percentile(boots, 2.5):.0f}, {100 * np.percentile(boots, 97.5):.0f}])"
+
+    lines += ["## Accuracy per band, with intervals", "",
+              "If the calibrator's ordering were reliable, the ANSWER band would be more accurate than the VERIFY band. Intervals are bootstrap over the band's items.", "",
+              "| population | ANSWER band | VERIFY band | ESCALATE band |", "|---|---|---|---|"]
+    for label, m in (("answerable items the agent answered", answered & (bucket == "answerable")), ("all answered items", answered)):
+        lines.append(f"| {label} | " + " | ".join(band_acc(m & (outcome == o)) for o in ("ANSWER", "VERIFY", "ESCALATE")) + " |")
+    lines += ["", "At this sample size the calibrator's ordering is not reliable enough for the top band to outperform the middle one. "
+              "That is one finding seen three ways: the band accuracies here, the AUROC of 0.69 [0.59, 0.78], and the flat risk-coverage curve. "
+              "The intervals cover the reversal; the report does not treat it as a separate effect.", ""]
+
     passthrough = ~answered
     pd = np.where(answered, p, 1.0)
     lines += ["## Deployed columns, with their caveat", "",

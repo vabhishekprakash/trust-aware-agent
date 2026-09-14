@@ -169,6 +169,20 @@ Outcomes per bucket, counts with rates and the correct count in each
 | unanswerable | 34 | 0 | 0 | 0 | 33 and 1, 32 correct |
 | false premise | 29 | 5 (17%), 0 correct | 5 (17%), 0 correct | 8 (28%), 0 correct | 11 and 0, 0 correct |
 
+The bands do not order as a reliable calibrator's would. Accuracy per
+band, with bootstrap intervals over the band's items:
+
+| population | ANSWER band | VERIFY band | ESCALATE band |
+|---|---|---|---|
+| answerable items the agent answered | 12/16 (75% [50, 94]) | 18/20 (90% [75, 100]) | 5/8 (62% [25, 88]) |
+| all answered items | 12/22 (55% [32, 77]) | 18/29 (62% [45, 79]) | 6/19 (32% [11, 53]) |
+
+At this sample size the calibrator's ordering is not reliable enough for
+the top band to outperform the middle one. That is one finding seen
+three ways, not three findings: the band accuracies here, the AUROC of
+0.69 [0.59, 0.78], and the flat risk-coverage curve. The intervals cover
+the reversal, and the report does not treat it as a separate effect.
+
 The deployed columns, wherever they appear, carry this caveat. Deployed
 coverage, 86 [80, 92] percent at the chosen threshold, is flattered by 34
 pass-through abstentions on unanswerable items that the policy never

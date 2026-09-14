@@ -25,6 +25,17 @@ Thresholds chosen by the owner on 2026-09-12: ANSWER at or above 0.58, ESCALATE 
 
 The point estimate moves in the expected direction and the interval does not exclude no effect. No claim that the policy reduces error is made on dev; the single read of the test split at M8 is where that is settled. The alternative row shows what a risk guarantee would cost here: 6 of 70 answered items shown.
 
+## Accuracy per band, with intervals
+
+If the calibrator's ordering were reliable, the ANSWER band would be more accurate than the VERIFY band. Intervals are bootstrap over the band's items.
+
+| population | ANSWER band | VERIFY band | ESCALATE band |
+|---|---|---|---|
+| answerable items the agent answered | 12/16 (75% [50, 94]) | 18/20 (90% [75, 100]) | 5/8 (62% [25, 88]) |
+| all answered items | 12/22 (55% [32, 77]) | 18/29 (62% [45, 79]) | 6/19 (32% [11, 53]) |
+
+At this sample size the calibrator's ordering is not reliable enough for the top band to outperform the middle one. That is one finding seen three ways: the band accuracies here, the AUROC of 0.69 [0.59, 0.78], and the flat risk-coverage curve. The intervals cover the reversal; the report does not treat it as a separate effect.
+
 ## Deployed columns, with their caveat
 
 All 134 items, with the agent's 64 ABSTAIN and CLARIFY outputs counted as shown with their own labels.
