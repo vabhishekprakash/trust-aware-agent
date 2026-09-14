@@ -92,7 +92,7 @@ def main() -> int:
             cached_calls[call["step"]] += int(call["cached"])
         per_item.append({"id": item["id"], "seconds": trace["seconds"]})
         ev = trace["evidence"]
-        print(f"{n:>3} {item['id']} {item['bucket']:<14} {trace['action']:<8} clarify={trace['clarify_by'] or '-':<6} abstain={trace['abstain_by'] or '-':<6} "
+        print(f"{n:>3} {item['id']} {item['bucket']:<14} {trace['action']:<8} reject={'rule' if trace['reject_by'] else '-':<5} clarify={trace['clarify_by'] or '-':<6} abstain={trace['abstain_by'] or '-':<6} "
               f"best={trace['best_score']:.3f} evidence={'rank ' + str(ev['rank']) if ev['retrieved'] else ('page' if ev['page_retrieved'] else 'no'):<7} "
               f"readings={len(trace['readings']['parsed'])} calc={len(trace['draft']['calc'])}{'!' if trace['spurious_calc'] else ''} {trace['seconds']:.0f}s", flush=True)
 

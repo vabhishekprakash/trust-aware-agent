@@ -19,9 +19,9 @@ from typing import Optional
 from agent.provider import Provider
 from agent.retriever import Hit, Index
 from agent.tools import calc_lines, calculate, format_number
-from calibration.grader import classify_form, normalise
+from calibration.grader import classify_form, content_words, normalise, shared_words
 
-TRACE_VERSION = "trace-v1"
+TRACE_VERSION = "trace-v2"  # v2 adds the premise step and the REJECT action
 DEFAULT_K = 8
 ABSTAIN_TEXT = "The handbook does not say."
 
@@ -29,7 +29,8 @@ ANSWER_SYSTEM = (
     "You answer questions about the NASA Systems Engineering Handbook using only the passages you are given. "
     "If the passages do not contain the answer, reply exactly: The handbook does not say. "
     "If the question could mean two different things that the passages answer differently, ask which is meant "
-    "instead of answering. Answer in one or two sentences. If the answer needs arithmetic on numbers in the "
+    "instead of answering. If the question takes something for granted that the passages contradict, say so and "
+    "give the correction. Answer in one or two sentences. If the answer needs arithmetic on numbers in the "
     "passages, reply with one line of the form CALC: <number> <+ or - or * or /> <number> and nothing else, "
     "for example CALC: 500 - 100; you will be given the result. Only do this when the question asks for a "
     "figure that has to be computed from two numbers in the passages."
@@ -49,6 +50,50 @@ _READING = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _BARE_LABEL = re.compile(r"^\W*\d*\W*$")
+
+PREMISE_SYSTEM = (
+    "You read a question and passages from the NASA Systems Engineering Handbook. Your only job is to say whether "
+    "the question takes something for granted that the passages contradict. Reply in exactly the format asked."
+)
+PREMISE_FOOTER = (
+    "If the question assumes nothing that the passages contradict, reply exactly: NO CONTRADICTION. Otherwise reply "
+    "on one line: ASSUMPTION: <what the question takes for granted, in the question's own words> | PASSAGE: <the "
+    "number of the passage that contradicts it> | CORRECTION: <what that passage says instead, in its words>."
+)
+_PREMISE = re.compile(
+    r"ASSUMPTION\s*:\s*(.+?)\s*\|\s*PASSAGE\s*:\s*\[?\s*(\d+)\s*\]?\s*\|\s*CORRECTION\s*:\s*(.+)",
+    re.IGNORECASE | re.DOTALL,
+)
+GATE_WORDS = 2
+GATE_COVERAGE = 0.6
+
+
+def parse_premise(text: str) -> Optional[dict]:
+    """The assumption, passage number and correction the model named, or None for NO CONTRADICTION."""
+    match = _PREMISE.search(text)
+    if not match:
+        return None
+    return {"assumption": match.group(1).strip(), "passage": int(match.group(2)), "correction": match.group(3).strip().rstrip(".")}
+
+
+def premise_grounded(parsed: dict, question: str, hits: list[Hit]) -> bool:
+    """The gate, three checks in code.
+
+    The assumption must be taken from the question: at least two content
+    words, and most of its words, occur there. A model that restates the
+    answer as the "assumption" fails this. The correction must be grounded
+    in the cited passage by at least two words that are not in the question,
+    and it must be about the assumption, sharing at least one word with it.
+    """
+    if not 1 <= parsed["passage"] <= len(hits):
+        return False
+    passage = hits[parsed["passage"] - 1].chunk["text"]
+    assumption_words = len(content_words(parsed["assumption"]))
+    from_question = shared_words(parsed["assumption"], question)
+    if assumption_words == 0 or from_question < GATE_WORDS or from_question / assumption_words < GATE_COVERAGE:
+        return False
+    return (shared_words(parsed["correction"], passage, excluding=question) >= GATE_WORDS
+            and shared_words(parsed["correction"], parsed["assumption"]) >= 1)
 
 
 def passages_block(hits: list[Hit]) -> str:
@@ -127,7 +172,16 @@ class Agent:
         passages = passages_block(hits)
         best = hits[0].score if hits else 0.0
 
-        # 2. readings step: the CLARIFY rule
+        # 2. premise step: the REJECT rule, gated in code
+        premise_raw = self._ask(
+            [{"role": "system", "content": PREMISE_SYSTEM},
+             {"role": "user", "content": f"Passages:\n{passages}\n\nQuestion: {question}\n\n{PREMISE_FOOTER}"}],
+            calls, "premise")
+        premise = parse_premise(premise_raw)
+        grounded = premise is not None and premise_grounded(premise, question, hits)
+        trace["premise"] = {"raw": premise_raw, "parsed": premise, "grounded": grounded, "fired": grounded}
+
+        # 3. readings step: the CLARIFY rule
         readings_raw = self._ask(
             [{"role": "system", "content": READINGS_SYSTEM},
              {"role": "user", "content": f"Passages:\n{passages}\n\nQuestion: {question}\n\n{READINGS_FOOTER}"}],
@@ -160,7 +214,11 @@ class Agent:
         clarify_prompt = form == "CLARIFY"
         clarify_rule = readings_fired
         action, response = "ANSWER", final_draft
-        if clarify_prompt or clarify_rule:
+        if grounded:
+            page = hits[premise["passage"] - 1].chunk["page_start"]
+            action = "REJECT"
+            response = f"The question assumes {premise['assumption']}. The handbook says {premise['correction']} (page {page})."
+        elif clarify_prompt or clarify_rule:
             action = "CLARIFY"
             if clarify_rule and not clarify_prompt:
                 response = clarify_question(readings)
@@ -171,6 +229,7 @@ class Agent:
         trace.update({
             "form": form,
             "best_score": round(best, 4),
+            "reject_by": "rule" if grounded else None,
             "clarify_by": _path(clarify_prompt, clarify_rule),
             "abstain_by": _path(abstain_prompt, abstain_rule),
             "action": action,

@@ -345,6 +345,16 @@ almost no positive examples, so the calibrator will have little to learn
 from it about when the agent is right, and any confidence it assigns to
 false-premise answers rests on the other buckets' patterns.
 
+The label structure also sets what the calibration numbers can show. Two
+buckets are nearly constant in label, so a pooled calibrator can do well by
+detecting the bucket. The real test is the stratum of answerable items whose
+evidence was retrieved, about 11 wrong against 27 right on dev, where the
+model's judgement rather than retrieval decides the outcome. M4 reports
+calibration within that stratum, within answerable alone, and pooled, and
+tests whether the bucket can be predicted from the signals. With dev at
+about 135 items and that stratum near 40, every reliability diagram carries
+bootstrap intervals and the honest conclusion is directional, not precise.
+
 After drafting, the owner reviews the set. As it happened, the blind item
 check and the owner's calls on the ambiguous bucket stood in for the
 planned sample of ten per bucket, and the owner locked on that basis.

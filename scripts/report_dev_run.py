@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
-ACTIONS = ("ANSWER", "CLARIFY", "ABSTAIN")
+ACTIONS = ("ANSWER", "REJECT", "CLARIFY", "ABSTAIN")
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 
 
@@ -49,6 +49,7 @@ def main() -> int:
     parser.add_argument("--out", default=str(ROOT / "reports" / "dev-run-v1.md"))
     parser.add_argument("--grading-note", default="", help="one sentence about how the grading pass went, appended to the wall clock section")
     parser.add_argument("--previous", default="", help="rows from an earlier grader on the same traces; adds a before-and-after section per bucket")
+    parser.add_argument("--before", default="", help="rows from an earlier run of a different loop; adds a labelled before table of actions and labels per bucket")
     args = parser.parse_args()
     rows = [json.loads(l) for l in Path(args.rows).read_text(encoding="utf-8").splitlines() if l.strip()]
     manifest = json.loads(Path(args.rows).with_name(Path(args.rows).stem + "-manifest.json").read_text(encoding="utf-8"))
@@ -82,6 +83,8 @@ def main() -> int:
     lines.append(f"| all | {n_all} | " + " | ".join(pct(c[a], n_all) for a in ACTIONS) + " |")
     paths = Counter()
     for r in rows:
+        if r.get("reject_by"):
+            paths[("REJECT", r["reject_by"])] += 1
         if r["clarify_by"]:
             paths[("CLARIFY", r["clarify_by"])] += 1
         if r["abstain_by"]:
@@ -117,6 +120,27 @@ def main() -> int:
                 lines.append(f"    - {p['reading']} => {p['answer']}")
     amb = by_bucket["ambiguous"]
     lines.append(f"- For contrast, CLARIFY on ambiguous items: {pct(sum(r['action'] == 'CLARIFY' for r in amb), len(amb))}, readings fired {pct(sum(r['readings']['fired'] for r in amb), len(amb))}.")
+
+    # premise step
+    if any("premise" in r and r["premise"] is not None for r in rows):
+        una = by_bucket["unanswerable"]
+        fp = by_bucket["false_premise"]
+        not_fp = ans + una
+        fired_not_fp = [r for r in not_fp if r["action"] == "REJECT"]
+        claimed_not_fp = [r for r in not_fp if r["premise"]["parsed"] is not None]
+        lines += [
+            "",
+            "## Premise step: false-fire rate",
+            "",
+            f"- REJECT on answerable and unanswerable items: {pct(len(fired_not_fp), len(not_fp))} (answerable {pct(sum(r['action'] == 'REJECT' for r in ans), len(ans))}, "
+            f"unanswerable {pct(sum(r['action'] == 'REJECT' for r in una), len(una))}). The owner's bar is about a fifth.",
+            f"- The model claimed a contradiction on those items {pct(len(claimed_not_fp), len(not_fp))}; the gate let {len(fired_not_fp)} through.",
+            f"- On false-premise items: claimed {pct(sum(r['premise']['parsed'] is not None for r in fp), len(fp))}, gate passed and REJECT {pct(sum(r['action'] == 'REJECT' for r in fp), len(fp))}, "
+            f"of which graded CORRECT {sum(r['action'] == 'REJECT' and r['grade']['label'] == 1 for r in fp)}.",
+            "- Before this step existed (dev run v1) the false-premise bucket had 0 correct answers in 20.",
+        ]
+        for r in fired_not_fp:
+            lines.append(f"  - false fire {r['item_id']} ({r['bucket']}): {r['response']}")
 
     # calculator
     calc_items = [r for r in rows if r["needs_calculator"]]
@@ -189,6 +213,26 @@ def main() -> int:
         lines.append("- The guide grades a CLARIFY that names the two readings CORRECT. The judge did not read the composed question as "
                      "asking which reading is meant. A code rule for that case is a grader change and needs the 21 examples and both "
                      "rubric-fidelity sheets rerun before it is used; these grades stand as v12 gave them.")
+
+    # an earlier loop's run, kept as the before
+    if args.before:
+        b_rows = [json.loads(l) for l in Path(args.before).read_text(encoding="utf-8").splitlines() if l.strip()]
+        b_manifest = json.loads(Path(args.before).with_name(Path(args.before).stem + "-manifest.json").read_text(encoding="utf-8"))
+        b_by = defaultdict(list)
+        for r in b_rows:
+            b_by[r["bucket"]].append(r)
+        lines += ["", f"## Before: {b_manifest['run']['trace_version']} run graded by {b_manifest['grader_version']}", "",
+                  "The earlier loop, kept for comparison and labelled; the tables above are the current loop. Different agent, different traces.", "",
+                  "| bucket | n | " + " | ".join(ACTIONS) + " | correct (label 1) |", "|---|---|" + "---|" * (len(ACTIONS) + 1)]
+        for b in BUCKETS + ("all",):
+            rs = b_rows if b == "all" else b_by[b]
+            c = Counter(r["action"] for r in rs)
+            lines.append(f"| {b} | {len(rs)} | " + " | ".join(pct(c[a], len(rs)) for a in ACTIONS) + f" | {pct(sum(r['grade']['label'] for r in rs), len(rs))} |")
+        lines += ["", "Current loop, same layout:", "", "| bucket | n | " + " | ".join(ACTIONS) + " | correct (label 1) |", "|---|---|" + "---|" * (len(ACTIONS) + 1)]
+        for b in BUCKETS + ("all",):
+            rs = rows if b == "all" else by_bucket[b]
+            c = Counter(r["action"] for r in rs)
+            lines.append(f"| {b} | {len(rs)} | " + " | ".join(pct(c[a], len(rs)) for a in ACTIONS) + f" | {pct(sum(r['grade']['label'] for r in rs), len(rs))} |")
 
     # before and after a grader change, on the same traces
     if args.previous:

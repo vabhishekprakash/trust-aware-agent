@@ -1,0 +1,564 @@
+{
+ "run": {
+  "trace_version": "trace-v2",
+  "split": "data\\eval\\dev.jsonl",
+  "model": "qwen2.5:3b-instruct",
+  "k": 8,
+  "items": 100,
+  "ids": [
+   "q0003",
+   "q0009",
+   "q0011",
+   "q0013",
+   "q0015",
+   "q0019",
+   "q0022",
+   "q0023",
+   "q0028",
+   "q0032",
+   "q0037",
+   "q0039",
+   "q0040",
+   "q0041",
+   "q0043",
+   "q0044",
+   "q0046",
+   "q0047",
+   "q0048",
+   "q0049",
+   "q0050",
+   "q0052",
+   "q0053",
+   "q0055",
+   "q0058",
+   "q0060",
+   "q0061",
+   "q0068",
+   "q0073",
+   "q0074",
+   "q0075",
+   "q0076",
+   "q0079",
+   "q0081",
+   "q0082",
+   "q0083",
+   "q0084",
+   "q0087",
+   "q0089",
+   "q0090",
+   "q0091",
+   "q0093",
+   "q0094",
+   "q0096",
+   "q0103",
+   "q0107",
+   "q0113",
+   "q0114",
+   "q0119",
+   "q0120",
+   "q0123",
+   "q0126",
+   "q0127",
+   "q0130",
+   "q0131",
+   "q0134",
+   "q0137",
+   "q0138",
+   "q0143",
+   "q0144",
+   "q0146",
+   "q0147",
+   "q0152",
+   "q0155",
+   "q0156",
+   "q0159",
+   "q0161",
+   "q0162",
+   "q0163",
+   "q0164",
+   "q0168",
+   "q0170",
+   "q0172",
+   "q0174",
+   "q0177",
+   "q0179",
+   "q0181",
+   "q0183",
+   "q0185",
+   "q0190",
+   "q0196",
+   "q0198",
+   "q0205",
+   "q0206",
+   "q0207",
+   "q0208",
+   "q0209",
+   "q0215",
+   "q0221",
+   "q0223",
+   "q0224",
+   "q0225",
+   "q0226",
+   "q0227",
+   "q0229",
+   "q0231",
+   "q0233",
+   "q0235",
+   "q0236",
+   "q0238"
+  ],
+  "started_at": "2026-09-11T04:27:55+00:00",
+  "wall_seconds": 2841.7,
+  "seconds_by_step": {
+   "retrieval": 2.8,
+   "premise": 1492.1,
+   "readings": 1.0,
+   "draft": 1271.5,
+   "draft_after_calc": 74.0
+  },
+  "cached_calls_by_step": {
+   "premise": 3,
+   "readings": 100,
+   "draft": 3,
+   "draft_after_calc": 0
+  },
+  "per_item_seconds": [
+   {
+    "id": "q0003",
+    "seconds": 0.05
+   },
+   {
+    "id": "q0009",
+    "seconds": 0.03
+   },
+   {
+    "id": "q0011",
+    "seconds": 0.03
+   },
+   {
+    "id": "q0013",
+    "seconds": 15.29
+   },
+   {
+    "id": "q0015",
+    "seconds": 32.71
+   },
+   {
+    "id": "q0019",
+    "seconds": 22.72
+   },
+   {
+    "id": "q0022",
+    "seconds": 25.45
+   },
+   {
+    "id": "q0023",
+    "seconds": 24.16
+   },
+   {
+    "id": "q0028",
+    "seconds": 23.77
+   },
+   {
+    "id": "q0032",
+    "seconds": 19.05
+   },
+   {
+    "id": "q0037",
+    "seconds": 26.36
+   },
+   {
+    "id": "q0039",
+    "seconds": 37.09
+   },
+   {
+    "id": "q0040",
+    "seconds": 27.65
+   },
+   {
+    "id": "q0041",
+    "seconds": 30.68
+   },
+   {
+    "id": "q0043",
+    "seconds": 34.98
+   },
+   {
+    "id": "q0044",
+    "seconds": 29.97
+   },
+   {
+    "id": "q0046",
+    "seconds": 27.05
+   },
+   {
+    "id": "q0047",
+    "seconds": 23.29
+   },
+   {
+    "id": "q0048",
+    "seconds": 31.27
+   },
+   {
+    "id": "q0049",
+    "seconds": 29.64
+   },
+   {
+    "id": "q0050",
+    "seconds": 30.09
+   },
+   {
+    "id": "q0052",
+    "seconds": 34.56
+   },
+   {
+    "id": "q0053",
+    "seconds": 23.05
+   },
+   {
+    "id": "q0055",
+    "seconds": 25.28
+   },
+   {
+    "id": "q0058",
+    "seconds": 30.98
+   },
+   {
+    "id": "q0060",
+    "seconds": 18.45
+   },
+   {
+    "id": "q0061",
+    "seconds": 21.44
+   },
+   {
+    "id": "q0068",
+    "seconds": 31.01
+   },
+   {
+    "id": "q0073",
+    "seconds": 41.97
+   },
+   {
+    "id": "q0074",
+    "seconds": 26.51
+   },
+   {
+    "id": "q0075",
+    "seconds": 87.75
+   },
+   {
+    "id": "q0076",
+    "seconds": 22.03
+   },
+   {
+    "id": "q0079",
+    "seconds": 22.57
+   },
+   {
+    "id": "q0081",
+    "seconds": 21.9
+   },
+   {
+    "id": "q0082",
+    "seconds": 27.89
+   },
+   {
+    "id": "q0083",
+    "seconds": 39.74
+   },
+   {
+    "id": "q0084",
+    "seconds": 21.21
+   },
+   {
+    "id": "q0087",
+    "seconds": 26.71
+   },
+   {
+    "id": "q0089",
+    "seconds": 27.96
+   },
+   {
+    "id": "q0090",
+    "seconds": 24.93
+   },
+   {
+    "id": "q0091",
+    "seconds": 33.87
+   },
+   {
+    "id": "q0093",
+    "seconds": 31.34
+   },
+   {
+    "id": "q0094",
+    "seconds": 31.97
+   },
+   {
+    "id": "q0096",
+    "seconds": 56.62
+   },
+   {
+    "id": "q0103",
+    "seconds": 29.48
+   },
+   {
+    "id": "q0107",
+    "seconds": 37.62
+   },
+   {
+    "id": "q0113",
+    "seconds": 33.29
+   },
+   {
+    "id": "q0114",
+    "seconds": 28.34
+   },
+   {
+    "id": "q0119",
+    "seconds": 23.97
+   },
+   {
+    "id": "q0120",
+    "seconds": 63.04
+   },
+   {
+    "id": "q0123",
+    "seconds": 30.66
+   },
+   {
+    "id": "q0126",
+    "seconds": 43.03
+   },
+   {
+    "id": "q0127",
+    "seconds": 29.42
+   },
+   {
+    "id": "q0130",
+    "seconds": 48.6
+   },
+   {
+    "id": "q0131",
+    "seconds": 25.88
+   },
+   {
+    "id": "q0134",
+    "seconds": 26.79
+   },
+   {
+    "id": "q0137",
+    "seconds": 19.54
+   },
+   {
+    "id": "q0138",
+    "seconds": 17.7
+   },
+   {
+    "id": "q0143",
+    "seconds": 18.13
+   },
+   {
+    "id": "q0144",
+    "seconds": 24.76
+   },
+   {
+    "id": "q0146",
+    "seconds": 19.65
+   },
+   {
+    "id": "q0147",
+    "seconds": 26.24
+   },
+   {
+    "id": "q0152",
+    "seconds": 18.81
+   },
+   {
+    "id": "q0155",
+    "seconds": 18.43
+   },
+   {
+    "id": "q0156",
+    "seconds": 18.57
+   },
+   {
+    "id": "q0159",
+    "seconds": 18.06
+   },
+   {
+    "id": "q0161",
+    "seconds": 23.02
+   },
+   {
+    "id": "q0162",
+    "seconds": 23.39
+   },
+   {
+    "id": "q0163",
+    "seconds": 37.53
+   },
+   {
+    "id": "q0164",
+    "seconds": 20.93
+   },
+   {
+    "id": "q0168",
+    "seconds": 18.93
+   },
+   {
+    "id": "q0170",
+    "seconds": 30.35
+   },
+   {
+    "id": "q0172",
+    "seconds": 47.76
+   },
+   {
+    "id": "q0174",
+    "seconds": 18.77
+   },
+   {
+    "id": "q0177",
+    "seconds": 36.18
+   },
+   {
+    "id": "q0179",
+    "seconds": 18.57
+   },
+   {
+    "id": "q0181",
+    "seconds": 47.41
+   },
+   {
+    "id": "q0183",
+    "seconds": 27.02
+   },
+   {
+    "id": "q0185",
+    "seconds": 29.38
+   },
+   {
+    "id": "q0190",
+    "seconds": 33.57
+   },
+   {
+    "id": "q0196",
+    "seconds": 25.2
+   },
+   {
+    "id": "q0198",
+    "seconds": 33.75
+   },
+   {
+    "id": "q0205",
+    "seconds": 18.82
+   },
+   {
+    "id": "q0206",
+    "seconds": 26.62
+   },
+   {
+    "id": "q0207",
+    "seconds": 23.28
+   },
+   {
+    "id": "q0208",
+    "seconds": 25.73
+   },
+   {
+    "id": "q0209",
+    "seconds": 20.98
+   },
+   {
+    "id": "q0215",
+    "seconds": 22.3
+   },
+   {
+    "id": "q0221",
+    "seconds": 32.93
+   },
+   {
+    "id": "q0223",
+    "seconds": 34.13
+   },
+   {
+    "id": "q0224",
+    "seconds": 33.01
+   },
+   {
+    "id": "q0225",
+    "seconds": 26.57
+   },
+   {
+    "id": "q0226",
+    "seconds": 40.1
+   },
+   {
+    "id": "q0227",
+    "seconds": 23.75
+   },
+   {
+    "id": "q0229",
+    "seconds": 34.88
+   },
+   {
+    "id": "q0231",
+    "seconds": 30.69
+   },
+   {
+    "id": "q0233",
+    "seconds": 24.59
+   },
+   {
+    "id": "q0235",
+    "seconds": 36.32
+   },
+   {
+    "id": "q0236",
+    "seconds": 43.1
+   },
+   {
+    "id": "q0238",
+    "seconds": 30.76
+   }
+  ],
+  "actions": {
+   "ambiguous/ANSWER": 4,
+   "ambiguous/REJECT": 5,
+   "answerable/ABSTAIN": 7,
+   "answerable/ANSWER": 29,
+   "answerable/CLARIFY": 4,
+   "answerable/REJECT": 6,
+   "false_premise/ABSTAIN": 7,
+   "false_premise/ANSWER": 9,
+   "false_premise/REJECT": 4,
+   "unanswerable/ABSTAIN": 19,
+   "unanswerable/ANSWER": 1,
+   "unanswerable/CLARIFY": 1,
+   "unanswerable/REJECT": 4
+  }
+ },
+ "grader_version": "grader-v13",
+ "judge": "llama3.1:latest",
+ "graded_at": "2026-09-11T05:38:44+00:00",
+ "grading_wall_seconds": 1403.7,
+ "decided_by": {
+  "judge": 54,
+  "rules": 31,
+  "exact": 15
+ },
+ "grades": {
+  "ambiguous/PARTIAL": 1,
+  "ambiguous/WRONG": 8,
+  "answerable/CORRECT": 23,
+  "answerable/PARTIAL": 5,
+  "answerable/WRONG": 18,
+  "false_premise/PARTIAL": 6,
+  "false_premise/WRONG": 14,
+  "unanswerable/CORRECT": 18,
+  "unanswerable/PARTIAL": 1,
+  "unanswerable/WRONG": 6
+ }
+}

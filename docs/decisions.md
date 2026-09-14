@@ -780,3 +780,75 @@ the Flight Readiness Review) and stays with the judge, WRONG. Both regrades
 of the sheets use scripts/regrade_key.py against the pool snapshot the
 sheets were built from (git 7a2a82d), so the drafts are exactly the ones
 the owner graded.
+
+## The label distribution before M3, 2026-09-11
+
+On dev v1 the labels are 54 of 100 correct pooled, but two buckets are
+nearly constant: unanswerable 23 of 25 correct, false premise 0 of 20. The
+action decides the label and the bucket decides the action, so a pooled
+calibrator can score well by detecting the bucket. The decisive stratum is
+answerable items with the evidence retrieved, 27 right against 11 wrong,
+where the model's judgement rather than retrieval decides the outcome.
+
+The owner decided, on 2026-09-11:
+
+- A bucket-detector test is a standing M4 commitment, three checks: predict
+  the bucket from the signal vector against the prior; calibration within
+  answerable alone; calibration within answerable with evidence retrieved.
+  Reported either way. Bootstrap intervals on every reliability diagram
+  from the start; with dev at 135 and the decisive stratum near 40 items
+  the conclusion is expected to be directional, not precise, and the report
+  says so up front.
+- A premise-check step in the loop, same shape as the readings step, with a
+  grounding gate in code: the model names the assumption and the passage
+  that contradicts it, and code accepts the rejection only when the
+  assumption comes from the question and the correction's words are in the
+  cited passage. Its false-fire rate on answerable and unanswerable dev
+  items is measured against the same one-fifth bar as the readings step.
+  The report states that the false-premise bucket was zero before the step
+  existed. Because the loop changes, the whole dev set is rerun so dev is
+  one agent, and the v1 run stays in the report as the before.
+- The 35 reserve items (17 answerable, 9 unanswerable, 9 false premise, no
+  ambiguous, no calculator) join dev after the premise step, through the
+  same code checks, as a labelled second run. Merging the reserve means
+  nothing can be swapped in later without a new drafting round; the owner
+  accepted that.
+- Not done: sampling each item at several retrieval k. The rows would not
+  be independent, the variation would be in one signal by construction, and
+  the run time triples. It stays available as a separate M4 experiment if
+  the calibrator turns out to be a retrieval detector.
+- Nothing touches test.
+
+## The premise gate, 2026-09-11
+
+The premise step's first version accepted a rejection when the assumption
+shared two words with the question and the correction shared two words
+with the cited passage. On the first dev item it fired falsely: the model
+put the answer in the ASSUMPTION slot and an unrelated sentence in
+CORRECTION, and both shared enough words to pass. The gate now has three
+checks. The assumption must be taken from the question: at least two
+content words and at least 60 percent of its words occur there, which a
+restated answer fails. The correction must be grounded in the cited
+passage by at least two words that are not in the question, so an echo of
+the question cannot pass for grounding. And the correction must share at
+least one word with the assumption, so it is about the same thing. The
+run was stopped after that one item and restarted with the gate; the item
+is now a test case. The false-fire rate on answerable and unanswerable dev
+items is the measure of whether this is enough.
+
+## Dev run v2: the premise step measured, 2026-09-11
+
+The whole dev set was rerun with the premise step (reports/dev-run-v2.md;
+v1 kept in it as the labelled before). The step did not do what it was
+for. On false-premise items the model claimed a contradiction on 8 of 20,
+the gate passed 4, and all 4 were graded WRONG: the "corrections" were
+passage sentences unrelated to the assumption, so the bucket stays at 0 of
+20 correct. Elsewhere the step cost labels: 6 false REJECTs on answerable
+items (13 percent) and 4 on unanswerable (16 percent), under the one-fifth
+bar but every one of them wrong, and 5 of 9 ambiguous items went to REJECT
+ahead of CLARIFY. The prompt sentence added for the step also changed
+drafts: 3 answerable items that were correct in v1 abstained in v2. Net,
+correct labels fell from 54 to 41 of 100, with one gain. The step added
+1,492 s to the run, more than half the wall clock. Owner's call pending on
+whether the step stays, is switched off with prompts identical to v1, or
+is reworked. Nothing touched test.

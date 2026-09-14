@@ -2,7 +2,7 @@
 
 import pytest
 
-from agent.loop import TRACE_VERSION, Agent, clarify_question, distinct_answers, parse_readings
+from agent.loop import TRACE_VERSION, Agent, clarify_question, distinct_answers, parse_premise, parse_readings
 from agent.retriever import Hit
 
 
@@ -16,7 +16,12 @@ class ScriptedProvider:
     model = "scripted"
 
     def __init__(self, replies):
-        self.replies = list(replies)
+        # The premise step asks first. Tests that are not about it give no premise reply,
+        # so a NO CONTRADICTION is supplied unless the first reply is a premise reply.
+        replies = list(replies)
+        if not replies or not (replies[0] == "NO CONTRADICTION" or replies[0].startswith("ASSUMPTION")):
+            replies = ["NO CONTRADICTION"] + replies
+        self.replies = replies
         self.calls = []
 
     def generate(self, messages, **kwargs):
@@ -92,8 +97,9 @@ def test_plain_answer_leaves_a_full_trace():
     assert trace["retrieval"][0]["score"] == 0.81
     assert trace["readings"] == {"raw": "ONE READING", "parsed": [], "fired": False}
     assert trace["draft"]["calc"] == []
-    assert trace["clarify_by"] is None and trace["abstain_by"] is None
-    assert [c["step"] for c in trace["calls"]] == ["readings", "draft"]
+    assert trace["clarify_by"] is None and trace["abstain_by"] is None and trace["reject_by"] is None
+    assert trace["premise"] == {"raw": "NO CONTRADICTION", "parsed": None, "grounded": False, "fired": False}
+    assert [c["step"] for c in trace["calls"]] == ["premise", "readings", "draft"]
     assert trace["k"] == 2 and trace["item_id"] == "q1" and trace["best_score"] == 0.81
 
 
@@ -158,7 +164,7 @@ def test_calculator_round_trip_is_traced():
     assert trace["draft"]["calc"] == [{"expression": "$500M - $100M", "result": "400,000,000"}]
     assert trace["draft"]["final"] == "The gap is $400M."
     assert trace["action"] == "ANSWER"
-    assert [c["step"] for c in trace["calls"]] == ["readings", "draft", "draft_after_calc"]
+    assert [c["step"] for c in trace["calls"]] == ["premise", "readings", "draft", "draft_after_calc"]
     assert "Result: $500M - $100M = 400,000,000" in provider.calls[-1][-1]["content"]
 
 
@@ -167,3 +173,66 @@ def test_uncomputable_calculator_line_is_reported_back():
     trace = make_agent(replies).run("q")
     assert trace["draft"]["calc"] == [{"expression": "five minus three", "result": None}]
     assert trace["action"] == "ABSTAIN"
+
+
+PREMISE_HITS = [
+    Hit({"id": "c00100", "text": "The SEMP is baselined at the System Requirements Review, which is held in Phase A. Type C projects cost up to $500M.", "page_start": "22", "page_end": "22", "word_count": 20}, 0.8),
+    Hit({"id": "c00101", "text": "Phase B ends with the Preliminary Design Review.", "page_start": "23", "page_end": "23", "word_count": 8}, 0.7),
+]
+PREMISE_Q = "Given that the SEMP is baselined during Phase B, which Phase B review does the handbook tie that baseline to?"
+REJECT_LINE = "ASSUMPTION: the SEMP is baselined during Phase B | PASSAGE: 1 | CORRECTION: the SEMP is baselined at the System Requirements Review, held in Phase A"
+
+
+def test_parse_premise_handles_both_replies():
+    assert parse_premise("NO CONTRADICTION") is None
+    parsed = parse_premise(REJECT_LINE)
+    assert parsed == {"assumption": "the SEMP is baselined during Phase B", "passage": 1,
+                      "correction": "the SEMP is baselined at the System Requirements Review, held in Phase A"}
+    assert parse_premise("ASSUMPTION: x | PASSAGE: [2] | CORRECTION: y")["passage"] == 2
+
+
+def test_grounded_rejection_becomes_the_reject_action():
+    replies = [REJECT_LINE, "ONE READING", "The handbook ties the SEMP baseline to the PDR."]
+    trace = Agent(ScriptedProvider(replies), FakeIndex(PREMISE_HITS), k=2).run(PREMISE_Q)
+    assert trace["trace_version"] == TRACE_VERSION == "trace-v2"
+    assert trace["premise"]["fired"] is True and trace["premise"]["grounded"] is True
+    assert (trace["action"], trace["reject_by"]) == ("REJECT", "rule")
+    assert trace["response"] == ("The question assumes the SEMP is baselined during Phase B. The handbook says the SEMP is "
+                                 "baselined at the System Requirements Review, held in Phase A (page 22).")
+    assert trace["draft"]["final"] == "The handbook ties the SEMP baseline to the PDR."
+    assert [c["step"] for c in trace["calls"]] == ["premise", "readings", "draft"]
+
+
+def test_rejection_gate_refuses_ungrounded_or_invented_claims():
+    # correction words not in the cited passage
+    bad = "ASSUMPTION: the SEMP is baselined during Phase B | PASSAGE: 2 | CORRECTION: the SEMP is baselined at the Critical Design Review in Phase C"
+    trace = make_agent([bad, "ONE READING", "The PDR."], hits=PREMISE_HITS).run(PREMISE_Q)
+    assert trace["premise"]["parsed"] is not None and trace["premise"]["grounded"] is False
+    assert (trace["action"], trace["reject_by"]) == ("ANSWER", None)
+    # assumption not taken from the question
+    bad = "ASSUMPTION: projects always cost under a million dollars | PASSAGE: 1 | CORRECTION: Type C projects cost up to $500M"
+    trace = make_agent([bad, "ONE READING", "The PDR."], hits=PREMISE_HITS).run(PREMISE_Q)
+    assert trace["action"] == "ANSWER" and trace["premise"]["grounded"] is False
+    # passage number out of range
+    bad = "ASSUMPTION: the SEMP is baselined during Phase B | PASSAGE: 7 | CORRECTION: the SEMP is baselined at the System Requirements Review"
+    trace = make_agent([bad, "ONE READING", "The PDR."], hits=PREMISE_HITS).run(PREMISE_Q)
+    assert trace["action"] == "ANSWER"
+
+
+def test_reject_takes_precedence_over_clarify_and_abstain():
+    replies = [REJECT_LINE, "READING: a | ANSWER: x\nREADING: b | ANSWER: y", "The handbook does not say."]
+    trace = Agent(ScriptedProvider(replies), FakeIndex(PREMISE_HITS), k=2).run(PREMISE_Q)
+    assert trace["action"] == "REJECT"
+    assert trace["clarify_by"] == "rule" and trace["abstain_by"] == "prompt"
+
+
+def test_rejection_gate_refuses_an_answer_restated_as_the_assumption():
+    # Seen on dev item q0003: the model put the answer in the ASSUMPTION slot and an unrelated sentence in CORRECTION.
+    hits = [Hit({"id": "c1", "text": "AS9100 is a widely adopted and standardized quality management system developed for the commercial aerospace industry.", "page_start": "7", "page_end": "8", "word_count": 16}, 0.65),
+            Hit({"id": "c2", "text": "Some NASA Centers have chosen to certify to the AS9100 quality system and may require their contractors to follow NPR 7123.1.", "page_start": "82", "page_end": "82", "word_count": 20}, 0.57)]
+    claim = ("ASSUMPTION: AS9100 is a widely adopted and standardized quality management system developed for the commercial aerospace industry. "
+             "| PASSAGE: 2 | CORRECTION: Some NASA Centers have chosen to certify to the AS9100 quality system and may require their contractors to follow NPR 7123.1.")
+    trace = make_agent([claim, "ONE READING", "AS9100 is a quality management system for the commercial aerospace industry."], hits=hits).run(
+        "What is AS9100 and which industry was it created for?")
+    assert trace["premise"]["parsed"] is not None and trace["premise"]["grounded"] is False
+    assert trace["action"] == "ANSWER"

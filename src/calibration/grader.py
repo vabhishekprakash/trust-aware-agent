@@ -372,6 +372,21 @@ def _content(text: str) -> set:
     return {_stem(t) for t in _tokens(text)}
 
 
+def content_words(text: str) -> set:
+    """Stemmed content words, without stopwords; shared with the agent loop's gates."""
+    return _content(text)
+
+
+def shared_words(a: str, b: str, excluding: str = "") -> int:
+    """How many of a's content words appear in b, allowing stems and prefixes.
+
+    Words that also occur in `excluding` (usually the question) are not
+    counted, so an echo of the question cannot pass for grounding.
+    """
+    pool = content_words(b)
+    return sum(1 for t in content_words(a) - content_words(excluding) if any(_same_word(t, r) for r in pool))
+
+
 def clarify_alternatives(draft: str) -> list[str]:
     """The alternatives a 'do you mean X, or Y' question offers; empty when the draft is not one."""
     match = _MEAN.search(draft.translate(_QUOTES).strip())

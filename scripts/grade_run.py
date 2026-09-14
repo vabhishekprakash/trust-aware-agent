@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from agent.provider import OllamaProvider  # noqa: E402
 from calibration.grader import GRADER_VERSION, ProviderJudge, grade  # noqa: E402
 
-TRACE_KEYS = ("item_id", "bucket", "question", "model", "k", "abstain_threshold", "action", "clarify_by", "abstain_by", "form",
+TRACE_KEYS = ("item_id", "bucket", "question", "model", "k", "action", "reject_by", "clarify_by", "abstain_by", "form", "premise",
               "best_score", "retrieval", "retrieval_seconds", "readings", "draft", "response", "evidence", "needs_calculator",
               "spurious_calc", "calls", "seconds", "trace_version")
 
@@ -53,7 +53,9 @@ def main() -> int:
         item = items[item_id]
         trace = json.loads((trace_dir / f"{item_id}.json").read_text(encoding="utf-8"))
         row = {k: trace.get(k) for k in TRACE_KEYS}
-        row["grade"] = grade(item, trace["response"], judge=judge, form_hint=trace["action"])
+        # a REJECT is a statement about the premise, which the grader reads as an ANSWER form
+        form_hint = "ANSWER" if trace["action"] == "REJECT" else trace["action"]
+        row["grade"] = grade(item, trace["response"], judge=judge, form_hint=form_hint)
         row["draft_grade"] = None
         if trace["response"] != trace["draft"]["final"]:
             row["draft_grade"] = grade(item, trace["draft"]["final"], judge=judge)
