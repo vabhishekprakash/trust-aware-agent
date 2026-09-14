@@ -325,9 +325,12 @@ passage was in front of it, 6 of 6. Without it, it was right on 1 of 8.
 Whether the agent answers correctly is therefore decided mostly by whether
 retrieval found the right passage. Much of the variance the calibrator sees,
 and much of what the confidence signals pick up, is retrieval quality rather
-than the model's judgement of its own answer. The final report must separate
-the two where it can, for example by reporting calibration with retrieval
-quality held fixed, and must say so where it cannot.
+than the model's judgement of its own answer. Measured on dev, about a
+quarter of questions never have their evidence in front of the model at any
+affordable k, and the same k feeds the retrieval-support signal, the abstain
+rule and the answer itself. The final report must separate retrieval failure
+from confidence failure where it can, for example by reporting calibration
+with retrieval quality held fixed, or state that it cannot.
 
 After drafting, the owner reviews the set. As it happened, the blind item
 check and the owner's calls on the ambiguous bucket stood in for the

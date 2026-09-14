@@ -20,9 +20,31 @@ import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Protocol
 
 Transport = Callable[[str, dict], dict]
+
+
+class Provider(Protocol):
+    """What the agent, the signals and the grader need from a model backend.
+
+    OllamaProvider is the only implementation. A hosted OpenAI-compatible
+    backend would be a second class with the same two members; the owner
+    decided not to build it until it is needed.
+    """
+
+    model: str
+
+    def generate(
+        self,
+        messages: list[dict],
+        *,
+        temperature: float = 0.0,
+        seed: int = 42,
+        max_tokens: int = 512,
+        logprobs: bool = False,
+        top_logprobs: int = 0,
+    ) -> "Generation": ...
 
 
 @dataclass

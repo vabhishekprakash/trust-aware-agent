@@ -39,3 +39,4 @@ scripts/demo/videos/
 test-results/
 *.webm
 data/index/
+data/traces/

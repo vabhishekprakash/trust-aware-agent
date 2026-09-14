@@ -669,6 +669,37 @@ words per chunk, so 1,500 words at k of 8 and 2,350 words at k of 5 with
 neighbours; tokens run about 1.3 times words. The choice of k is the
 owner's; the numbers are recorded here so it is made from measurement.
 
+## M2 design, decided by the owner on 2026-09-10
+
+CLARIFY and ABSTAIN are both a prompt instruction and a rule, so the
+behaviour exists even when the model does not produce it, and so the trace
+records which path fired. The CLARIFY rule is not a retrieval statistic,
+because no statistic means "two readings" and a score-gap rule would fire
+on any question that spans sections. It is a readings step: the model lists
+the readings the passages answer differently, and code decides CLARIFY when
+more than one reading has a different answer. The step will over-list, so
+its firing rate on answerable dev items is measured and reported as a
+false-clarify rate. Above about a fifth of answerable items, the step gets
+a stricter bar before M4. The ABSTAIN rule fires when the best retrieved
+chunk scores below a threshold set on dev, or when the draft says the
+handbook does not say.
+
+The calculator is narrow: two operands, plus, minus, times, divide and
+percent, with dollar signs and M or B suffixes parsed. That is what the
+calculator items need (differences of two stated figures, a ratio, a
+percentage). There is no expression evaluator.
+
+The OpenAI-compatible backend is not built. The provider is a protocol with
+one method, which the Ollama provider satisfies. A second implementation
+would be a later file.
+
+Retriever: k of 8, no neighbours, window kept at 4,096 tokens. Measured on
+dev it recalls the evidence chunk for 77 percent of items at about 1,500
+words of context. The alternative was k of 5 with one neighbour each side,
+the same 77 percent overall at 2,360 words, which would have bought
+answerable recall of 40 of 46 instead of 38 of 46; the smaller context
+leaves margin on the 4 GB card when the judge is loaded.
+
 ## M2 must implement CLARIFY and ABSTAIN as real actions
 
 On the grader check the model under test scored 0 of 4 on ambiguous items
