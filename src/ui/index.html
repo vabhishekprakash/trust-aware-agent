@@ -114,7 +114,11 @@ function render(r) {
   capMark.style.left = pct(r.display_cap);
   capMark.style.display = r.confidence < r.display_cap ? "block" : "none";  // the tick only when it adds information
   $("note").textContent = r.note;
-  $("capline").textContent = "Shown value capped at " + pct(r.display_cap) + " (uncapped " + pct(r.confidence_uncapped) + "). The shipped calibrator is refit on all 134 dev items; the report's metrics are out of fold, and the two differ by 0.09 on average. The cap is a presentation guard, not a fix." + (r.gated ? "" : " The policy did not gate this output: the agent's own action stands.");
+  const capped = r.confidence_uncapped > r.display_cap;
+  const capText = capped
+    ? "Shown value capped at " + pct(r.display_cap) + " (the calibrator gave " + pct(r.confidence_uncapped) + "). The cap is a presentation guard, not a fix."
+    : "Display cap of " + pct(r.display_cap) + " not applied: the value shown is the calibrator's own.";
+  $("capline").textContent = capText + " The shipped calibrator is refit on all 134 dev items; the report's metrics are out of fold, and the two differ by 0.09 on average." + (r.gated ? "" : " The policy did not gate this output: the agent's own action stands.");
   $("families").innerHTML = r.families.filter(f => Math.abs(f.log_odds) >= 0.05).map(f => `<span>${f.family}</span><b>${f.log_odds > 0 ? "+" : ""}${f.log_odds.toFixed(2)}</b>`).join("");
   $("breakdown").textContent = r.breakdown;
   $("passages").innerHTML = r.passages.map(p => `<div class="passage"><span class="pg">[${p.rank}] page ${p.page}, score ${p.score}</span><br>${escapeHtml(p.text)}</div>`).join("");
