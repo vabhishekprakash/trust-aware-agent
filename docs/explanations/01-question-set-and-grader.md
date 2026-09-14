@@ -14,12 +14,12 @@ asked the impossible never has to admit uncertainty, which is the point.
 
 The grader is the rule that decides whether an answer was right. Free text
 cannot be compared letter by letter: "the Program Manager" and "the manager
-of the program" are the same answer. So the grader has stages: a check for
-a refusal or a clarifying question, a cheap exact match, and only then a
-language model that answers fixed yes-or-no questions about the draft. A
-rule turns those answers into a grade, and the grades feed the calibrator
-as ones and zeros. A lenient grader makes the agent look better calibrated
-than it is, a harsh one worse, so the owner signs off on the examples first.
+of the program" are the same answer. So the grader checks for a refusal or
+a clarifying question, then tries a cheap exact match. Only then does it ask
+a language model fixed yes-or-no questions about the draft, each yes backed
+by words copied from it. A rule turns the answers into a grade, and the
+grades feed the calibrator as ones and zeros. A lenient grader flatters the
+agent, a harsh one punishes it, so the owner signs off on the examples first.
 
 A common misconception: a bigger question set fixes a bad grader. It does
 not. It produces more wrong labels, faster.

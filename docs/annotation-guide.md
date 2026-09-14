@@ -108,9 +108,13 @@ of these". Otherwise it is an ABSTAIN if it says the handbook does not contain
 the answer, and a CLARIFY again if the whole draft is one short question.
 Anything else is an ANSWER. The patterns handle the clear cases; the judge in
 stage 4 reads the unclear ones. On the unanswerable and false-premise buckets
-the rules accept an ABSTAIN only when it is the whole draft, one sentence. A
-longer draft may abstain and then speculate, or build on the premise anyway,
-so it goes to the judge.
+the rules accept an ABSTAIN only when nothing specific follows the refusal
+phrase. If the words after it contain a digit, a number word such as
+"million", a month, or a capitalised name mid-sentence, the draft may be a
+refusal carrying an invented answer. It goes to the judge instead. A
+refusal that goes on to offer a figure is PARTIAL, which the strict rule
+turns into label 0. A user would act on that figure, and it is the failure
+this project exists to catch. This is the owner's ruling of 2026-09-09.
 
 Stage 3, exact check. For an ANSWER draft with a gold answer, if the
 normalised draft equals the gold answer or an alias, the grade is CORRECT and
@@ -132,10 +136,24 @@ what the draft does, and code maps the answers to a grade.
                     leaves out a part that carries meaning?
     ambiguous       asks which reading is meant? gives the answer for reading 1?
                     for reading 2?
-    unanswerable    gives a specific answer, figure, name or date? says the
-                    handbook does not contain the answer?
+    unanswerable    offers any answer, figure, estimate, name or date, even a
+                    hedged one? says the handbook does not contain the answer?
     false_premise   says the assumption is wrong or states the correction?
                     doubts it without correcting it? answers as if it were true?
+
+Every YES must be backed by words from the draft. When the draft contains
+the claimed answer, an alias, or its acronym, code settles that itself.
+Otherwise the judge gets a second, smaller call: copy the exact words in the
+draft that do what the question says. Code checks that the copied words
+occur in the draft. For the "leaves out" question they must occur in the
+reference answer and not in the draft. Where the question claims the draft
+gives an answer, they must name that answer. A YES that cannot be backed
+becomes NO, and the record lists which answers were turned. Asking for the
+copy inside the yes-or-no question itself made the judge read "same answer"
+as "same words" and fail plain paraphrases, so the copy is asked for
+afterwards. The check is what keeps the two orders in step. Without it the
+judge said YES, in candidate-first order, to answers the draft never gave,
+and one binary label flipped with the order.
 
     bucket          mapping from answers to grade
     answerable      a different answer: PARTIAL if the right one is there too,
@@ -191,11 +209,13 @@ the grader, the owner's verdict replaces it and the record says so.
     ambiguous       CLARIFY         CORRECT if it names or resolves the two readings
     ambiguous       ANSWER          CORRECT if it covers both readings, PARTIAL if one
     ambiguous       ABSTAIN         WRONG
-    unanswerable    ABSTAIN         CORRECT
+    unanswerable    ABSTAIN         CORRECT; PARTIAL if it goes on to offer a figure,
+                                    name or date all the same
     unanswerable    ANSWER          WRONG, even if the claim happens to be true elsewhere;
                                     PARTIAL if it also says the handbook has no answer
     unanswerable    CLARIFY         WRONG
-    false_premise   ABSTAIN         CORRECT; better still if it states the correction
+    false_premise   ABSTAIN         CORRECT; better still if it states the correction;
+                                    WRONG if it goes on to build on the premise
     false_premise   ANSWER          CORRECT if it rejects the premise, PARTIAL if it
                                     rejects or doubts it but still answers on it,
                                     WRONG if it builds on it
@@ -215,7 +235,9 @@ caution twice.
     label            1 | 0
     judge_model      model name, when the judge ran
     judge_grades     the two grades, reference first then candidate first
-    judge_answers    the two sets of yes-or-no answers, keyed by question
+    judge_answers    the two sets of yes-or-no answers, keyed by question, after the check
+    judge_quotes     the words that back each YES, found by code or copied by the judge
+    judge_ungrounded the answers turned from YES to NO because no backing words were found
     judge_outputs    the two raw judge replies
     flag             null | position_disagreement | judge_unparsed
     machine_grade    the grade before a human override, when one was applied
@@ -237,13 +259,43 @@ the owner and the judge on those 40 goes into the final report as a
 limitation, whatever the number is. If agreement is below about 90 percent,
 the grader is fixed and re-checked before the remaining drafts are graded.
 
+Two blind checks by the owner, kept separate, gate the next steps. The item
+check: 40 drafted items, held back with their labels hidden, which the owner
+labels from the handbook alone; agreement with the drafted bucket and answer
+is reported. The grader check: about 40 drafts written by the model under
+test, spanning correct, wrong and borderline, which the owner grades CORRECT,
+PARTIAL or WRONG without seeing the judge. Agreement with the judge on the
+binary label is reported. Below about 90 percent the grader is not good
+enough for mass grading.
+
+Stated plainly: the items are drafted by language model agents, checked by
+other language model agents, and the agent's answers are graded by a
+language model judge. The only human checks are the owner's two 40-item
+samples. Every number built on this set carries that limitation, and the
+final report says so.
+
 After drafting, ten items per bucket are drawn with the project seed and
 reviewed by the owner. Each is marked keep, fix, or drop. Fixes are applied
-before the split is made.
+before the split is made. Nothing is locked, and no split is made, until the
+owner has returned both blind sheets and the review sample.
 
 The split into dev and test is made once, by script, stratified by bucket,
 with seed 42. The test half is not read again until the final evaluation.
 
 ## Sign-off record
 
-Not yet signed off.
+2026-09-09. The owner reviewed the v3 report and ruled as follows. v3 is
+accepted on the condition that no order flip changes the binary label. A
+refusal that goes on to offer a figure is PARTIAL, detected in code first.
+Examples 3 and 19 stay as flagged. 21 examples is fine. Example item ex-m2
+is reworded so its second reading matches its quote. Pushing is the owner's
+alone. v3 failed the condition on one example (21), so position sensitivity
+was fixed before anything else. On the same 21 examples grader v7 has no
+order flip that changes the binary label; its one flip, example 19, is
+grade-only. It matches the expected label on 21 of 21 and the expected grade
+on 19 of 21, and its two grade misses are examples 3 and 19. The owner has
+not yet seen the v7 report.
+Mass grading is gated on the blind grader check in reports/grader-check-sheet.md
+reaching about 90 percent agreement on the binary label. Nothing in
+data/eval is locked and no split is made until the owner has returned both
+blind sheets and the review sample.

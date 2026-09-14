@@ -244,3 +244,83 @@ appendices the handbook marks "Reserved". One side effect is accepted: the
 chapter title line is also dropped from a chapter's opening page, because it
 matches the running header there too. The numbered section headings in the
 body survive, so retrieval loses nothing a question would ask for.
+
+## Owner's rulings on the grader, 2026-09-09
+
+The owner read the v3 report and asked one question before signing off. The
+order flips had stayed flat across the three versions, 4 of 15 to 4 of 16,
+so did swapping the order ever change the binary label, or only the
+three-way grade? Broken down from the report records: in v1 all four flips
+changed the label, in v2 all three did, and in v3 one of the four did.
+Example 21, a plainly wrong ambiguous draft, was WRONG with the reference
+first and CORRECT with the candidate first. In that order the judge said the
+draft gave both readings' answers when it named neither. The owner
+had ruled in advance that one such flip means v3 is not signed off and
+position sensitivity is fixed first. That fix is grader v4, below.
+
+The other rulings, all applied the same day:
+
+A refusal that goes on to offer a figure is PARTIAL, so the strict rule
+counts it as label 0. A refusal carrying an invented number is the failure
+this project exists to catch, and a user would act on it. It is detected in
+code first, so judge exposure stays small. A digit, a number word, a month,
+or a capitalised name after the refusal phrase sends the draft to the judge.
+A refusal with nothing specific after it is CORRECT by rule. Worked
+example 15 changed from CORRECT to PARTIAL under this ruling.
+
+Examples 3 and 19 stay as flagged. Their binary label is unaffected, but the
+three-way grade feeds the lenient sensitivity check, so if the strict and
+lenient numbers diverge in the final report they come back into scope.
+
+Twenty-one worked examples is fine.
+
+Example item ex-m2 gave its second reading, "program life-cycle phases", the
+answer "two", while its own first quote listed Program Pre-Formulation as
+well. A gold answer that contradicts its supporting quote teaches the grader
+the wrong thing, so the item was reworded. The second reading is now the
+top-level NASA life-cycle phases. Its quote is the sentence on page 18 that
+names exactly Formulation and Implementation and says they divide into the
+seven project phases.
+
+Pushing is the owner's alone. Nothing here sets ALLOW_PUSH or runs git push.
+
+## Grader v4 to v7: every YES is backed by the draft's own words
+
+The binary flip in v3 came from a YES with nothing behind it: in
+candidate-first order the judge said the draft gave both readings' answers
+when it named neither. The fix is to make every YES carry words from the
+draft that code can check. Four versions were needed to get the mechanism
+right, and the same 21 worked examples were run under each. The numbers
+below are against the expectations as they stand after the owner's rulings,
+with example 15 now PARTIAL. That is why v1 and v2 read one lower than in
+the morning's report.
+
+    version  grade matches  label matches  order flips  flips that changed the label
+    v1       13 of 20       13 of 20       4 of 15      4
+    v2       14 of 20       16 of 20       3 of 15      3
+    v3       18 of 21       20 of 21       4 of 16      1
+    v4       16 of 21       18 of 21       2 of 18      0
+    v5       15 of 21       18 of 21       3 of 17      0
+    v6       18 of 21       20 of 21       1 of 17      0
+    v7       19 of 21       21 of 21       1 of 17      0
+
+v4 asked for the copy in the same reply as the yes-or-no answers. That
+removed the binary flips at once, but it made the judge literal. It wrote
+"conveys the same meaning" and still answered NO to a paraphrase, because
+it could not point at identical words. v5 put a copying hint on every
+question and marked the candidate with delimiters. The judge stayed literal,
+and a loose matching rule let a copy of the question text pass as a copy of
+the draft. v6 separated the two jobs. The yes-or-no call is the v3 prompt
+again, and each YES then goes back to the judge as a small copying task,
+"copy the exact words in this text that ...", checked by code. Recall came
+back and no flip changed a label. v7 lets code settle a YES itself when the
+draft contains the claimed answer, an alias, or its acronym. The copying
+call had missed "MDR/SDR", and that closed the last label miss.
+
+What is left in v7: example 3 comes out WRONG where the writer expected
+PARTIAL, and example 19 flips between PARTIAL and WRONG with the order and
+takes WRONG. Both leave the binary label unchanged and both are the cases
+the owner ruled to keep flagged. v7 costs about two extra judge calls per
+draft. Grading the 21 examples from a cold cache takes about ten minutes.
+The owner has not yet seen the v7 report; the blind grader check is the
+gate for mass grading.
