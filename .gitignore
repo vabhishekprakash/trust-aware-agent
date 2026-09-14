@@ -1,0 +1,40 @@
+# working notes and assistant files
+CLAUDE.md
+.claude/
+context.md
+progress.md
+skills.md
+*.skill
+notes/
+.brain/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# environments and secrets
+.venv/
+venv/
+.env
+
+# operating system noise
+.DS_Store
+Thumbs.db
+
+# generated data and large inputs
+data/cache/
+*.faiss
+data/corpus/*.pdf
+
+# demo recording scratch (the final gif is committed)
+scripts/demo/videos/
+test-results/
+*.webm
