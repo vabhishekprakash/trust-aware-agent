@@ -4,8 +4,8 @@ The signals are numbers; the deliverable is a probability. The calibrator
 maps a feature vector to a probability that the answer is correct. The
 question is whether that probability means what it says on items the fit
 never saw, so every number is out of fold: dev is split five ways, each
-fifth is scored by a model fitted on the other four, and the metrics are
-computed on those held-out scores.
+fifth is scored by a model fitted on the other four, and the metrics use
+those held-out scores.
 
 Two fits are compared. A logistic regression on standardised features,
 which gives a probability directly and can be read coefficient by
@@ -24,8 +24,8 @@ test asks whether the same features predict the bucket. Every metric
 carries a bootstrap interval.
 
 A common misconception: a low expected calibration error means a good
-calibrator. A constant prediction at the base rate scores well on it too;
-the ranking metrics and the strata say whether it discriminates.
+calibrator. A constant base-rate prediction scores well on it too; the
+ranking metrics and the strata say whether it discriminates.
 
 Summary: out-of-fold scores, two fits, three variants, three strata,
 intervals on everything, and a bucket-detector test.

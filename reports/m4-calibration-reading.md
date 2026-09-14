@@ -50,13 +50,13 @@ moved in or out:
 
 The whole gain is lp_tokens: the token count of the regenerated draft.
 Adding that one feature back to the minus_logprobs vector restores the
-full result; the five probability summaries add nothing, and on the
+full result, and the five probability summaries add nothing. On the
 matched subset, where the sequence does describe the graded text, their
 means by label are flat (reports/logprob-mismatch.md). A token count of a
 text that differs from the graded one on 40 percent of the stratum is not
-a confidence signal, it is a length feature with noise, and its
-coefficient pairs with a negative one on the response's own length. That
-is a pattern that would not transfer. The log-probability features are
+a confidence signal. It is a length feature with noise, and its
+coefficient pairs with a negative one on the response's own length, a
+pattern that would not transfer. The log-probability features are
 dropped, the cost is stated, and the recommended vector is minus_logprobs.
 
 ## Which fit?
