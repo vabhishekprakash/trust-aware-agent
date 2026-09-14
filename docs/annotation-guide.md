@@ -149,9 +149,10 @@ what the draft does, and code maps the answers to a grade.
 
 One more check applies in every bucket: does the draft assert anything the
 handbook does not support? The judge is not asked it. Asked as a fourth
-question, it said YES to true statements (a correct premise fix, a sentence
-the evidence supports) and its presence changed the other answers in one
-order, which brought binary flips back on the worked examples. Code makes
+question, it said YES to true statements, such as a correct premise fix or
+a sentence the evidence supports. Its presence also changed the other
+answers in one order, which brought binary flips back on the worked
+examples. Code makes
 the check with the whole corpus instead. An acronym expanded differently
 from Appendix A (data/corpus/acronyms.json) counts as unsupported. So does
 a claim that the handbook does not mention, cover, discuss, address,
@@ -376,12 +377,12 @@ as measured limitations.
 
 2026-09-09, evening. The owner's rulings on the seven disagreements are in
 stage 2, stage 4 and the bucket table above, and in docs/decisions.md. The
-grader is now v10. It keeps the v7 judge questions, adds the question-aware
-specifics trigger, and does the unsupported-assertion check in code with
-the whole corpus: acronym expansions against Appendix A, claims that the
-handbook does not mention a term it contains, names and acronyms from
-outside the handbook, and a "same answer" that must add something beyond
-the question. On the 21 worked examples v10 matches v7: 19 of 21 grades,
+grader is now v10. It keeps the v7 judge questions and adds the
+question-aware specifics trigger. The unsupported-assertion check is done
+in code with the whole corpus. It covers acronym expansions against
+Appendix A, claims that the handbook does not mention a term it contains,
+names and acronyms from outside the handbook, and a "same answer" that
+must add something beyond the question. On the 21 worked examples v10 matches v7: 19 of 21 grades,
 21 of 21 labels, one grade-only order flip, none that change the label.
 Rerun on the first 40 drafts and scored against the owner's grades, with
 the four rule-based revisions applied (sheets 9, 16, 33 and 34), v10 agrees

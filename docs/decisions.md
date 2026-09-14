@@ -440,17 +440,18 @@ sheet 19.
 Then the 21 worked examples were rerun under v9 and the result was 18 of
 21 labels with three order flips that changed the label, after v7 had had
 none. The records showed why. v8 had added a fourth question to the judge,
-whether the draft asserts anything unsupported, and the judge answered YES
-to true statements: the correct premise fix in example 17, a sentence the
+whether the draft asserts anything unsupported. The judge answered YES to
+true statements: the correct premise fix in example 17, a sentence the
 evidence supports in example 9. Its presence also changed the first three
 answers in one order. The sheet-1 gains, meanwhile, had come from the code
-checks, not from that question. v10 therefore drops the fourth question and
-returns the judge prompt to the v7 form, keeps every code check, and adds
-one more: a capitalised name or acronym in the draft that is in neither the
-question, nor the item's reference and evidence, nor anywhere in the
-handbook is a claim brought in from outside, which is the padded-answer case
-of sheet 32. That check also runs before the exact stage, so a short right
-answer with an outside name attached is not accepted without the judge.
+checks, not from that question. v10 therefore drops the fourth question,
+returns the judge prompt to the v7 form, and keeps every code check. It
+adds one more check: a capitalised name or acronym in the draft that is in
+neither the question, nor the item's reference and evidence, nor anywhere
+in the handbook is a claim brought in from outside. That is the
+padded-answer case of sheet 32. The check also runs before the exact stage,
+so a short right answer with an outside name attached is not accepted
+without the judge.
 
 v10 on the worked examples matches v7 exactly: 19 of 21 grades, 21 of 21
 labels, one grade-only flip, none that change the label. Rerun on the
