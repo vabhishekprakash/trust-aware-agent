@@ -240,4 +240,7 @@ were joined with a space, giving "require- ments". Drop-cap initials came out
 detached, as in "T his handbook". The "References Cited" and "Bibliography"
 running headers were spliced into the body on 28 pages. Four pages come out
 empty, and that is right: two are chapter divider pages and two are
-appendices the handbook marks "Reserved".
+appendices the handbook marks "Reserved". One side effect is accepted: the
+chapter title line is also dropped from a chapter's opening page, because it
+matches the running header there too. The numbered section headings in the
+body survive, so retrieval loses nothing a question would ask for.
