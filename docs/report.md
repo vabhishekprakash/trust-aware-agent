@@ -132,13 +132,13 @@ The standing limitations are in docs/annotation-guide.md. In short:
 ## Decision policy
 
 VERIFY is a flag, not a verification loop. The problem statement's
-tool-based verification is not implemented. Two reasons: retrieval recall
-on dev is 77 percent at k=8 and the same at k=10, so re-retrieving buys
-little and a second draft from the same model mostly repeats the first;
-and the premise step is the precedent, a second model pass built to fix a
-measured gap that made every bucket worse (reports/premise-step.md). The
-agent's own CLARIFY and ABSTAIN stand; the policy gates only the items
-the agent answered.
+tool-based verification is not implemented, for two reasons. Retrieval
+recall on dev is 77 percent at k=8 and the same at k=10, so re-retrieving
+buys little, and a second draft from the same model mostly repeats the
+first. The premise step is the precedent: a second model pass built to
+fix a measured gap made every bucket worse (reports/premise-step.md).
+The agent's own CLARIFY and ABSTAIN stand; the policy gates only the
+items the agent answered.
 
 The thresholds are a coverage choice, not a risk guarantee. On the
 out-of-fold probabilities no error target of 10, 15, 20 or 25 percent
@@ -149,28 +149,30 @@ tertile: ANSWER at or above 0.58, VERIFY from 0.35 to 0.58, ESCALATE
 below 0.35 (reports/m5-policy.md).
 
 On the 70 answered dev items, 36 correct, the error rate among shown
-answers is 49 [37, 60] percent when everything is shown and 41 [28, 55]
-percent at the chosen threshold, at 73 [61, 83] percent coverage. The
+answers is 49 [37, 60] percent when everything is shown. At the chosen
+threshold it is 41 [28, 55] percent, at 73 [61, 83] percent coverage. The
 point estimate moves in the expected direction and the interval does not
 exclude no effect. No claim that the policy reduces error is made on
 dev; the single read of the test split at M8 is where that is settled.
-The alternative is in the same table: a 20 percent risk target needs a
-threshold of 0.846 and shows 6 of 70 answered items, 9 [3, 16] percent
+The alternative is in the same table. A 20 percent risk target needs a
+threshold of 0.846 and shows 6 of 70 answered items: 9 [3, 16] percent
 coverage at 17 [0, 55] percent risk. That is what a risk guarantee would
 cost here.
 
-Per bucket, counts with rates: answerable, 62 items, 16 ANSWER (26
-percent, 12 correct), 20 VERIFY (32 percent, 18 correct), 8 ESCALATE (13
-percent, 5 correct), 12 ABSTAIN and 6 CLARIFY passed through (1 correct
-between them); ambiguous, 9, 1 ANSWER, 4 VERIFY, 3 ESCALATE, 1 CLARIFY, 2
-correct in all, indicative only; unanswerable, 34, 33 ABSTAIN and 1
-CLARIFY passed through, 32 correct, none gated; false premise, 29, 5
-ANSWER, 5 VERIFY, 8 ESCALATE, 11 ABSTAIN, none correct.
+Outcomes per bucket, counts with rates and the correct count in each
+(ambiguous is indicative only):
 
-The deployed columns, wherever they appear, carry this caveat: deployed
-coverage (86 [80, 92] percent at the chosen threshold) is flattered by 34
+| bucket | n | ANSWER | VERIFY | ESCALATE | pass-through ABSTAIN, CLARIFY |
+|---|---|---|---|---|---|
+| answerable | 62 | 16 (26%), 12 correct | 20 (32%), 18 correct | 8 (13%), 5 correct | 12 and 6, 1 correct |
+| ambiguous | 9 | 1, 0 correct | 4, 0 correct | 3, 1 correct | 0 and 1, 1 correct |
+| unanswerable | 34 | 0 | 0 | 0 | 33 and 1, 32 correct |
+| false premise | 29 | 5 (17%), 0 correct | 5 (17%), 0 correct | 8 (28%), 0 correct | 11 and 0, 0 correct |
+
+The deployed columns, wherever they appear, carry this caveat. Deployed
+coverage, 86 [80, 92] percent at the chosen threshold, is flattered by 34
 pass-through abstentions on unanswerable items that the policy never
-touches, 32 of them correct, and deployed risk (44 [35, 54] percent) is
+touches, 32 of them correct. Deployed risk, 44 [35, 54] percent, is
 punished by 11 false-premise bare abstentions graded PARTIAL and counted
 as errors. The answered-population figures are the policy's real work.
 
