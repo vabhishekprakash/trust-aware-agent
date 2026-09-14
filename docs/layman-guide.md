@@ -4,8 +4,8 @@
 
 A program that answers questions about one long technical document, the
 NASA Systems Engineering Handbook, and says how sure it is. It runs on a
-small language model on an ordinary laptop card, with no internet. When
-it is not sure, it does one of three things instead of answering: it asks
+local language model on an ordinary laptop card, with no internet. When
+it is not sure, it does one of three things instead of answering. It asks
 which of two meanings you intended, it says the handbook does not cover
 that, or it hands the question to a person. Every number it gives comes
 with a plain-language list of the reasons behind it.
@@ -26,11 +26,11 @@ about to be wrong? And can that estimate be trusted enough to act on?
    you which.
 3. It drafts an answer from the passages. If arithmetic is needed, a
    calculator does it, not the model.
-4. It measures thirty-nine things about how that went: how much of the
+4. It measures thirty-nine things about how that went. How much of the
    answer's wording is in the passages, how similar five re-tries of the
    answer are to each other, what the model says when asked how sure it
-   is, and so on. None of those measurements uses the right answer, because
-   at the moment of answering nobody knows it.
+   is, and so on. None of those measurements uses the right answer,
+   because at the moment of answering nobody knows it.
 5. A small statistical model, trained on 134 questions with known
    answers, turns those measurements into a probability. A rule then
    shows the answer, shows it with a warning, or withholds it.
@@ -42,8 +42,8 @@ how it would be judged. On the 134 training questions the probability
 was a weak but real guide to correctness. On 100 fresh questions it
 mostly was not. Where it mattered most, on answerable questions where the
 right passage had been found, the probability was no better than a coin
-toss at telling right answers from wrong ones, though with only 36 such
-questions the result is too noisy to be sure of either way. The rule
+toss at telling right answers from wrong ones. With only 36 such
+questions, though, the result is too noisy to be sure of either way. The rule
 built on the probability withheld ten correct answers out of twelve it
 held back. A deployed version would have refused to show answers that
 were right.
@@ -52,11 +52,11 @@ Three things did hold up. First, whether the right passage was found
 decided almost everything: with it, the model was right about three
 times in four; without it, never. Second, the cheap measurements, taken
 from the model's own trace at no extra cost, told you as much or more
-than the expensive ones, which involve asking the model again and cost
-thirty seconds a question. Third, the most obvious fix for the weakest
-category of question, a step that asks the model whether the question
-rests on a false assumption, made everything worse, because the model
-cannot make that judgement at this size.
+than the expensive ones. The expensive ones involve asking the model
+again and cost thirty seconds a question. Third, the most obvious fix
+for the weakest category of question made everything worse. That fix was
+a step asking the model whether the question rests on a false
+assumption, a judgement the model cannot make at this size.
 
 ## What was done to keep the numbers honest
 

@@ -19,9 +19,9 @@ stand-in. The counterpoint is the project's main finding: the free
 signals read from the trace carried more of the usable signal than any of
 the paid ones, so a cheaper deployment would start there.
 
-Status: early scaffolding. There are no results yet. The evaluation arrives in
-milestone M8, and every number that appears in this file will come from a run
-you can repeat.
+Status: complete. The evaluation is done and the result is negative; see
+Results below and docs/report.md. Every number in this file comes from a
+committed script output you can repeat.
 
 ## Quickstart
 
@@ -100,15 +100,27 @@ script arrives with milestone M8.
 
 ## Results
 
-Development set only so far, 134 items, every number out of fold with a
-95 percent bootstrap interval. The calibrated probability separates right
-from wrong answers with an AUROC of 0.70 [0.61, 0.79] pooled and 0.63
-[0.45, 0.80] inside the stratum where bucket and retrieval are held
-fixed. The honest claim is that confidence carries real but weak
-information beyond the action taken and the question's bucket. The free
-signals read from the agent's trace beat the three paid signals, which
-roughly triple the cost per question. The test split has not been read.
-Full draft: docs/report.md; the choices and why: docs/decisions.md.
+The result is negative, and it was judged against criteria written down
+before the held-out split was read. On the 134 development items the
+calibrated probability was a weak but real guide to correctness, AUROC
+0.70 [0.61, 0.79] pooled and 0.63 [0.45, 0.80] where bucket and
+retrieval were held fixed. On the 100 test items, read once, the pooled
+AUROC was 0.66 [0.56, 0.76] and the held-fixed stratum was at chance,
+0.49 [0.29, 0.72] on 36 items, too few to resolve either way. The
+decision policy tuned on dev withheld correct answers on test: the error
+rate among shown answers was 64 [49, 80] percent against a base rate of
+56 [43, 70] percent. Two findings held in direction: retrieval decides
+most of the outcome (26 of 36 correct with the evidence retrieved, 0 of
+10 without), and the free signals read from the agent's trace matched
+or beat the paid ones (agreement alone 0.71 [0.60, 0.80], free signals
+0.70 [0.59, 0.80], the full vector 0.66 [0.56, 0.76], intervals
+overlapping). The grader's labels were checked blind three times; the
+signed-off figure is 19 of 20 on real agent outputs.
+
+Full report: docs/report.md. The plain-language version:
+docs/layman-guide.md. The choices and why, including the ones that
+turned out wrong: docs/decisions.md. The preregistration the test read
+was held to: reports/m8-preregistration.md.
 
 ## License
 
