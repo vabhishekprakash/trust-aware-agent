@@ -4,7 +4,7 @@
 
 A program that answers questions about one long technical document, the
 NASA Systems Engineering Handbook, and says how sure it is. It runs on a
-local language model on an ordinary laptop card, with no internet. When
+small language model on an ordinary graphics card, with no internet. When
 it is not sure, it does one of three things instead of answering. It asks
 which of two meanings you intended, it says the handbook does not cover
 that, or it hands the question to a person. Every number it gives comes
@@ -30,7 +30,9 @@ about to be wrong? And can that estimate be trusted enough to act on?
    answer's wording is in the passages, how similar five re-tries of the
    answer are to each other, what the model says when asked how sure it
    is, and so on. None of those measurements uses the right answer,
-   because at the moment of answering nobody knows it.
+   because at the moment of answering nobody knows it. That rule matters
+   more than it sounds: if the program could see the correct answer while
+   judging its own work, the whole test would prove nothing.
 5. A small statistical model, trained on 134 questions with known
    answers, turns those measurements into a probability. A rule then
    shows the answer, shows it with a warning, or withholds it.
@@ -51,8 +53,8 @@ were right.
 Three things did hold up. First, whether the right passage was found
 decided almost everything: with it, the model was right about three
 times in four; without it, never. Second, the cheap measurements, taken
-from the model's own trace at no extra cost, told you as much or more
-than the expensive ones. The expensive ones involve asking the model
+from the record of what the model did at no extra cost, told you as much
+or more than the expensive ones. The expensive ones involve asking the model
 again and cost thirty seconds a question. Third, the most obvious fix
 for the weakest category of question made everything worse. That fix was
 a step asking the model whether the question rests on a false
