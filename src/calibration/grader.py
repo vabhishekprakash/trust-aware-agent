@@ -33,10 +33,15 @@ invented acronym expansion, or a right answer padded with claims from
 outside the handbook, is PARTIAL rather than CORRECT. An abstention scoped
 to "the passage" with nothing added stays CORRECT.
 
-The judge only ever sees one passage, so three of those checks are done by
-code with the whole corpus: an acronym expanded differently from Appendix A,
-a claim that the handbook does not mention a term it does contain, and a
-"same answer" backed only by words the question itself supplied.
+The unsupported-assertion check is done by code, not by the judge. Asked as
+a fourth yes-or-no question, the judge said YES to true statements (a
+correct premise fix, a sentence the evidence supports) and its presence
+changed the first three answers in one order, which brought binary flips
+back on the worked examples. Code with the whole corpus does it steadily:
+an acronym expanded differently from Appendix A, a claim that the handbook
+does not mention a term it does contain, a capitalised name or acronym that
+is neither in the question nor anywhere in the handbook, and a "same
+answer" backed only by words the question itself supplied.
 
 Where a question is about a specific piece of text (the answer for each
 reading, the premise correction) that text is quoted in the question; for
@@ -62,7 +67,7 @@ PAGES_PATH = ROOT / "data" / "corpus" / "pages.jsonl"
 ACRONYMS: Optional[dict] = None
 CORPUS: Optional[str] = None
 
-GRADER_VERSION = "grader-v9"
+GRADER_VERSION = "grader-v10"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
@@ -299,7 +304,6 @@ def questions_for(item: dict) -> list[tuple[str, str]]:
         ]
     else:
         raise ValueError(f"unknown bucket {bucket!r}")
-    questions.append(("unsupported", UNSUPPORTED_QUESTION))
     return questions
 
 
@@ -419,12 +423,54 @@ def _in_corpus(term: str) -> bool:
     return f" {phrase} " in corpus or f" {_singular(phrase)} " in corpus
 
 
-def code_unsupported(item: dict, draft: str) -> Optional[str]:
-    """Words of the draft that assert something the corpus contradicts, or None.
+def _outside_terms(text: str, known: str) -> list[str]:
+    """Capitalised names and acronyms in the text that are in neither the known text nor the corpus.
 
-    Two checks the judge cannot make from one passage: an acronym expanded
-    differently from Appendix A, and a claim that the handbook does not
-    mention, cover or define a term that the handbook does contain.
+    The known text is the question, the item's reference material and its
+    evidence quotes: names the item itself vouches for are not outside claims.
+    Terms inside a "does not mention X" clause are skipped too; saying the
+    handbook lacks a term is not a claim brought in from outside.
+    """
+    asked = f" {normalise(known)} "
+    negated = [(m.start(), m.end()) for m in _NEGATIVE_COVERAGE.finditer(text)]
+    # Appendix A vouches for its acronyms and their expansions as well.
+    listed = set()
+    for acronym, expansions in _acronyms().items():
+        listed.add(normalise(acronym))
+        listed.update(normalise(e) for e in expansions)
+    found = []
+    for match in _TERM.finditer(text):
+        if any(s <= match.start() < e for s, e in negated):
+            continue
+        term = match.group(0)
+        before = text[:match.start()].rstrip()
+        if (not before or before.endswith((".", "!", "?", ":", ";"))) and not term.split()[0].isupper():
+            # a sentence-initial capital is not a name; test the rest of the phrase
+            rest = " ".join(term.split()[1:])
+            inner = _TERM.search(rest)
+            if not inner:
+                continue
+            term = inner.group(0)
+        phrase = normalise(term)
+        if not phrase or phrase in listed or f" {phrase} " in asked or _in_corpus(term):
+            continue
+        found.append(term)
+    return found
+
+
+def _known_text(item: dict) -> str:
+    quotes = " ".join(e.get("quote", "") for e in item.get("evidence", []))
+    return " ".join([item.get("question", ""), _reference_text(item), quotes])
+
+
+def code_unsupported(item: dict, draft: str) -> Optional[str]:
+    """Words of the draft that assert something the corpus does not support, or None.
+
+    Three checks the judge cannot make from one passage: an acronym expanded
+    differently from Appendix A; a claim that the handbook does not mention,
+    cover or contain a term that the handbook does contain; and a capitalised
+    name or acronym that appears in neither the question nor the handbook,
+    which is a claim brought in from outside.
     """
     text = draft.translate(_QUOTES)
     table = _acronyms()
@@ -444,6 +490,10 @@ def code_unsupported(item: dict, draft: str) -> Optional[str]:
         for term in _TERM.findall(rest):
             if term.strip() and _in_corpus(term):
                 return " ".join(span.split())[:200]
+    if _corpus():
+        outside = _outside_terms(text, _known_text(item))
+        if outside:
+            return outside[0]
     return None
 
 
@@ -650,8 +700,8 @@ def _run_judge(record: dict, item: dict, draft: str, judge: Judge) -> dict:
                 quotes[key] = known if known is not None else parse_extraction(judge(build_extraction_messages(item, draft, key)))
         answers, ungrounded = ground_answers(item, draft, answers, quotes)
         contradicted = code_unsupported(item, draft)
+        answers["unsupported"] = bool(contradicted)
         if contradicted:
-            answers["unsupported"] = True
             quotes["unsupported"] = contradicted
         grade_ = grade_from_answers(bucket, answers)
         record["judge_answers"].append(answers)
@@ -704,7 +754,9 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
             return _decide(record, "rules", "WRONG", "the handbook holds the answer and the draft did not give it")
         if form == "CLARIFY":
             return _decide(record, "rules", "WRONG", "the question is not ambiguous, so a clarifying question is a miss")
-        if exact_match(draft, item.get("gold_answer"), item.get("gold_aliases") or []):
+        # A short draft that contains the gold answer is CORRECT without a model,
+        # unless it also brings in a name or claim the handbook does not support.
+        if exact_match(draft, item.get("gold_answer"), item.get("gold_aliases") or []) and code_unsupported(item, draft) is None:
             return _decide(record, "exact", "CORRECT", "matches the reference answer or an accepted alias")
         return _run_judge(record, item, draft, judge)
 

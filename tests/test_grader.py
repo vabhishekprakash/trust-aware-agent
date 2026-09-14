@@ -204,7 +204,11 @@ def small_corpus(monkeypatch):
     import calibration.grader as g
 
     monkeypatch.setattr(g, "ACRONYMS", {"PDR": ["Preliminary Design Review"], "CE": ["Concurrent Engineering", "Chief Engineer"], "KDP": ["Key Decision Point"]})
-    monkeypatch.setattr(g, "CORPUS", " " + g.normalise("The Agency Baseline Commitment is set at KDP C. Reviews are held at key decision points. The Program Manager approves the SEMP.") + " ")
+    monkeypatch.setattr(g, "CORPUS", " " + g.normalise(
+        "The Agency Baseline Commitment is set at KDP C. Reviews are held at key decision points. The Program Manager approves the SEMP. "
+        "NASA holds a Preliminary Design Review (PDR), a Critical Design Review (CDR) and a System Requirements Review (SRR) in each life cycle. "
+        "Flight units and the Jet Propulsion Laboratory are not mentioned here."
+    ) + " ")
 
 
 def test_code_unsupported_catches_a_wrong_acronym_expansion():
@@ -214,7 +218,8 @@ def test_code_unsupported_catches_a_wrong_acronym_expansion():
     assert code_unsupported(UNANSWERABLE, "No details related to PDR (Preliminary Design Review) are given.") is None
     assert code_unsupported(UNANSWERABLE, "The Chief Engineer (CE) signs it.") is None
     assert code_unsupported(UNANSWERABLE, "The Cost Estimator (CE) signs it.") == "CE (Cost Estimator)"
-    assert code_unsupported(UNANSWERABLE, "The XYZ (Extra Yield Zone) is not in the table.") is None
+    # an acronym the handbook never uses is an outside claim, whatever its expansion
+    assert code_unsupported(UNANSWERABLE, "The XYZ (Extra Yield Zone) is not in the table.") == "XYZ"
 
 
 def test_code_unsupported_catches_a_false_claim_that_the_handbook_does_not_mention_a_term():
@@ -233,7 +238,7 @@ def test_code_unsupported_catches_a_false_claim_that_the_handbook_does_not_menti
 def test_wrong_expansion_makes_an_abstention_partial_even_if_the_judge_misses_it():
     item = {**UNANSWERABLE, "question": "What minimum mass margin should a project hold at PDR?"}
     draft = "The passage does not provide information about the mass margin or any details related to PDR (Pre-Development Review)."
-    r = grade(item, draft, judge=both(False, True, False))
+    r = grade(item, draft, judge=both(False, True))
     assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
     assert r["judge_quotes"][0]["unsupported"] == "PDR (Pre-Development Review)"
 
@@ -241,7 +246,7 @@ def test_wrong_expansion_makes_an_abstention_partial_even_if_the_judge_misses_it
 def test_a_false_coverage_claim_blocks_the_rule_path_and_is_partial():
     item = {**UNANSWERABLE, "question": "What confidence level must the Agency Baseline Commitment be funded to at KDP C?"}
     draft = "The passage does not provide information about confidence levels, nor does it mention anything related to Agency Baseline Commitments or KDP C."
-    r = grade(item, draft, judge=both(False, True, False))
+    r = grade(item, draft, judge=both(False, True))
     assert (r["decided_by"], r["grade"]) == ("judge", "PARTIAL")
 
 
@@ -253,7 +258,7 @@ def test_same_answer_must_add_something_beyond_the_question():
         "gold_aliases": ["NPR7120.5", "7120.5", "NASA Procedural Requirements 7120.5"],
     }
     draft = "The NASA Systems Engineering Handbook (SEH) requires that data management planning appear in the project plan, " + "as the guidelines say. " * 8
-    r = grade(item, draft, judge=both(True, False, False, False, extract=lambda c: '"The NASA Systems Engineering Handbook (SEH)"'))
+    r = grade(item, draft, judge=both(True, False, False, extract=lambda c: '"The NASA Systems Engineering Handbook (SEH)"'))
     assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["same"], ["same"]])
 
 
@@ -288,21 +293,22 @@ def test_exact_match_ignores_empty_gold_and_empty_aliases():
 # the judge's questions, the grounding check, and the mapping from answers to grades
 
 
-def test_questions_are_anchored_on_the_reference_text_and_end_with_the_support_question():
+def test_questions_are_anchored_on_the_reference_text_and_the_judge_is_not_asked_about_support():
     keys = [k for k, _ in questions_for(ANSWERABLE)]
-    assert keys == ["same", "contradicts", "omits", "unsupported"]
-    assert all("reference answer" in text for _, text in questions_for(ANSWERABLE)[:3])
+    assert keys == ["same", "contradicts", "omits"]
+    assert all("reference answer" in text for _, text in questions_for(ANSWERABLE))
     assert not any("the Program Manager" in text for _, text in questions_for(ANSWERABLE))
     amb = questions_for(AMBIGUOUS)
-    assert [k for k, _ in amb] == ["flags", "reading1", "reading2", "unsupported"]
+    assert [k for k, _ in amb] == ["flags", "reading1", "reading2"]
     assert "before Phase C" in amb[0][1] and "before Phase B" in amb[0][1]
     assert "the Critical Design Review" in amb[1][1]
     assert "the System Requirements Review" in amb[2][1]
     fp = questions_for(FALSE_PREMISE)
-    assert [k for k, _ in fp] == ["rejects", "doubts", "builds", "unsupported"]
+    assert [k for k, _ in fp] == ["rejects", "doubts", "builds"]
     assert FALSE_PREMISE["premise_fix"] in fp[0][1]
-    assert [k for k, _ in questions_for(UNANSWERABLE)] == ["answers", "abstains", "unsupported"]
-    assert "do not support" in questions_for(UNANSWERABLE)[-1][1]
+    assert [k for k, _ in questions_for(UNANSWERABLE)] == ["answers", "abstains"]
+    prompt = build_judge_messages(UNANSWERABLE, "x", "reference_first")[-1]["content"]
+    assert "do not support" not in prompt
 
 
 def test_ambiguous_item_needs_two_readings():
@@ -449,7 +455,7 @@ def test_answerable_abstain_is_wrong_without_judge():
 
 
 def test_answerable_abstain_that_still_names_the_answer_goes_to_judge():
-    judge = both(True, False, False, False)
+    judge = both(True, False, False)
     r = grade(ANSWERABLE, "The handbook does not specify a date, but the SEMP is approved by the Program Manager.", judge=judge)
     assert r["form"] == "ABSTAIN"
     assert r["decided_by"] == "judge"
@@ -486,21 +492,21 @@ def test_false_premise_plain_abstain_is_correct_without_judge():
 
 def test_abstentions_that_go_on_to_name_specifics_go_to_the_judge():
     draft = "The handbook does not say which comes first. Of the two per phase, the entry KDP comes first."
-    r = grade(FALSE_PREMISE, draft, judge=both(False, False, True, False))
+    r = grade(FALSE_PREMISE, draft, judge=both(False, False, True))
     assert r["form"] == "ABSTAIN"
     assert (r["decided_by"], r["grade"]) == ("judge", "WRONG")
     draft = "The handbook does not state a figure, but a CDR would typically run into the millions of dollars."
-    r = grade(UNANSWERABLE, draft, judge=both(True, True, False))
+    r = grade(UNANSWERABLE, draft, judge=both(True, True))
     assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
     draft = "The handbook does not give a cost for a CDR; it describes only the review's purpose."
-    r = grade(UNANSWERABLE, draft, judge=both(False, True, False))
+    r = grade(UNANSWERABLE, draft, judge=both(False, True))
     assert (r["decided_by"], r["grade"]) == ("judge", "CORRECT")
 
 
 def test_abstention_with_an_invented_expansion_is_partial():
     item = {**UNANSWERABLE, "question": "What minimum mass margin should a project hold at PDR?"}
     draft = "The passage does not provide information about the mass margin or any details related to PDR (Pre-Development Review)."
-    r = grade(item, draft, judge=both(False, True, True))
+    r = grade(item, draft, judge=both(False, True))
     assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
 
 
@@ -519,7 +525,7 @@ def test_unknown_bucket_is_rejected():
 
 def test_long_draft_containing_gold_goes_to_judge_in_both_orders():
     draft = "The Program Manager approves it, although " + "some people say " * 12 + "the Center Director does."
-    judge = both(True, True, False, False)
+    judge = both(True, True, False)
     r = grade(ANSWERABLE, draft, judge=judge)
     assert r["decided_by"] == "judge"
     assert r["grade"] == "PARTIAL"
@@ -529,11 +535,11 @@ def test_long_draft_containing_gold_goes_to_judge_in_both_orders():
 
 
 def test_judge_sees_evidence_quote_and_the_questions():
-    judge = both(True, False, False, False)
+    judge = both(True, False, False)
     grade(ANSWERABLE, LONG_HEDGE, judge=judge)
     prompt = judge.question_calls()[0][-1]["content"]
     assert "approved by the Program Manager" in prompt
-    assert "Q1:" in prompt and "Q4:" in prompt and "Q5:" not in prompt
+    assert "Q1:" in prompt and "Q3:" in prompt and "Q4:" not in prompt
     assert EXTRACT_MARK not in prompt
 
 
@@ -546,7 +552,7 @@ def test_unanswerable_and_false_premise_prompts_carry_the_evidence():
 
 
 def test_every_yes_is_grounded_by_a_copying_call():
-    judge = both(True, False, False, False)
+    judge = both(True, False, False)
     r = grade(ANSWERABLE, LONG_HEDGE, judge=judge)
     assert r["grade"] == "CORRECT"
     assert len(judge.question_calls()) == 2
@@ -557,7 +563,7 @@ def test_every_yes_is_grounded_by_a_copying_call():
 
 
 def test_reading_yes_is_grounded_by_code_when_the_draft_names_the_answer():
-    judge = both(False, True, False, False, extract=no_extraction)
+    judge = both(False, True, False, extract=no_extraction)
     r = grade(AMBIGUOUS, "It is the Critical Design Review, held before Phase C.", judge=judge)
     assert r["grade"] == "PARTIAL"
     assert r["judge_quotes"][0]["reading1"] == "the Critical Design Review"
@@ -569,7 +575,7 @@ def test_reading_yes_is_grounded_by_code_from_a_parenthesised_acronym():
         {"reading": "before Phase C", "answer": "the Critical Design Review (CDR)", "page": "22"},
         {"reading": "before Phase B", "answer": "the System Requirements Review (SRR)", "page": "21"},
     ]}
-    judge = both(False, True, True, False, extract=no_extraction)
+    judge = both(False, True, True, extract=no_extraction)
     r = grade(item, "Both the CDR and the SRR come before implementation, depending on the phase.", judge=judge)
     assert r["grade"] == "CORRECT"
     assert r["judge_quotes"][0] == {"reading1": "CDR", "reading2": "SRR"}
@@ -577,14 +583,14 @@ def test_reading_yes_is_grounded_by_code_from_a_parenthesised_acronym():
 
 def test_same_yes_is_grounded_by_code_when_the_draft_contains_an_alias():
     draft = "The PM signs it off, although " + "some people say " * 12 + "others do too."
-    judge = both(True, False, False, False, extract=no_extraction)
+    judge = both(True, False, False, extract=no_extraction)
     r = grade(ANSWERABLE, draft, judge=judge)
     assert r["grade"] == "CORRECT"
     assert r["judge_quotes"][0] == {"same": "PM"}
 
 
 def test_a_yes_the_copying_call_cannot_back_becomes_no():
-    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, False, extract=lambda c: "NONE"))
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, extract=lambda c: "NONE"))
     assert (r["grade"], r["label"]) == ("WRONG", 0)
     assert r["judge_answers"] == [{"same": False, "contradicts": False, "omits": False, "unsupported": False}] * 2
     assert r["judge_ungrounded"] == [["same"], ["same"]]
@@ -592,7 +598,7 @@ def test_a_yes_the_copying_call_cannot_back_becomes_no():
 
 
 def test_copied_words_not_in_the_candidate_count_as_no():
-    judge = both(False, True, True, False, extract=lambda c: '"the System Requirements Review"')
+    judge = both(False, True, True, extract=lambda c: '"the System Requirements Review"')
     r = grade(AMBIGUOUS, "The big design review, the one before you start building.", judge=judge)
     assert r["grade"] == "WRONG"
     assert r["judge_answers"][0] == {"flags": False, "reading1": False, "reading2": False, "unsupported": False}
@@ -600,39 +606,53 @@ def test_copied_words_not_in_the_candidate_count_as_no():
 
 
 def test_answer_bearing_yes_must_mention_the_answer_it_claims():
-    r = grade(AMBIGUOUS, "The Critical Design Review (CDR).", judge=both(False, False, True, False))
+    r = grade(AMBIGUOUS, "The Critical Design Review (CDR).", judge=both(False, False, True))
     assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["reading2"], ["reading2"]])
-    r = grade(AMBIGUOUS, "The Critical Design Review (CDR).", judge=both(False, True, False, False))
+    r = grade(AMBIGUOUS, "The Critical Design Review (CDR).", judge=both(False, True, False))
     assert (r["grade"], r["judge_ungrounded"]) == ("PARTIAL", [[], []])
-    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, False, extract=lambda c: '"signs it off after the review board meets"'))
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, extract=lambda c: '"signs it off after the review board meets"'))
     assert (r["grade"], r["judge_ungrounded"]) == ("WRONG", [["same"], ["same"]])
 
 
-def test_a_right_answer_padded_with_unsupported_claims_is_partial():
-    draft = "AS9100, developed by the Aerospace Industries Association, is a quality management system for the aerospace and defense industries."
+def test_a_right_answer_padded_with_an_outside_name_is_partial():
+    from calibration.grader import code_unsupported
+
     item = {**ANSWERABLE, "question": "What is AS9100?", "gold_answer": "a quality management system for the commercial aerospace industry", "gold_aliases": []}
-    r = grade(item, draft, judge=both(True, False, False, True))
-    assert (r["grade"], r["label"]) == ("PARTIAL", 0)
-    assert r["judge_quotes"][0]["unsupported"] == draft
-    only_claim_unbacked = lambda c: "NONE" if "do not support" in c else f'"{source_of(c)}"'  # noqa: E731
-    r = grade(item, draft, judge=both(True, False, False, True, extract=only_claim_unbacked))
-    assert r["grade"] == "CORRECT"
-    assert r["judge_ungrounded"] == [["unsupported"], ["unsupported"]]
+    padded = "AS9100, developed by the Aerospace Industries Association (AIA), is a quality management system for the commercial aerospace industry."
+    assert code_unsupported(item, padded) == "Aerospace Industries Association"
+    # the exact stage would have accepted this; the outside name sends it to the judge, and the code check makes it PARTIAL
+    r = grade(item, padded, judge=both(True, False, False))
+    assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "PARTIAL", 0)
+    assert r["judge_quotes"][0]["unsupported"] == "Aerospace Industries Association"
+    plain = "AS9100 is a quality management system for the commercial aerospace industry."
+    assert code_unsupported(item, plain) is None
+    assert grade(item, plain, judge=never_called)["decided_by"] == "exact"
+
+
+def test_outside_terms_ignore_sentence_initial_capitals_known_names_and_negated_clauses():
+    from calibration.grader import _outside_terms
+
+    assert _outside_terms("Both the Program Manager and the SEMP matter.", "") == []
+    assert _outside_terms("Ask the Program Manager. The SEMP is the plan.", "") == []
+    assert _outside_terms("The Widget Review Board approves it.", "") == ["Widget Review Board"]
+    assert _outside_terms("The Widget Review Board approves it.", "Who chairs the Widget Review Board?") == []
+    assert _outside_terms("Only NASA and the JPL team see it.", "") == ["JPL"]
+    assert _outside_terms("The handbook does not mention the Quantum Flux Capacitor.", "") == []
 
 
 def test_unanswerable_answer_goes_to_judge_and_a_figure_is_wrong():
-    r = grade(UNANSWERABLE, "A design review costs about two million dollars.", judge=both(True, False, False))
+    r = grade(UNANSWERABLE, "A design review costs about two million dollars.", judge=both(True, False))
     assert (r["decided_by"], r["grade"], r["label"]) == ("judge", "WRONG", 0)
 
 
 def test_false_premise_reject_correct_and_build_wrong():
     draft = "Actually the handbook places key decision points at phase boundaries, so there is no two per phase."
-    assert grade(FALSE_PREMISE, draft, judge=both(True, False, False, False))["grade"] == "CORRECT"
-    assert grade(FALSE_PREMISE, "The first of the two is the entry KDP.", judge=both(False, False, True, False))["grade"] == "WRONG"
+    assert grade(FALSE_PREMISE, draft, judge=both(True, False, False))["grade"] == "CORRECT"
+    assert grade(FALSE_PREMISE, "The first of the two is the entry KDP.", judge=both(False, False, True))["grade"] == "WRONG"
 
 
 def test_ambiguous_clarify_that_names_both_readings_is_correct():
-    judge = both(True, False, False, False)
+    judge = both(True, False, False)
     r = grade(AMBIGUOUS, "Do you mean the review before Phase B or before Phase C?", judge=judge)
     assert r["grade"] == "CORRECT"
     prompt = judge.question_calls()[0][-1]["content"]
@@ -640,14 +660,14 @@ def test_ambiguous_clarify_that_names_both_readings_is_correct():
 
 
 def test_disagreeing_orders_take_stricter_grade_and_flag():
-    judge = StubJudge([reply(True, False, False, False), reply(True, False, True, False)])
+    judge = StubJudge([reply(True, False, False), reply(True, False, True)])
     r = grade(ANSWERABLE, LONG_HEDGE, judge=judge)
     assert r["judge_grades"] == ["CORRECT", "PARTIAL"]
     assert (r["grade"], r["label"], r["flag"]) == ("PARTIAL", 0, "position_disagreement")
 
 
 def test_agreeing_orders_produce_no_flag_and_keep_answers():
-    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False, False))
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(True, False, False))
     assert (r["grade"], r["label"], r["flag"]) == ("CORRECT", 1, None)
     assert r["judge_grades"] == ["CORRECT", "CORRECT"]
     assert r["judge_answers"] == [{"same": True, "contradicts": False, "omits": False, "unsupported": False}] * 2
@@ -655,12 +675,12 @@ def test_agreeing_orders_produce_no_flag_and_keep_answers():
 
 
 def test_partial_maps_to_label_zero_and_keeps_grade():
-    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(False, False, True, False))
+    r = grade(ANSWERABLE, LONG_HEDGE, judge=both(False, False, True))
     assert (r["grade"], r["label"]) == ("PARTIAL", 0)
 
 
 def test_one_unreadable_reply_is_flagged_wrong_and_keeps_the_readable_grade():
-    judge = StubJudge(["I think it is fine.", reply(True, False, False, False)])
+    judge = StubJudge(["I think it is fine.", reply(True, False, False)])
     r = grade(ANSWERABLE, LONG_HEDGE, judge=judge)
     assert (r["grade"], r["label"], r["flag"]) == ("WRONG", 0, "judge_unparsed")
     assert r["judge_grades"] == [None, "CORRECT"]
@@ -677,7 +697,7 @@ def test_two_unreadable_replies_are_flagged_wrong():
 
 
 def test_human_override_wins_and_keeps_machine_grade():
-    r = grade(UNANSWERABLE, "It costs about two million dollars.", judge=both(True, False, False))
+    r = grade(UNANSWERABLE, "It costs about two million dollars.", judge=both(True, False))
     r2 = apply_human(r, "CORRECT", "owner: the figure is in a table the item writer missed")
     assert (r2["grade"], r2["label"], r2["decided_by"], r2["machine_grade"]) == ("CORRECT", 1, "human", "WRONG")
     assert r["decided_by"] == "judge", "apply_human must not mutate the original record"
@@ -691,7 +711,7 @@ def test_apply_human_rejects_unknown_grade():
 
 def test_provider_judge_calls_the_provider_deterministically():
     class FakeGeneration:
-        text = reply(True, False, False, False)
+        text = reply(True, False, False)
 
     class FakeProvider:
         model = "fake-model"

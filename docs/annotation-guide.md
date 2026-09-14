@@ -146,18 +146,22 @@ what the draft does, and code maps the answers to a grade.
                     hedged one? says the handbook does not contain the answer?
     false_premise   says the assumption is wrong or states the correction?
                     doubts it without correcting it? answers as if it were true?
-    every bucket    asserts anything as fact that the reference and the
-                    evidence do not support (an acronym expansion, a claim
-                    about what the handbook covers, a figure, an outside
-                    detail)?
 
-The judge sees one passage, so code answers the last question where the
-whole corpus is needed: an acronym expanded differently from Appendix A
-(data/corpus/acronyms.json), and a claim that the handbook does not
-mention, cover, discuss, address, include or contain a term the text does
-contain, both count as unsupported whatever the judge said. A claim about a
-detail ("does not specify where X happens") is an abstention, not an
-existence claim, and is left alone.
+One more check applies in every bucket: does the draft assert anything the
+handbook does not support? The judge is not asked it. Asked as a fourth
+question, it said YES to true statements (a correct premise fix, a sentence
+the evidence supports) and its presence changed the other answers in one
+order, which brought binary flips back on the worked examples. Code makes
+the check with the whole corpus instead. An acronym expanded differently
+from Appendix A (data/corpus/acronyms.json) counts as unsupported. So does
+a claim that the handbook does not mention, cover, discuss, address,
+include or contain a term the text does contain. So does a capitalised
+name or acronym that appears in neither the question, nor the item's
+reference and evidence, nor anywhere in the handbook: a claim brought in
+from outside. A claim about a detail ("does not specify where X happens")
+is an abstention, not an existence claim, and is left alone. The check also
+runs before the exact stage, so a short right answer padded with an outside
+name is not accepted without the judge.
 
 Every YES must be backed by words from the draft. When the draft contains
 the claimed answer, an alias, or its acronym, code settles that itself.
@@ -357,11 +361,11 @@ percent (reports/grader-check-result.md). That is below the bar, so grader
 v7 is not signed off in practice and mass grading waits. One of the seven
 disagreements is a judge error (an abstention on an unanswerable item
 graded as an answer). The other six were rubric questions the owner's
-grades raised and this guide did not then settle. They were: an abstention
-that refers to "the passage" rather than the handbook, or adds an invented
-detail; a bare abstention on a false-premise question; a right answer padded
-with claims from outside the handbook; and one ambiguous item the owner read
-as having one natural answer. The rulings that settled them are in stage 2
+grades raised and this guide did not then settle. They were four. An
+abstention that refers to "the passage" rather than the handbook, or adds an
+invented detail. A bare abstention on a false-premise question. A right
+answer padded with claims from outside the handbook. One ambiguous item the
+owner read as having one natural answer. The rulings that settled them are in stage 2
 and stage 4 above and in docs/decisions.md. Item check: the owner's bucket
 matched the drafted bucket on 37 of 40 items, 92 percent
 (reports/item-check-result.md). Answerable 14 of 14, with the owner's answer
@@ -372,15 +376,19 @@ as measured limitations.
 
 2026-09-09, evening. The owner's rulings on the seven disagreements are in
 stage 2, stage 4 and the bucket table above, and in docs/decisions.md. The
-grader is now v9: it adds the unsupported-assertion question to every
-bucket, the question-aware specifics trigger, and three code checks against
-the whole corpus (acronym expansions against Appendix A, claims that the
-handbook does not mention a term it contains, and a "same answer" that must
-add something beyond the question). Rerun on the first 40 drafts and scored
-against the owner's grades with the four rule-based revisions applied
-(sheets 9, 16, 33 and 34), v9 agrees on the binary label on 38 of 39, 97
-percent. That is rubric fidelity, not blind agreement: the fixes were built
-against those drafts. The blind figure remains 82 percent. The second sheet,
-reports/grader-check-sheet-2.md, holds 25 fresh drafts the owner has not
-seen; its blind agreement, once graded, is the post-fix figure that gates
-mass grading. Nothing is locked and no split is made.
+grader is now v10. It keeps the v7 judge questions, adds the question-aware
+specifics trigger, and does the unsupported-assertion check in code with
+the whole corpus: acronym expansions against Appendix A, claims that the
+handbook does not mention a term it contains, names and acronyms from
+outside the handbook, and a "same answer" that must add something beyond
+the question. On the 21 worked examples v10 matches v7: 19 of 21 grades,
+21 of 21 labels, one grade-only order flip, none that change the label.
+Rerun on the first 40 drafts and scored against the owner's grades, with
+the four rule-based revisions applied (sheets 9, 16, 33 and 34), v10 agrees
+on the binary label on 38 of 39. That is 97 percent. It is rubric fidelity,
+not blind agreement: the fixes were built against those drafts, and the one
+miss, sheet 19, is an item that has since moved to answerable. The blind
+figure remains 82 percent. The second sheet, reports/grader-check-sheet-2.md,
+holds 25 fresh drafts the owner has not seen; its blind agreement, once
+graded, is the post-fix figure that gates mass grading. Nothing is locked
+and no split is made.

@@ -344,7 +344,7 @@ the judge because a capitalised name followed the refusal. The judge then
 answered that the draft offers an answer. The rubric gaps, which the guide
 did not settle and the owner's grades did, were four kinds. Three
 abstentions were phrased as "the passage does not provide" rather than the
-handbook; one of them added a wrong expansion of PDR and one added a false
+handbook. One of them added a wrong expansion of PDR and one added a false
 claim about what the handbook mentions. The owner graded those PARTIAL and
 the grader CORRECT. One bare abstention on a false-premise item was CORRECT
 by the guide's table and WRONG to the owner. One right answer was padded
@@ -360,9 +360,9 @@ owner's answer contained the gold answer or an alias every time.
 Unanswerable 10 of 10. False premise 8 of 8, with corrections matching the
 drafted fix. Ambiguous 5 of 8. The three misses were drafted as ambiguous
 and read as answerable. The second reading rested on a distinction the
-handbook draws that a user asking the question would not have in mind:
-Concept of Operations against Operations Concept, MOEs against MOPs,
-requirements validation against product validation. In two of the three the
+handbook draws that a user asking the question would not have in mind. The
+three were Concept of Operations against Operations Concept, MOEs against
+MOPs, and requirements validation against product validation. In two of the three the
 owner noted the near-call. That is the failure the guide names: "if one
 reading is clearly what any reader would mean, the item is not ambiguous".
 It is the bucket to re-read across all candidates during the review.
@@ -410,37 +410,57 @@ The 82 percent first-pass figure stands as the blind number. A second sheet
 of 25 fresh drafts, drawn the same way, gives the honest post-fix agreement
 once the owner has graded it blind.
 
-## Grader v9: three checks the judge cannot make from one passage
+## Grader v9 and v10: the support check moves to code
 
 v8 reached 33 of 39, 85 percent, on the rerun (reports/grader-check-
 rubric-fidelity-v8.md). Six disagreements were left. Two were the same
 bare-abstention-on-a-false-premise case the owner had ruled on for sheet
-16, so sheets 9 and 33 were revised to CORRECT under that rule and the
+16. Sheets 9 and 33 were revised to CORRECT under that rule, and the
 revisions file records all four. One, sheet 19, resolves through the item:
 q0124 moved to answerable in the ambiguous pass, and there the draft is an
 exact match. Three were grader gaps of one kind: the judge sees a single
-passage, so it cannot tell that "Pre-Development Review" is the wrong
-expansion of PDR, that the handbook does discuss the Agency Baseline
-Commitment when a draft says it is not mentioned, or that "the NASA Systems
-Engineering Handbook" is not the same answer as "NPR 7120.5" when the only
-word they share came from the question.
+passage. It cannot tell that "Pre-Development Review" is the wrong
+expansion of PDR. It cannot tell that the handbook does discuss the Agency
+Baseline Commitment when a draft says it is not mentioned. And it cannot
+tell that "the NASA Systems Engineering Handbook" is not the same answer as
+"NPR 7120.5" when the only word they share came from the question.
 
 v9 does those three with code and the whole corpus. Appendix A is parsed
 into data/corpus/acronyms.json (187 entries, scripts/build_acronyms.py),
 and an acronym expanded differently from the table is an unsupported
 claim. A claim that the handbook does not mention, cover, discuss, address,
-include or contain a term is checked against the full text; verbs like
-"specify" and "define" are left out because "does not specify where X
-happens" is an abstention about a detail, and a claim containing a wh-word
-is skipped for the same reason. And the words that back a "same answer"
+include or contain a term is checked against the full text. Verbs like
+"specify" and "define" are left out, because "does not specify where X
+happens" is an abstention about a detail. A claim containing a wh-word is
+skipped for the same reason. And the words that back a "same answer"
 must add something beyond the question's own words. Rerun on the same 40
-drafts, v9 gives 38 of 39, 97 percent, rubric fidelity (reports/grader-
-check-rubric-fidelity.md); the one miss is sheet 19. This is still not a
-blind number. The blind number is 82 percent, and the second sheet
-(reports/grader-check-sheet-2.md, 25 fresh drafts graded by v9 into
-data/eval/grader_check_key-2.jsonl) is where an honest post-fix figure
-comes from. Below about 90 percent there, the grader is still not good
-enough for mass grading.
+drafts, v9 gave 38 of 39, 97 percent, rubric fidelity; the one miss was
+sheet 19.
+
+Then the 21 worked examples were rerun under v9 and the result was 18 of
+21 labels with three order flips that changed the label, after v7 had had
+none. The records showed why. v8 had added a fourth question to the judge,
+whether the draft asserts anything unsupported, and the judge answered YES
+to true statements: the correct premise fix in example 17, a sentence the
+evidence supports in example 9. Its presence also changed the first three
+answers in one order. The sheet-1 gains, meanwhile, had come from the code
+checks, not from that question. v10 therefore drops the fourth question and
+returns the judge prompt to the v7 form, keeps every code check, and adds
+one more: a capitalised name or acronym in the draft that is in neither the
+question, nor the item's reference and evidence, nor anywhere in the
+handbook is a claim brought in from outside, which is the padded-answer case
+of sheet 32. That check also runs before the exact stage, so a short right
+answer with an outside name attached is not accepted without the judge.
+
+v10 on the worked examples matches v7 exactly: 19 of 21 grades, 21 of 21
+labels, one grade-only flip, none that change the label. Rerun on the
+first 40 drafts, v10 gives 38 of 39 binary and 38 of 39 three-way,
+97 percent (reports/grader-check-rubric-fidelity.md); the one miss is sheet
+19, whose item moved to answerable. This is still not a blind number. The
+blind number is 82 percent, and the second sheet (reports/grader-check-
+sheet-2.md, 25 fresh drafts graded by v10 into data/eval/grader_check_key-2.
+jsonl) is where an honest post-fix figure comes from. Below about 90
+percent there, the grader is still not good enough for mass grading.
 
 ## Ambiguous pass, 2026-09-09
 
