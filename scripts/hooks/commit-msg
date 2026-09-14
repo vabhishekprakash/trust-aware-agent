@@ -2,6 +2,11 @@
 # commit-msg hook: strip co-author and generator trailers, keep the subject short.
 # Installed into .git/hooks by scripts/hooks/install-hooks.sh
 
+# Byte-oriented text handling: without this, grep treats a message holding a
+# byte that is invalid in a UTF-8 locale as binary and drops or replaces lines.
+LC_ALL=C
+export LC_ALL
+
 f="$1"
 tmp="$f.tmp"
 

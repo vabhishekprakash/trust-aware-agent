@@ -1,9 +1,10 @@
 #!/bin/sh
 # Copies the project hooks into .git/hooks so git runs them.
-# Run once after cloning:  sh scripts/hooks/install-hooks.sh
+# Run from anywhere inside the repository:  sh scripts/hooks/install-hooks.sh
 
 set -e
 root=$(git rev-parse --show-toplevel)
+cd "$root"
 hooks_dir=$(git rev-parse --git-path hooks)
 case "$hooks_dir" in
   /*|?:*) ;;
