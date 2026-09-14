@@ -1,0 +1,11 @@
+{
+  "source_url": "https://www.nasa.gov/wp-content/uploads/2018/09/nasa_systems_engineering_handbook_0.pdf",
+  "sha256": "8eeb4887a4dc57a23049da7dd2ed556833cf98e214b240468d987873164ff688",
+  "bytes": 3773440,
+  "fetched_on": "2026-09-08",
+  "licence": "Work of the United States government; public domain in the US under 17 U.S.C. 105",
+  "pages": 297,
+  "empty_pages": 0,
+  "pymupdf_version": "1.28.2",
+  "title_page_snippet": "National Aeronautics and\n Space Administration\nNASA\nSYSTEMS ENGINEERING\nHANDBOOK\ndesign\ntest\nintegrate\nfly\nwww.nasa.gov"
+}

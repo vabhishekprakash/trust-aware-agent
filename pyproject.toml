@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trust-aware-agent"
+version = "0.1.0"
+description = "A retrieval question-answering agent that estimates a calibrated probability of being right before it answers."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Vallamalla Abhishek Prakash", email = "vabhishekprakash@gmail.com"}]
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.7",
+    "httpx>=0.27",
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "sentence-transformers>=3.0",
+    "faiss-cpu>=1.8",
+    "matplotlib>=3.9",
+    "pymupdf>=1.24",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2"]
+demo = ["playwright>=1.45"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"

@@ -1,0 +1,28 @@
+#!/bin/sh
+# commit-msg hook: strip co-author and generator trailers, keep the subject short.
+# Installed into .git/hooks by scripts/hooks/install-hooks.sh
+
+f="$1"
+tmp="$f.tmp"
+
+before=$(grep -c '' "$f")
+grep -viE '^[[:space:]]*co-authored-by:|^[[:space:]]*[[:alnum:]-]*session:[[:space:]]*https?://|generated with \[[^]]*\]\(https?://' "$f" > "$tmp" || true
+after=$(grep -c '' "$tmp")
+if [ "$before" -ne "$after" ]; then
+  echo "commit-msg: removed $((before - after)) attribution line(s)" >&2
+fi
+
+# drop trailing blank lines left behind by stripping
+sed -i -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$tmp"
+mv "$tmp" "$f"
+
+subject=$(grep -v '^#' "$f" | sed '/^[[:space:]]*$/d' | head -n 1)
+if [ -z "$subject" ]; then
+  echo "commit-msg: message is empty after stripping attribution" >&2
+  exit 1
+fi
+if [ "${#subject}" -gt 60 ]; then
+  echo "commit-msg: subject is ${#subject} characters, limit is 60" >&2
+  exit 1
+fi
+exit 0

@@ -1,0 +1,13 @@
+#!/bin/sh
+# pre-push hook: pushing is blocked so it can never happen by accident.
+# Installed into .git/hooks by scripts/hooks/install-hooks.sh
+
+if [ "$ALLOW_PUSH" = "1" ]; then
+  exit 0
+fi
+
+echo "pre-push: pushing is blocked for this repository." >&2
+echo "If you really mean it, run the push yourself with ALLOW_PUSH set:" >&2
+echo "    ALLOW_PUSH=1 git push <remote> <branch>           (bash)" >&2
+echo "    \$env:ALLOW_PUSH=1; git push <remote> <branch>     (powershell)" >&2
+exit 1
