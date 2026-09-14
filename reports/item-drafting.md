@@ -55,3 +55,11 @@ ids: q0004, q0005, q0012, q0014, q0015, q0018, q0029, q0032, q0036, q0055, q0070
     - Not genuinely ambiguous. The handbook assigns bidirectional traceability outright to Requirements Management: page 132 lists 'Maintain bidirectional traceability between requirements' as a key activity and devotes subsection 6.2.1.2.3 'Conduct Expectations and Requirements Traceability' to it. The page 60 passage for reading 1 is a step in requirements validation where reviewers 'check that the requirement statements (a) have bidirectional traceability'; checking a property during validation is not being the process 'responsible for' traceability, and no reader asking this question would mean Technical Requirements Definition. Rule (4) applies: one reading is clearly what any reader means. Could be recast as an answerable item with gold 'Requirements Management' (aliases 'Requirements Management Process') and the existing page 132 quote as evidence; the fixed schema has no 'expected' field, so I am dropping rather than switching bucket.
 - [ambiguous] Which process evaluates and approves change requests against the baseline?
     - The two answers do not really differ. For the requirements-baseline reading the handbook itself routes approval through Configuration Management: page 133 says that after SRR 'any changes to the requirements should be approved by a Configuration Control Board (CCB) or equivalent authority' and that assessing requirement changes 'is normally accomplished through the use of the Configuration Management Process'; page 132 says Requirements Management evaluates change requests and makes changes only 'if approved by change board'. So an agent answering 'Configuration Management / the CCB' is supported for both readings, contradicting the notes' claim that this misses the requirements-baseline reading. The page 135 quote shows RM issues approved changes as an output, not that RM approves them. Check (3) fails.
+
+## Late verification
+
+The verifier batches that had hit the session limit were resumed. Of the 23 items
+they covered, 23 were kept (1 with a fix) and 0 dropped; 0 remain unverified. The kept items were appended with ids from
+q0219 on; no existing id changed. Candidates in items_candidates.jsonl per bucket, blind
+hold-back excluded: answerable 80, ambiguous 31, unanswerable 49, false_premise 41.
+
