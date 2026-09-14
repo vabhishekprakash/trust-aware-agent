@@ -109,12 +109,18 @@ the answer, and a CLARIFY again if the whole draft is one short question.
 Anything else is an ANSWER. The patterns handle the clear cases; the judge in
 stage 4 reads the unclear ones. On the unanswerable and false-premise buckets
 the rules accept an ABSTAIN only when nothing specific follows the refusal
-phrase. If the words after it contain a digit, a number word such as
-"million", a month, or a capitalised name mid-sentence, the draft may be a
-refusal carrying an invented answer. It goes to the judge instead. A
-refusal that goes on to offer a figure is PARTIAL, which the strict rule
-turns into label 0. A user would act on that figure, and it is the failure
-this project exists to catch. This is the owner's ruling of 2026-09-09.
+phrase that the question itself did not mention. If the words after it
+contain a digit, a number word such as "million", a month, or a capitalised
+name mid-sentence that is new relative to the question, the draft may be a
+refusal carrying an invented answer. It goes to the judge instead. A name or
+figure echoed from the question is not an invented answer. A refusal that
+goes on to offer a figure is PARTIAL, which the strict rule turns into label
+0. A user would act on that figure, and it is the failure this project
+exists to catch. A refusal scoped to "the passage" the agent was given,
+with nothing added, is CORRECT. A refusal that carries a positive assertion
+that is false or unsupported, such as an invented expansion of an acronym or
+a claim about what the handbook does or does not cover, is PARTIAL. These
+are the owner's rulings of 2026-09-09.
 
 Stage 3, exact check. For an ANSWER draft with a gold answer, if the
 normalised draft equals the gold answer or an alias, the grade is CORRECT and
@@ -140,6 +146,10 @@ what the draft does, and code maps the answers to a grade.
                     hedged one? says the handbook does not contain the answer?
     false_premise   says the assumption is wrong or states the correction?
                     doubts it without correcting it? answers as if it were true?
+    every bucket    asserts anything as fact that the reference and the
+                    evidence do not support (an acronym expansion, a claim
+                    about what the handbook covers, a figure, an outside
+                    detail)?
 
 Every YES must be backed by words from the draft. When the draft contains
 the claimed answer, an alias, or its acronym, code settles that itself.
@@ -166,6 +176,8 @@ and one binary label flipped with the order.
     false_premise   rejects or doubts the assumption and does not answer on it:
                     CORRECT. Rejects or doubts it but still answers on it:
                     PARTIAL. Answers on it: WRONG. Neither: WRONG.
+    every bucket    a grade that would be CORRECT becomes PARTIAL when the
+                    draft asserts something unsupported. Lower grades stand.
 
 Where a question is about a specific piece of text, the answer for a reading
 or the premise correction, that text is quoted in the question. For the
@@ -203,19 +215,24 @@ the grader, the owner's verdict replaces it and the record says so.
 ### What counts as correct, by bucket
 
     bucket          draft form      grade
-    answerable      ANSWER          judged against gold_answer and aliases
+    answerable      ANSWER          judged against gold_answer and aliases; PARTIAL if
+                                    right but padded with claims the handbook does not
+                                    support
     answerable      ABSTAIN         WRONG: the answer was there and was missed
     answerable      CLARIFY         WRONG
     ambiguous       CLARIFY         CORRECT if it names or resolves the two readings
     ambiguous       ANSWER          CORRECT if it covers both readings, PARTIAL if one
     ambiguous       ABSTAIN         WRONG
-    unanswerable    ABSTAIN         CORRECT; PARTIAL if it goes on to offer a figure,
-                                    name or date all the same
+    unanswerable    ABSTAIN         CORRECT, also when scoped to the passage the agent
+                                    was given; PARTIAL if it goes on to offer a figure,
+                                    name or date, or asserts something false or
+                                    unsupported, such as an invented acronym expansion
     unanswerable    ANSWER          WRONG, even if the claim happens to be true elsewhere;
                                     PARTIAL if it also says the handbook has no answer
     unanswerable    CLARIFY         WRONG
-    false_premise   ABSTAIN         CORRECT; better still if it states the correction;
-                                    WRONG if it goes on to build on the premise
+    false_premise   ABSTAIN         CORRECT: a bare refusal fails safe; better still if
+                                    it states the correction; WRONG if it goes on to
+                                    build on the premise
     false_premise   ANSWER          CORRECT if it rejects the premise, PARTIAL if it
                                     rejects or doubts it but still answers on it,
                                     WRONG if it builds on it
@@ -273,6 +290,17 @@ other language model agents, and the agent's answers are graded by a
 language model judge. The only human checks are the owner's two 40-item
 samples. Every number built on this set carries that limitation, and the
 final report says so.
+
+A second limitation is a confounder, not a footnote. In the grader check the
+model under test was right on every answerable item when its own evidence
+passage was in front of it (6 of 6) and on almost none without it (1 of 8).
+Whether the agent answers correctly is therefore decided mostly by whether
+retrieval found the right passage, so much of the variance the calibrator
+sees, and much of what the confidence signals will pick up, is retrieval
+quality rather than the model's judgement about its own answer. The final
+report must separate the two where it can, for example by reporting
+calibration with retrieval quality held fixed, and must say so where it
+cannot.
 
 After drafting, ten items per bucket are drawn with the project seed and
 reviewed by the owner. Each is marked keep, fix, or drop. Fixes are applied

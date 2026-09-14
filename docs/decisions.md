@@ -369,3 +369,65 @@ owner expected to be the shakiest bucket, matched on every item.
 
 Both figures are measured limitations and go into the final report as they
 stand.
+
+## Owner's rulings on the seven disagreements, 2026-09-09
+
+Sheet 18 was a judge defect and is fixed: the specifics trigger after a
+refusal now fires only on names and figures the question itself did not
+mention, because a capitalised phrase echoed from the question is not an
+invented answer.
+
+Sheets 3 and 5 stay PARTIAL, as the owner graded, under a new rule: an
+abstention scoped to "the passage" stays CORRECT, and an abstention carrying
+a positive assertion that is false, including an invented expansion of an
+acronym, is PARTIAL.
+
+Sheet 34 the owner withdrew: same scoped wording as sheet 18, so CORRECT.
+The owner recorded that the two grades were inconsistent, and the
+scoped-versus-positive rule above is what resolves them.
+
+Sheet 32 stays PARTIAL, as the owner graded. Every bucket now asks the judge
+one more question, whether the candidate asserts anything the handbook does
+not support, and a correct answer padded with outside claims is PARTIAL.
+
+Sheet 16 the owner withdrew: a bare abstention on a false premise fails safe
+and stays CORRECT, as the guide's table said. The owner's stricter reading,
+that a refusal which neither rejects the premise nor answers should be
+WRONG, is recorded here as the alternative, and the final report will show
+the sensitivity of the results to it.
+
+Sheet 19: the guide's rule stands, one reading without the other is
+PARTIAL. The disagreement is an item problem and is handled in the
+ambiguous pass below.
+
+The fixed grader is v8. Rerun on the same 40 drafts, and scored against the
+owner's grades with the two withdrawals applied, it gives a rubric-fidelity
+figure, not a blind one: it measures how faithfully the fixed grader follows
+the rubric the owner settled, on the drafts the fix was designed against.
+The 82 percent first-pass figure stands as the blind number. A second sheet
+of 25 fresh drafts, drawn the same way, gives the honest post-fix agreement
+once the owner has graded it blind.
+
+## Ambiguous pass, 2026-09-09
+
+The blind item check put the item problem in the ambiguous bucket, so every
+ambiguous candidate was tested against one question: would a person asking
+this question have both readings in mind? Of 39 items, 20 hold up, 4 move
+to answerable (the owner's three blind labels and q0124, where the owner's
+grade on the grader check took the Flight Readiness Review as the natural
+answer), 3 are duplicates the code check missed and are dropped, and 12 are
+close calls left to the owner in reports/ambiguous-calls.md, since language
+model verifiers produced the problem and the author of the pass is one too.
+The bucket will end between 20 and 32 items depending on those calls, so
+the 40-item target for ambiguous is out of reach without more drafting; the
+200-item plan (70/40/50/40) may need to accept fewer ambiguous items or a
+second drafting round for that bucket only.
+
+## M2 must implement CLARIFY and ABSTAIN as real actions
+
+On the grader check the model under test scored 0 of 4 on ambiguous items
+and 1 of 4 on false-premise items. Without a clarify action and an abstain
+action available to the agent, the ninety-odd items in those two buckets
+would measure a missing feature rather than confidence. M2 therefore builds
+both as first-class actions of the plan-act loop (ask which reading is
+meant; say the handbook does not cover it), before any signal is measured.

@@ -87,9 +87,27 @@ def main() -> int:
     parser.add_argument("--model", default="qwen2.5:3b-instruct")
     parser.add_argument("--judge", default="llama3.1:latest")
     parser.add_argument("--base-url", default="http://localhost:11434")
+    parser.add_argument("--tag", default="", help="suffix for the sheet and key file names, for a second sheet or a rerun")
+    parser.add_argument("--exclude-key", action="append", default=[], help="key file whose items must not be drawn again")
+    parser.add_argument("--force", action="store_true", help="overwrite an existing sheet, which may hold the owner's grades")
     args = parser.parse_args()
 
+    global SHEET, KEY
+    if args.tag:
+        SHEET = SHEET.with_name(f"grader-check-sheet-{args.tag}.md")
+        KEY = KEY.with_name(f"grader_check_key-{args.tag}.jsonl")
+    if SHEET.exists() and not args.force:
+        print(f"{SHEET} exists and may hold the owner's grades; pass --tag for a new sheet or --force to overwrite")
+        return 1
+
     items = read_items(Path(args.items))
+    used = set()
+    for path in args.exclude_key:
+        for line in Path(path).read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                row = json.loads(line)
+                used.add(row.get("item_id") or row.get("id"))
+    items = [i for i in items if i["id"] not in used]
     rng = random.Random(SEED)
     cache = ROOT / "data" / "cache"
     model = OllamaProvider(model=args.model, base_url=args.base_url, cache_dir=cache)

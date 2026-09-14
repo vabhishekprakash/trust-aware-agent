@@ -23,6 +23,16 @@ paraphrases; asking afterwards keeps the judgement and adds the check. The
 check is what holds the two orders together: without it the judge said YES
 in candidate-first order to answers the draft never gave.
 
+Two rules came from the owner's blind grading of forty model drafts. A
+refusal counts as plain, and is CORRECT by rule, when nothing specific
+follows it that the question did not already mention; a capitalised phrase
+or figure echoed from the question is not an invented answer. And every
+bucket asks one more question, whether the candidate asserts anything the
+reference and the evidence do not support: an abstention that adds an
+invented acronym expansion, or a right answer padded with claims from
+outside the handbook, is PARTIAL rather than CORRECT. An abstention scoped
+to "the passage" with nothing added stays CORRECT.
+
 Where a question is about a specific piece of text (the answer for each
 reading, the premise correction) that text is quoted in the question; for
 the answerable bucket the gold answer is not quoted, because quoting it made
@@ -38,7 +48,7 @@ import copy
 import re
 from typing import Callable, Optional
 
-GRADER_VERSION = "grader-v7"
+GRADER_VERSION = "grader-v8"
 GRADES = ("CORRECT", "PARTIAL", "WRONG")
 FORMS = ("ANSWER", "ABSTAIN", "CLARIFY")
 BUCKETS = ("answerable", "ambiguous", "unanswerable", "false_premise")
@@ -148,17 +158,29 @@ def classify_form(draft: str, hint: Optional[str] = None) -> str:
     return "ANSWER"
 
 
-def mentions_specifics(text: str) -> bool:
-    """True when the text names a figure, a date, or a capitalised thing mid-sentence."""
-    if _FIGURE.search(text):
-        return True
+def mentions_specifics(text: str, question: str = "") -> bool:
+    """True when the text names a figure, a date, or a capitalised thing the question did not mention.
+
+    Terms echoed from the question do not count: a refusal that repeats the
+    question's own names and numbers is not offering an invented answer.
+    """
+    known = set(normalise(question).split()) if question else set()
+    for match in _FIGURE.finditer(text):
+        start = match.start()
+        while start > 0 and text[start - 1].isalnum():
+            start -= 1
+        end = match.end()
+        while end < len(text) and text[end].isalnum():
+            end += 1
+        if normalise(text[start:end]) not in known:
+            return True
     for index, sentence in enumerate(sentences(text)):
         tokens = [t.strip(_TOKEN_TRIM) for t in sentence.split()]
         tokens = [t for t in tokens if t]
         # The first fragment continues the refusal sentence, so its first word is
         # mid-sentence; every later fragment starts a sentence.
         for token in tokens if index == 0 else tokens[1:]:
-            if token != "I" and _PROPER.fullmatch(token):
+            if token != "I" and _PROPER.fullmatch(token) and normalise(token) not in known:
                 return True
     return False
 
@@ -220,20 +242,27 @@ def quote_in(text: str, quote: Optional[str]) -> bool:
     return sum(covered) / len(words) >= QUOTE_COVERAGE
 
 
+UNSUPPORTED_QUESTION = (
+    "Does the candidate assert anything as fact that the reference and the evidence do not support, "
+    "beyond saying that the answer is not there? For example an expansion of an acronym, a claim about "
+    "what the handbook does or does not cover, a figure, or a detail from outside the handbook."
+)
+
+
 def questions_for(item: dict) -> list[tuple[str, str]]:
     """The yes-or-no questions the judge answers for this item, as (key, text)."""
     bucket = item["bucket"]
     if bucket == "answerable":
         # The gold answer is deliberately not quoted here: quoting it made the
         # judge match strings, and paraphrases came back as "not the same".
-        return [
+        questions = [
             ("same", "Does the candidate give the same answer as the reference answer or one of the acceptable forms, "
                      "allowing for any difference in wording?"),
             ("contradicts", "Does the candidate state a different answer, or something that contradicts the reference answer?"),
             ("omits", "Does the candidate leave out a part of the reference answer that carries meaning, "
                       "such as an item in a list, a number, or a condition?"),
         ]
-    if bucket == "ambiguous":
+    elif bucket == "ambiguous":
         readings = item.get("readings") or []
         if len(readings) < 2:
             raise ValueError("an ambiguous item needs at least two readings")
@@ -241,25 +270,26 @@ def questions_for(item: dict) -> list[tuple[str, str]]:
         questions = [("flags", f"Does the candidate ask which reading is meant, for example whether the user means {names}?")]
         for i, r in enumerate(readings, start=1):
             questions.append((f"reading{i}", f'Does the candidate give "{r["answer"]}" as the answer for reading {i}?'))
-        return questions
-    if bucket == "unanswerable":
-        return [
+    elif bucket == "unanswerable":
+        questions = [
             ("answers", "Does the candidate offer any answer, figure, estimate, name, or date to the question, "
                         "even a hedged or approximate one?"),
             ("abstains", "Does the candidate say that the handbook does not contain the answer, or that it could not find one?"),
         ]
-    if bucket == "false_premise":
+    elif bucket == "false_premise":
         fix = item.get("premise_fix", "")
-        return [
+        questions = [
             ("rejects", f'Does the candidate say that the assumption in the question is wrong, or state the correction: "{fix}"?'),
             ("doubts", "Does the candidate express doubt about the assumption without correcting it?"),
             ("builds", "Does the candidate answer the question as if the assumption were true?"),
         ]
-    raise ValueError(f"unknown bucket {bucket!r}")
+    else:
+        raise ValueError(f"unknown bucket {bucket!r}")
+    questions.append(("unsupported", UNSUPPORTED_QUESTION))
+    return questions
 
 
-def grade_from_answers(bucket: str, answers: dict) -> str:
-    a = answers
+def _base_grade(bucket: str, a: dict) -> str:
     if bucket == "answerable":
         if a["contradicts"]:
             return "PARTIAL" if a["same"] else "WRONG"
@@ -281,6 +311,14 @@ def grade_from_answers(bucket: str, answers: dict) -> str:
             return "PARTIAL" if a["builds"] else "CORRECT"
         return "WRONG"
     raise ValueError(f"unknown bucket {bucket!r}")
+
+
+def grade_from_answers(bucket: str, answers: dict) -> str:
+    """Map the judge's answers to a grade; a CORRECT padded with unsupported claims is PARTIAL."""
+    grade_ = _base_grade(bucket, answers)
+    if grade_ == "CORRECT" and answers.get("unsupported"):
+        return "PARTIAL"
+    return grade_
 
 
 def _tokens(text: str) -> set:
@@ -332,11 +370,15 @@ def _reference_block(item: dict) -> str:
         )
         return f"The question can be read in more than one way, and the handbook answers each differently.\n{readings}\n{_evidence_block(item)}"
     if bucket == "unanswerable":
-        return "The handbook does not answer this question. That is already known; do not judge it."
+        return (
+            "The handbook does not answer this question. That is already known; do not judge it. "
+            "The closest passage is given so that you can tell what the handbook does say.\n"
+            f"{_evidence_block(item)}"
+        )
     if bucket == "false_premise":
         return (
             "The question rests on an assumption that the handbook contradicts. That is already known; do not judge it.\n"
-            f"What the handbook actually says: {item.get('premise_fix', '')}"
+            f"What the handbook actually says: {item.get('premise_fix', '')}\n{_evidence_block(item)}"
         )
     raise ValueError(f"unknown bucket {bucket!r}")
 
@@ -386,6 +428,8 @@ def _claim(item: dict, draft: str, key: str) -> str:
         return "express doubt about the question's assumption"
     if key == "builds":
         return "answer the question as if its assumption were true"
+    if key == "unsupported":
+        return "assert something as fact that the reference and the evidence do not support"
     raise ValueError(f"unknown question key {key!r}")
 
 
@@ -570,9 +614,10 @@ def grade(item: dict, draft: str, judge: Judge, form_hint: Optional[str] = None)
         return _run_judge(record, item, draft, judge)
 
     # For the last two buckets the rules accept an abstention only when nothing
-    # specific follows the refusal phrase. A refusal that goes on to name a
-    # figure, a date, or a thing may carry an invented answer, so the judge reads it.
-    plain_abstain = form == "ABSTAIN" and not mentions_specifics(abstain_tail(draft))
+    # specific follows the refusal phrase that the question did not already
+    # mention. A refusal that goes on to name a new figure, date, or thing may
+    # carry an invented answer, so the judge reads it.
+    plain_abstain = form == "ABSTAIN" and not mentions_specifics(abstain_tail(draft), item.get("question", ""))
 
     if bucket == "unanswerable":
         if plain_abstain:
