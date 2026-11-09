@@ -76,8 +76,7 @@ scripts/build_features.py with scripts/paid_signals.py (features),
 scripts/fit_calibrator.py and scripts/finalize_calibrator.py (the
 calibrator), scripts/policy_curve.py and scripts/policy_apply.py (the
 thresholds). Every model call is cached under data/cache, so reruns are
-cheap. The test split is read by one script, once, at the end; that
-script arrives with milestone M8.
+cheap. The test split is read once, at the end, by scripts/evaluate_test.py.
 
 ## Layout
 
@@ -116,11 +115,20 @@ or beat the paid ones (agreement alone 0.71 [0.60, 0.80], free signals
 overlapping). The grader's labels were checked blind three times; the
 signed-off figure is 19 of 20 on real agent outputs.
 
-Full report: docs/report.md. The plain-language version:
-docs/layman-guide.md. The choices and why, including the ones that
-turned out wrong: docs/decisions.md. The preregistration the test read
-was held to: reports/m8-preregistration.md.
+Full report: [docs/report.md](docs/report.md). Plain-language version:
+[docs/layman-guide.md](docs/layman-guide.md). The choices and the reasons
+for them, including the ones that turned out wrong:
+[docs/decisions.md](docs/decisions.md). The test read followed the
+preregistration in [reports/m8-preregistration.md](reports/m8-preregistration.md).
 
+## How AI was used
+
+  I built this with Claude Code, an AI coding agent, working under my direction.
+  The 200 evaluation questions were drafted and verified by language-model
+  agents (docs/report.md), and several audits in docs/decisions.md were run by
+  language-model agents; those entries say so. I graded the blind check sheets
+  myself.
+  
 ## License
 
 MIT. See LICENSE.
