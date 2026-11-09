@@ -1,3 +1,5 @@
+[![tests](https://github.com/vabhishekprakash/trust-aware-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/vabhishekprakash/trust-aware-agent/actions/workflows/tests.yml)
+
 # Trust-aware agent
 
 A question-answering agent that retrieves from a fixed document set, uses
